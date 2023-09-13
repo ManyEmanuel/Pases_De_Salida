@@ -241,7 +241,6 @@ export const useSolicitudPaseStore = defineStore("solicitudPase", {
         let resp = await api.get(`/PasesSalida/${id}`);
         let { success, data } = resp.data;
         let img = new Image();
-        console.log("Esto es data", data);
         img.src = require("../assets/IEEN300.png");
         if (success == true) {
           const doc = new jsPDF();
@@ -410,8 +409,11 @@ export const useSolicitudPaseStore = defineStore("solicitudPase", {
             doc.setLineWidth(0.1);
             doc.line(56, 70, 185, 70);
             doc.text("VEHÍCULO:", 53, 69, null, null, "right");
-            doc.text(data.vehiculo, 56, 69, null, null);
-
+            if (data.rol == "Chofer") {
+              doc.text(data.vehiculo, 56, 69, null, null);
+            } else {
+              doc.text("Vehículo Oficial", 56, 69, null, null);
+            }
             doc.text("ASUNTO:", 53, 75, null, null, "right");
             //doc.rect(56, 72, 129, 25);
             let texto = data.asunto;
@@ -428,8 +430,11 @@ export const useSolicitudPaseStore = defineStore("solicitudPase", {
             doc.setLineWidth(0.1);
             doc.line(56, 204, 185, 204);
             doc.text("VEHÍCULO:", 53, 203, null, null, "right");
-            doc.text(data.vehiculo, 56, 203, null, null);
-
+            if (data.rol == "Chofer") {
+              doc.text(data.vehiculo, 56, 203, null, null);
+            } else {
+              doc.text("Vehículo Oficial", 56, 203, null, null);
+            }
             doc.text("ASUNTO:", 53, 209, null, null, "right");
             //doc.rect(56, 72, 129, 25);
             var lines = doc.splitTextToSize(texto, 128); // 80 is the maximum width of line (you can change it according to your needs)
@@ -447,7 +452,12 @@ export const useSolicitudPaseStore = defineStore("solicitudPase", {
             doc.setLineWidth(0.1);
             doc.line(56, 70, 185, 70);
             doc.text("VEHÍCULO:", 53, 69, null, null, "right");
-            doc.text("Sin vehículo requerido", 56, 69, null, null);
+            if (data.rol == "Pasajero") {
+              doc.text("Vehículo Oficial", 56, 69, null, null);
+            } else {
+              doc.text("Sin vehículo requerido", 56, 69, null, null);
+            }
+
             doc.text("ASUNTO:", 53, 75, null, null, "right");
             let texto = data.asunto;
             var lines = doc.splitTextToSize(texto, 130); // 80 is the maximum width of line (you can change it according to your needs)
@@ -463,7 +473,11 @@ export const useSolicitudPaseStore = defineStore("solicitudPase", {
             doc.setLineWidth(0.1);
             doc.line(56, 204, 185, 204);
             doc.text("VEHÍCULO:", 53, 203, null, null, "right");
-            doc.text("Sin vehículo requerido", 56, 203, null, null);
+            if (data.rol == "Pasajero") {
+              doc.text("Vehículo Oficial", 56, 203, null, null);
+            } else {
+              doc.text("Sin vehículo requerido", 56, 203, null, null);
+            }
             doc.text("ASUNTO:", 53, 209, null, null, "right");
             var lines = doc.splitTextToSize(texto, 130); // 80 is the maximum width of line (you can change it according to your needs)
             var y = 209;

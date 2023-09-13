@@ -267,11 +267,20 @@
               v-model="verVehiculo"
               size="lg"
               color="green"
-              label="Solicitar vehículo oficial"
+              label="Solicitar vehículo oficial (Chofer o pasajero)"
+            />
+            <br />
+            <q-option-group
+              v-if="verVehiculo == true"
+              v-model="rol"
+              :options="opcionesRol"
+              color="purple"
+              left-label
+              inline
             />
           </div>
           <div
-            v-if="verVehiculo == true"
+            v-if="verVehiculo == true && rol == 'Chofer'"
             class="col-lg-6 col-md-6 col-sm-12 col-xs-12"
           >
             <q-select
@@ -279,6 +288,7 @@
               :options="vehiculos"
               label="Vehiculos disponibles"
               hint="Seleccione un vehiculo"
+              :loading="loadingVehiculo"
             >
             </q-select>
           </div>
@@ -317,7 +327,7 @@
 </template>
 
 <script setup>
-import { onBeforeMount, ref, watch } from "vue";
+import { onBeforeMount, ref, watch, watchEffect } from "vue";
 import { storeToRefs } from "pinia";
 import { useQuasar } from "quasar";
 import { useAuthStore } from "../../../stores/auth_store";
@@ -333,6 +343,11 @@ let verVehiculo = ref(false);
 let verCombo = ref(false);
 let areaRead = ref(false);
 let personalRead = ref(false);
+let rol = ref("Chofer");
+let opcionesRol = ref([
+  { label: "Chofer", value: "Chofer" },
+  { label: "Pasajero", value: "Pasajero" },
+]);
 const tipoPase = ref(null);
 const asuntoPase = ref(null);
 const opcionTipoPase = ref(["Entrada", "Intermedio", "Salida"]);
@@ -344,6 +359,7 @@ const horasLlegada = [
 ];
 const empleado_Id = ref(null);
 const vehiculo_Id = ref(null);
+const loadingVehiculo = ref(false);
 
 const { pase, modal, areas, empleados, myLocale, vehiculos, isEditar } =
   storeToRefs(pasesStore);
@@ -354,11 +370,12 @@ const actualizarModal = (valor) => {
   empleado_Id.value = null;
   area_Id.value = null;
   vehiculo_Id.value = null;
+  verVehiculo.value = false;
 };
 
 onBeforeMount(() => {
   pasesStore.loadInformacionPase();
-  pasesStore.loadVehiculos();
+  //pasesStore.loadVehiculos();
 });
 
 watch(area_Id, (val) => {
@@ -373,6 +390,16 @@ watch(area_Id, (val) => {
 watch(empleado_Id, (val) => {
   if (val != null) {
     pasesStore.loadPuestoPersonal(empleado_Id.value.value);
+  }
+});
+
+watchEffect(async () => {
+  if (pase.value.llegada != null) {
+    loadingVehiculo.value = true;
+    let fecha = pase.value.salida.split(" ");
+    let fechaRegreso = fecha[0] + " " + pase.value.llegada;
+    await pasesStore.loadVehiculos(pase.value.salida, fechaRegreso);
+    loadingVehiculo.value = false;
   }
 });
 
@@ -399,15 +426,16 @@ watch(pase.value, (val) => {
     cargarArea(val);
     cargarEmpleado(val);
     cargarVehiculo(val);
+    if (val.rol != null) {
+      rol.value = val.rol;
+    }
   }
   if (val.area_Id != null) {
-    console.log("Esta verificando el area");
     let areaFiltrada = areas.value.find((x) => x.value == val.area_Id);
     area_Id.value = areaFiltrada;
     areaRead.value = true;
   }
   if (val.solicitante_Id != null) {
-    console.log("Esta verificando el personal");
     let personalFiltrado = empleados.value.find(
       (x) => x.value == val.solicitante_Id
     );
@@ -454,8 +482,13 @@ const onSubmit = async () => {
   $q.loading.show();
   pase.value.solicitante_Id = empleado_Id.value.value;
   pase.value.area_Id = area_Id.value.value;
+  if (verVehiculo.value == true) {
+    pase.value.rol = rol.value;
+  }
   if (vehiculo_Id.value != null) {
-    pase.value.vehiculo_Id = vehiculo_Id.value.value;
+    if (rol.value == "Chofer") {
+      pase.value.vehiculo_Id = vehiculo_Id.value.value;
+    }
   }
   if (pase.value.tipo_Pase != "Intermedio") {
     if (isEditar.value == true) {

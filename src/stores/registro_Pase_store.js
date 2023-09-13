@@ -35,6 +35,7 @@ export const useRegistroPaseStore = defineStore("registroPase", {
       tipo_Pase: null,
       asunto: null,
       fecha_Creacion: null,
+      rol: null,
     },
     paseConsulta: {
       id: null,
@@ -60,6 +61,7 @@ export const useRegistroPaseStore = defineStore("registroPase", {
       tipo_Pase: null,
       asunto: null,
       fecha_Creacion: null,
+      rol: null,
     },
     myLocale: {
       days: "Domingo_Lunes_Martes_Miércoles_Jueves_Viernes_Sábado".split("_"),
@@ -99,6 +101,7 @@ export const useRegistroPaseStore = defineStore("registroPase", {
       this.pase.tipo_Pase = null;
       this.pase.asunto = null;
       this.pase.fecha_Creacion = null;
+      this.pase.rol = null;
     },
     initPaseConsulta() {
       this.paseConsulta.id = null;
@@ -124,6 +127,7 @@ export const useRegistroPaseStore = defineStore("registroPase", {
       this.paseConsulta.tipo_Pase = null;
       this.paseConsulta.asunto = null;
       this.paseConsulta.fecha_Creacion = null;
+      this.paseConsulta.rol = null;
     },
 
     async loadInformacionPase() {
@@ -134,7 +138,6 @@ export const useRegistroPaseStore = defineStore("registroPase", {
         let dataresp = resp.data.data;
 
         if (perfil == 1) {
-          console.log("Entro en 1");
           let respArea = await api.get("Areas/GetLista");
           let { data } = respArea.data;
           let listAreas = data.map((areas) => {
@@ -145,7 +148,6 @@ export const useRegistroPaseStore = defineStore("registroPase", {
           });
           this.areas = listAreas.filter((x) => x.value != 13 && x.value != 21);
         } else if (perfil == 2) {
-          console.log("Entro en 2");
           let respArea = await api.get("/Areas/AreaByUsuario");
           let { data } = respArea.data;
           let listAreas = [{ value: data.area_Id, label: data.area }];
@@ -169,9 +171,7 @@ export const useRegistroPaseStore = defineStore("registroPase", {
           this.empleados = listPersonal;
           this.pase.responsable_Area = dataresp.empleado;
           this.pase.responsable_Area_Id = dataresp.empleado_Id;
-          console.log("Esto es data");
         } else if (perfil == 3) {
-          console.log("Entro en 3");
           let respArea = await api.get("/Areas/AreaByUsuario");
           let { data } = respArea.data;
           let listAreas = [{ value: data.area_Id, label: data.area }];
@@ -333,6 +333,7 @@ export const useRegistroPaseStore = defineStore("registroPase", {
             this.pase.tipo_Pase = data.tipo_Pase;
             this.pase.asunto = data.asunto;
             this.pase.fecha_Creacion = data.fecha_Creacion;
+            this.pase.rol = data.rol;
           }
         }
       } catch (error) {
@@ -376,6 +377,7 @@ export const useRegistroPaseStore = defineStore("registroPase", {
             this.paseConsulta.tipo_Pase = data.tipo_Pase;
             this.paseConsulta.asunto = data.asunto;
             this.paseConsulta.fecha_Creacion = data.fecha_Creacion;
+            this.paseConsulta.rol = data.rol;
           }
         }
       } catch (error) {
@@ -417,7 +419,7 @@ export const useRegistroPaseStore = defineStore("registroPase", {
       const resp = await api.get("/ResponsablesAreas");
       let { success, data } = resp.data;
       let filtro = data.find((x) => x.area_Id == id);
-      console.log("Esto es filtro del responsable de area ", filtro);
+
       this.pase.responsable_Area = filtro.empleado;
       this.pase.responsable_Area_Id = filtro.empleado_Id;
     },
@@ -427,7 +429,7 @@ export const useRegistroPaseStore = defineStore("registroPase", {
       let listResponsable = per.data.data;
       const resp = await api.get(`/Empleados/${id}`);
       let { success, data } = resp.data;
-      console.log("Este es el puesto", data);
+
       this.pase.puesto_Solicitante = data.puesto;
       this.pase.puesto_Solicitante_Id = data.puesto_Id;
       let filtro = listResponsable.find((x) => x.empleado_Id == id);
@@ -441,14 +443,19 @@ export const useRegistroPaseStore = defineStore("registroPase", {
         this.pase.responsable_Area_Id = filtro2.empleado_Id;
       } else {
         let filtro2 = listResponsable.find((x) => x.area_Id == data.area_Id);
-        console.log("Esto es filtro del responsable de area ", filtro);
+
         this.pase.responsable_Area = filtro2.empleado;
         this.pase.responsable_Area_Id = filtro2.empleado_Id;
       }
     },
 
-    async loadVehiculos() {
-      const resp = await api.get("/Vehiculos/GetLista");
+    async loadVehiculos(inicio, fin) {
+      this.vehiculos = [];
+      const resp = await api.post("/Vehiculos/GetListaDisponible", {
+        fecha_Inicio: inicio,
+        fecha_Fin: fin,
+      });
+
       let { success, data } = resp.data;
       let listVehiculo = data.map((vehiculo) => {
         return {
@@ -461,7 +468,6 @@ export const useRegistroPaseStore = defineStore("registroPase", {
 
     async createPase(pase) {
       try {
-        console.log("Esto es pase", pase);
         const resp = await api.post("/PasesSalida", pase);
         if (resp.status == 200) {
           const { success, data } = resp.data;
@@ -515,8 +521,7 @@ export const useRegistroPaseStore = defineStore("registroPase", {
         const resp = await api.get(`/PasesSalida/Cancelar/${id}`);
         if (resp.status == 200) {
           let { success, data } = resp.data;
-          console.log(resp.data);
-          console.log("Esto es success", success, "Esto es data", data);
+
           if (success === true) {
             return { success, data };
           } else {
@@ -548,7 +553,6 @@ export const useRegistroPaseStore = defineStore("registroPase", {
           };
         } else if (llegada.getHours() == salida.getHours()) {
           if (llegada.getMinutes() > salida.getMinutes()) {
-            console.log("Es mayor");
             return {
               success: true,
               data: "Hora bien",
@@ -560,7 +564,6 @@ export const useRegistroPaseStore = defineStore("registroPase", {
             };
           }
         } else {
-          console.log("Es menor");
           return {
             success: false,
             data: "La hora estimada de llegada, debe ser mayor a la hora de salida",

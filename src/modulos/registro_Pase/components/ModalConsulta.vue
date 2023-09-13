@@ -137,6 +137,19 @@
             >
             </q-input>
           </div>
+          <div
+            v-if="
+              paseConsulta.tipo_Pase == 'Intermedio' && paseConsulta.rol != null
+            "
+            class="col-lg-6 col-md-6 col-sm-12 col-xs-12"
+          >
+            <q-input
+              v-model="paseConsulta.rol"
+              readonly
+              label="Rol en el vehículo"
+            >
+            </q-input>
+          </div>
           <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
             <q-input
               v-model="paseConsulta.asunto"
