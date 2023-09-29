@@ -20,6 +20,11 @@ const routes = [
         name: "registro_General",
         component: () => import("../modulos/registro_General/pages/IndexPage"),
       },
+      {
+        path: "/registro_Justificante",
+        name: "registro_Justificante",
+        component: () => import("../modulos/justificantes/pages/IndexPage"),
+      },
     ],
   },
 
