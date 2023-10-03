@@ -26,7 +26,7 @@
         <template v-slot:body="props">
           <q-tr :props="props">
             <q-td v-for="col in props.cols" :key="col.name" :props="props">
-              <div v-if="col.name === 'inventario_Id'">
+              <div v-if="col.name === 'id'">
                 <q-btn
                   v-if="isEditar"
                   disable
@@ -94,10 +94,10 @@ const columns = [
     sortable: true,
   },
   {
-    name: "incidencia_Id",
+    name: "id",
     align: "center",
     label: "Acciones",
-    field: "incidencia_Id",
+    field: "id",
     sortable: false,
   },
 ];

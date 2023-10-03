@@ -29,6 +29,17 @@
             <q-td v-for="col in props.cols" :key="col.name" :props="props">
               <div v-if="col.name === 'justificante_Id'">
                 <q-btn
+                  v-show="modulo.leer && props.row.estatus != 'Pendiente'"
+                  flat
+                  round
+                  color="purple-ieen"
+                  icon="search"
+                  @click="visualizar(col.value)"
+                >
+                  <q-tooltip>Ver asignación</q-tooltip>
+                </q-btn>
+                <q-btn
+                  v-if="modulo.actualizar && props.row.estatus == 'Pendiente'"
                   flat
                   round
                   color="purple-ieen"
@@ -38,13 +49,24 @@
                   <q-tooltip>Editar justificante</q-tooltip>
                 </q-btn>
                 <q-btn
+                  v-if="modulo.actualizar && props.row.estatus == 'Pendiente'"
+                  flat
+                  round
+                  color="purple-ieen"
+                  icon="cancel_schedule_send"
+                  @click="cancelar(col.value)"
+                >
+                  <q-tooltip>Cancelar justificante</q-tooltip>
+                </q-btn>
+                <q-btn
+                  v-if="modulo.eliminar && props.row.estatus == 'Pendiente'"
                   flat
                   round
                   color="purple-ieen"
                   icon="cancel"
-                  @click="cancelar(col.value)"
+                  @click="rechazar(col.value)"
                 >
-                  <q-tooltip>Cancelar justificante</q-tooltip>
+                  <q-tooltip>Rechazar justificante</q-tooltip>
                 </q-btn>
               </div>
               <label v-else>{{ col.value }}</label>
@@ -60,13 +82,24 @@
 import { onBeforeMount, ref } from "vue";
 import { useJustificanteStore } from "src/stores/justificantes_store";
 import { storeToRefs } from "pinia";
+import { useQuasar } from "quasar";
+import { useAuthStore } from "src/stores/auth_store";
 
+//-----------------------------------------------------------
+
+const $q = useQuasar();
 const justificanteStore = useJustificanteStore();
 const { justificantes } = storeToRefs(justificanteStore);
+const authStore = useAuthStore();
+const { modulo } = storeToRefs(authStore);
+//-----------------------------------------------------------
 
 onBeforeMount(() => {
   justificanteStore.loadJustificantes();
 });
+
+//-----------------------------------------------------------
+
 const columns = [
   {
     name: "folio",
@@ -136,7 +169,6 @@ const columns = [
 ];
 
 const pagination = ref({
-  //********** */
   page: 1,
   rowsPerPage: 25,
   sortBy: "name",
@@ -144,6 +176,66 @@ const pagination = ref({
 });
 
 const filter = ref("");
+
+//-----------------------------------------------------------
+
+const cancelar = async (id) => {
+  $q.dialog({
+    title: "Cancelar asignación",
+    message: "Al aceptar, se cancelará el justificante",
+    icon: "Warning",
+    persistent: true,
+    transitionShow: "scale",
+    transitionHide: "scale",
+    ok: {
+      color: "positive",
+      label: "Si, Aceptar",
+    },
+    cancel: {
+      color: "negative",
+      label: "No cancelar",
+    },
+  }).onOk(async () => {
+    $q.loading.show();
+    const resp = await justificanteStore.cancelarJustificante(id);
+    if (resp.success) {
+      $q.loading.hide();
+      $q.notify({
+        position: "top-right",
+        type: "positive",
+        message: resp.data,
+      });
+      justificanteStore.loadJustificantes();
+    } else {
+      $q.loading.hide();
+      $q.notify({
+        position: "top-right",
+        type: "negative",
+        message: resp.data,
+      });
+    }
+  });
+};
+
+const editar = async (id) => {
+  $q.loading.show();
+  await justificanteStore.loadJustificante(id);
+  await justificanteStore.loadDetalleJustificantes(id);
+  justificanteStore.actualizarModal(true);
+  justificanteStore.updateEditar(true);
+  justificanteStore.updateVisualizar(false);
+  $q.loading.hide();
+};
+
+const visualizar = async (id) => {
+  $q.loading.show();
+  await justificanteStore.loadJustificante(id);
+  await justificanteStore.loadDetalleJustificantes(id);
+  justificanteStore.actualizarModal(true);
+  justificanteStore.updateEditar(true);
+  justificanteStore.updateVisualizar(true);
+  $q.loading.hide();
+};
 </script>
 
 <style></style>

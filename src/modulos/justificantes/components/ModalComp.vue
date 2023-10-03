@@ -22,7 +22,15 @@
         <q-form class="q-col-gutter-xs" @submit="onSubmit">
           <div class="row">
             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+              <q-input
+                v-if="isVisualizar"
+                readonly
+                v-model="justificante.area"
+                label="Área"
+              >
+              </q-input>
               <q-select
+                v-else
                 v-model="area_Id"
                 :options="areas"
                 label="Area del empleado"
@@ -35,6 +43,14 @@
             </div>
             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
               <q-input
+                v-if="isVisualizar"
+                readonly
+                v-model="justificante.responsable_Area"
+                label="Área"
+              >
+              </q-input>
+              <q-input
+                v-else
                 stack-label
                 v-model="justificante.responsable_Area"
                 label="Empleado responsable de área"
@@ -44,6 +60,14 @@
             </div>
             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
               <q-input
+                v-if="isVisualizar"
+                readonly
+                v-model="justificante.empleado"
+                label="Área"
+              >
+              </q-input>
+              <q-input
+                v-else
                 stack-label
                 v-model="justificante.empleado"
                 label="Empleado que realiza la captura de la solicitud"
@@ -52,7 +76,10 @@
               </q-input>
             </div>
 
-            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            <div
+              v-if="!isVisualizar"
+              class="col-lg-12 col-md-12 col-sm-12 col-xs-12"
+            >
               <q-select
                 stack-label
                 v-model="empleado_Id"
@@ -65,11 +92,13 @@
               >
               </q-select>
               <br />
-              <q-separator color="purple" />
               <div class="text-h6 q-pt-xs text-bold">Incidencia</div>
             </div>
 
-            <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 q-pt-md">
+            <div
+              v-if="!isVisualizar"
+              class="col-lg-6 col-md-6 col-sm-12 col-xs-12 q-pt-md"
+            >
               <q-btn-dropdown
                 class="bg-purple-ieen-3 text-white"
                 :label="tipo == null ? 'Seleccione una opcion' : tipo"
@@ -90,7 +119,10 @@
                 </q-list>
               </q-btn-dropdown>
             </div>
-            <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 q-pt-xs">
+            <div
+              v-if="!isVisualizar"
+              class="col-lg-6 col-md-6 col-sm-12 col-xs-12 q-pt-xs"
+            >
               <q-input label="Fecha" v-model="days">
                 <template v-slot:append>
                   <q-icon name="event" class="cursor-pointer">
@@ -106,7 +138,7 @@
               </q-input>
             </div>
           </div>
-          <div class="row" v-if="tipo == 'Vacaciones'">
+          <div class="row" v-if="tipo == 'Vacaciones' && !isVisualizar">
             <text-body2 class="text-bold q-pt-xs"
               >Periodo vacacional</text-body2
             >
@@ -127,7 +159,7 @@
               />
             </div>
           </div>
-          <div class="col-12">
+          <div v-if="!isVisualizar" class="col-12">
             <q-input
               v-model="motivo"
               label="Motivo: (Especificar en todos los casos)"
@@ -137,7 +169,7 @@
               hint="Máximo 200 carácteres"
             />
           </div>
-          <div class="col-12">
+          <div v-if="!isVisualizar" class="col-12">
             <div class="text-right">
               <q-btn
                 label="Agregar"
@@ -163,7 +195,7 @@
                 @click="actualizarModal(false)"
               />
               <q-btn
-                :disable="listaConceptos.value == ''"
+                :disable="listaIncidencias.value == ''"
                 label="Guardar"
                 type="submit"
                 color="secondary"
@@ -190,11 +222,11 @@ const $q = useQuasar();
 const justificanteStore = useJustificanteStore();
 const {
   modal,
-  listaConceptos,
   justificante,
   listEmpleados,
   areas,
   isEditar,
+  isVisualizar,
   listaIncidencias,
 } = storeToRefs(justificanteStore);
 const tipoJustificante = ref([
@@ -213,11 +245,22 @@ const area_Id = ref(null);
 const motivo = ref(null);
 let areaRead = ref(false);
 let personalRead = ref(false);
+
 //-----------------------------------------------------------
+
 onBeforeMount(() => {
   justificanteStore.loadInformacionJustificante();
   // justificanteStore.loadAreaByUsuario();
   justificanteStore.loadEmpleadosByUsuario();
+});
+
+//-----------------------------------------------------------
+watch(justificante.value, (val) => {
+  console.log("envio val", val);
+  if (val.id != null) {
+    cargarArea(val);
+    cargarSolicitante(val);
+  }
 });
 
 watch(justificante.value, (val) => {
@@ -246,80 +289,105 @@ watch(empleado_Id, (val) => {
     justificanteStore.loadResponsabeArea(val.value);
   }
 });
+
+//-----------------------------------------------------------
+
+const cargarArea = async (val) => {
+  if (area_Id.value == null) {
+    let areaFiltrado = areas.value.find((x) => x.value == `${val.area_Id}`);
+    area_Id.value = areaFiltrado;
+  }
+};
+
+const cargarSolicitante = async (val) => {
+  console.log("list empleados", listEmpleados.value);
+  if (empleado_Id.value == null) {
+    let solicitanteFiltrado = listEmpleados.value.find(
+      (x) => x.label == `${val.solicitante}`
+    );
+    empleado_Id.value = solicitanteFiltrado;
+  }
+};
+
 const actualizarModal = (valor) => {
   $q.loading.show();
   justificanteStore.actualizarModal(valor);
+  limpiarCampos();
   $q.loading.hide();
 };
 
 const onItemClick = (val) => {
-  console.log(val);
   tipo.value = val;
 };
 
 const agregarIncidencia = async () => {
-  const resultado = days.value.join(", ");
-  console.log(resultado);
-  await justificanteStore.addIncidencia(resultado, motivo.value, tipo.value);
+  if (tipo.value == null || motivo.value == null || days.value == "") {
+    $q.notify({
+      position: "top-right",
+      type: "negative",
+      message: "Campos incompletos",
+    });
+  } else {
+    const resultado = days.value.join(", ");
+    console.log("motivo", tipo.value);
+    await justificanteStore.addIncidencia(resultado, motivo.value, tipo.value);
+    limpiarCampos();
+  }
+};
+
+const limpiarCampos = () => {
+  tipo.value = null;
+  days.value = null;
+  motivo.value = null;
+  justificanteStore.initJustificante();
 };
 
 const onSubmit = async () => {
   let resp = null;
   let respDetalle = null;
   $q.loading.show();
-  if (listaConceptos == "") {
+  if (listaIncidencias.value == "") {
     $q.dialog({
       title: "Atención",
-      message: "Debes de agregar minimo un concepto",
+      message: "Debes de agregar minimo una incidencia",
       icon: "Warning",
       persistent: true,
       transitionShow: "scale",
       transitionHide: "scale",
     });
   } else {
-    console.log("empleado id", empleado_Id.value.value);
+    justificante.value.area_Id = area_Id.value.value;
     justificante.value.solicitante_Id = empleado_Id.value.value;
-    justificante.value.puesto_Solicitante_Id = 74;
+    justificante.value.puesto_Solicitante_Id = empleado_Id.value.puesto_Id;
     if (isEditar.value == true) {
     } else {
       resp = await justificanteStore.createJustificante(justificante.value);
-      console.log("resp", resp);
       if (resp.success == true) {
-        console.log("entro succes", listaIncidencias.value);
-        // for (let index = 0; index < listaIncidencias.value.length; index++) {
-        //   const element = array[index];
-        //   respDetalle = await justificanteStore.createDetalleJustificantes(
-        //     resp.idJustificante,
-        //     element
-        //   );
-        // }
         listaIncidencias.value.forEach((element) => {
-          console.log("element", element);
           respDetalle = justificanteStore.createDetalleJustificantes(
             resp.idJustificante,
             element
           );
-          console.log("resp", respDetalle);
         });
       }
     }
-    // if (resp.success) {
-    //   $q.notify({
-    //     position: "top-right",
-    //     type: "positive",
-    //     message: resp.data,
-    //   });
-    //   justificanteStore.loadJustificantes();
-    //   actualizarModal(false);
-    // } else {
-    //   $q.notify({
-    //     position: "top-right",
-    //     type: "negative",
-    //     message: resp.data,
-    //   });
-    // }
   }
 
+  if (resp.success) {
+    $q.notify({
+      position: "top-right",
+      type: "positive",
+      message: resp.data,
+    });
+    justificanteStore.loadJustificantes();
+    actualizarModal(false);
+  } else {
+    $q.notify({
+      position: "top-right",
+      type: "negative",
+      message: resp.data,
+    });
+  }
   $q.loading.hide();
 };
 </script>
