@@ -46,14 +46,14 @@
                 v-if="isVisualizar"
                 readonly
                 v-model="justificante.responsable_Area"
-                label="Área"
+                label="Responsable del área"
               >
               </q-input>
               <q-input
                 v-else
                 stack-label
                 v-model="justificante.responsable_Area"
-                label="Empleado responsable de área"
+                label="Responsable de área"
                 readonly
               >
               </q-input>
@@ -62,8 +62,8 @@
               <q-input
                 v-if="isVisualizar"
                 readonly
-                v-model="justificante.empleado"
-                label="Área"
+                v-model="justificante.capturista"
+                label="Empleado que realiza la captura de la solicitud"
               >
               </q-input>
               <q-input
@@ -76,11 +76,16 @@
               </q-input>
             </div>
 
-            <div
-              v-if="!isVisualizar"
-              class="col-lg-12 col-md-12 col-sm-12 col-xs-12"
-            >
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+              <q-input
+                v-if="isVisualizar"
+                readonly
+                v-model="justificante.solicitante"
+                label="Solicitante"
+              >
+              </q-input>
               <q-select
+                v-else
                 stack-label
                 v-model="empleado_Id"
                 :options="listEmpleados"
@@ -234,7 +239,7 @@ const tipoJustificante = ref([
   "Omisión de salida",
   "Comisión oficial",
   "Permiso día económico",
-  "Permuta por dia laborado",
+  "Permuta por día laborado",
   "Vacaciones",
 ]);
 const days = ref([]);
@@ -312,6 +317,7 @@ const cargarSolicitante = async (val) => {
 const actualizarModal = (valor) => {
   $q.loading.show();
   justificanteStore.actualizarModal(valor);
+  justificanteStore.updateVisualizar(false);
   limpiarCampos();
   $q.loading.hide();
 };

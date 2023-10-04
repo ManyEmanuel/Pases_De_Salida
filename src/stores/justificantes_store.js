@@ -127,6 +127,7 @@ export const useJustificanteStore = defineStore("justificante", {
         const resp = await api.get(`/Justificantes_/${id}`);
         if (resp.status == 200) {
           const { success, data } = resp.data;
+          console.log("---", data);
           if (success == true) {
             this.justificante.id = data.id;
             this.justificante.responsable_Area_Id = data.responsable_Area_Id;
