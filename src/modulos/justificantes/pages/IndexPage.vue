@@ -28,7 +28,6 @@
         </div>
       </div>
     </div>
-    <q-btn @click="descargar()">Descargar</q-btn>
     <ModalCompVue />
     <TablaComp />
   </q-page>
@@ -65,10 +64,6 @@ const actualizarModal = (valor) => {
   $q.loading.show();
   justificanteStore.actualizarModal(valor);
   $q.loading.hide();
-};
-
-const descargar = async () => {
-  ValeJustificante();
 };
 </script>
 

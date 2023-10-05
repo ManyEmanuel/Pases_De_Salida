@@ -36,7 +36,7 @@
                   icon="send"
                   @click="aprobar(col.value)"
                 >
-                  <q-tooltip>Ver asignación</q-tooltip>
+                  <q-tooltip>Aprobar justificante</q-tooltip>
                 </q-btn>
                 <q-btn
                   v-show="modulo.leer && props.row.estatus != 'Pendiente'"
@@ -46,7 +46,17 @@
                   icon="search"
                   @click="visualizar(col.value)"
                 >
-                  <q-tooltip>Ver asignación</q-tooltip>
+                  <q-tooltip>Ver justificante</q-tooltip>
+                </q-btn>
+                <q-btn
+                  v-show="modulo.leer && props.row.estatus == 'Aprobado'"
+                  flat
+                  round
+                  color="purple-ieen"
+                  icon="print"
+                  @click="imprimir(col.value)"
+                >
+                  <q-tooltip>Imprimir justificante</q-tooltip>
                 </q-btn>
                 <q-btn
                   v-if="modulo.actualizar && props.row.estatus == 'Pendiente'"
@@ -94,7 +104,7 @@ import { useJustificanteStore } from "src/stores/justificantes_store";
 import { storeToRefs } from "pinia";
 import { useQuasar } from "quasar";
 import { useAuthStore } from "src/stores/auth_store";
-
+import ValeJustificante from "src/helpers/ValeJustificante";
 //-----------------------------------------------------------
 
 const $q = useQuasar();
@@ -191,7 +201,7 @@ const filter = ref("");
 
 const cancelar = async (id) => {
   $q.dialog({
-    title: "Cancelar asignación",
+    title: "Cancelar justificante",
     message: "Al aceptar, se cancelará el justificante",
     icon: "Warning",
     persistent: true,
@@ -208,6 +218,44 @@ const cancelar = async (id) => {
   }).onOk(async () => {
     $q.loading.show();
     const resp = await justificanteStore.cancelarJustificante(id);
+    if (resp.success) {
+      $q.loading.hide();
+      $q.notify({
+        position: "top-right",
+        type: "positive",
+        message: resp.data,
+      });
+      justificanteStore.loadJustificantes();
+    } else {
+      $q.loading.hide();
+      $q.notify({
+        position: "top-right",
+        type: "negative",
+        message: resp.data,
+      });
+    }
+  });
+};
+
+const rechazar = async (id) => {
+  $q.dialog({
+    title: "Rechazar justificante",
+    message: "Al aceptar, se rechazará el justificante",
+    icon: "Warning",
+    persistent: true,
+    transitionShow: "scale",
+    transitionHide: "scale",
+    ok: {
+      color: "positive",
+      label: "Si, Aceptar",
+    },
+    cancel: {
+      color: "negative",
+      label: "No cancelar",
+    },
+  }).onOk(async () => {
+    $q.loading.show();
+    const resp = await justificanteStore.rechazarJustificante(id);
     if (resp.success) {
       $q.loading.hide();
       $q.notify({
@@ -244,6 +292,17 @@ const visualizar = async (id) => {
   justificanteStore.actualizarModal(true);
   justificanteStore.updateEditar(false);
   justificanteStore.updateVisualizar(true);
+  $q.loading.hide();
+};
+
+const imprimir = async (id) => {
+  let resp = null;
+  $q.loading.show();
+  resp = await justificanteStore.loadJustificante(id);
+  await justificanteStore.loadDetalleJustificantes(id);
+  if (resp.success === true) {
+    ValeJustificante();
+  }
   $q.loading.hide();
 };
 

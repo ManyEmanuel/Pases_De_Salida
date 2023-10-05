@@ -7,7 +7,15 @@
   >
     <q-card style="width: 800px; max-width: 80vw">
       <q-card-section class="row">
-        <div class="text-h6">Registro de justificante</div>
+        <div class="text-h6">
+          {{
+            isEditar
+              ? "Editar justificante"
+              : isVisualizar
+              ? "Ver justificante"
+              : "Crear justificante"
+          }}
+        </div>
         <q-space />
         <q-btn
           icon="close"
@@ -60,18 +68,9 @@
             </div>
             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
               <q-input
-                v-if="isVisualizar"
                 readonly
                 v-model="justificante.capturista"
                 label="Empleado que realiza la captura de la solicitud"
-              >
-              </q-input>
-              <q-input
-                v-else
-                stack-label
-                v-model="justificante.empleado"
-                label="Empleado que realiza la captura de la solicitud"
-                readonly
               >
               </q-input>
             </div>
@@ -89,7 +88,6 @@
                 stack-label
                 v-model="empleado_Id"
                 :options="listEmpleados"
-                :readonly="personalRead"
                 label="Solicitante"
                 hint="Seleccione una opción"
                 lazy-rules
@@ -234,6 +232,7 @@ const {
   isVisualizar,
   listaIncidencias,
   detalle,
+  editarDetalle,
 } = storeToRefs(justificanteStore);
 const tipoJustificante = ref([
   "Omisión de entrada",
@@ -256,7 +255,6 @@ let personalRead = ref(false);
 
 onBeforeMount(() => {
   justificanteStore.loadInformacionJustificante();
-  // justificanteStore.loadAreaByUsuario();
   justificanteStore.loadEmpleadosByUsuario();
 });
 
@@ -272,7 +270,7 @@ watch(detalle.value, (val) => {
   if (val.id != null) {
     cargarTipoJustificante(val);
     motivo.value = val.motivo;
-    days.value = val.fecha;
+    days.value = val.dias_Incidencias;
   }
 });
 
@@ -307,7 +305,9 @@ watch(empleado_Id, (val) => {
 
 const cargarTipoJustificante = async (val) => {
   if (tipo.value == null) {
-    let tipoFiltrado = tipoJustificante.value.find((x) => x == `${val.tipo}`);
+    let tipoFiltrado = tipoJustificante.value.find(
+      (x) => x == `${val.tipo_Justificantes}`
+    );
     tipo.value = tipoFiltrado;
   }
 };
@@ -332,8 +332,10 @@ const actualizarModal = (valor) => {
   $q.loading.show();
   justificanteStore.actualizarModal(valor);
   justificanteStore.updateVisualizar(false);
+  justificanteStore.updateEditar(false);
   limpiarCampos();
   listaIncidencias.value = [];
+  empleado_Id.value = null;
   $q.loading.hide();
 };
 
@@ -342,17 +344,16 @@ const onItemClick = (val) => {
 };
 
 const agregarIncidencia = async () => {
-  if (isEditar.value == true) {
-    console.log("entro", justificante.value.id);
-    const resultado = days.value.join(", ");
-    await justificanteStore.addIncidencia(resultado, motivo.value, tipo.value);
-    limpiarCampos();
-    // listaIncidencias.value.forEach((element) => {
-    //   respDetalle = justificanteStore.createDetalleJustificantes(
-    //     resp.idJustificante,
-    //     element
-    //   );
-    // });
+  let resp = null;
+  if (listaIncidencias.value.length == 4) {
+    $q.dialog({
+      title: "Atención",
+      message: "Solo puedes agregar maximo 4 incidencias por justificante",
+      icon: "Warning",
+      persistent: true,
+      transitionShow: "scale",
+      transitionHide: "scale",
+    });
   } else {
     if (tipo.value == null || motivo.value == null || days.value == "") {
       $q.notify({
@@ -361,13 +362,45 @@ const agregarIncidencia = async () => {
         message: "Campos incompletos",
       });
     } else {
-      const resultado = days.value.join(", ");
-      await justificanteStore.addIncidencia(
-        resultado,
-        motivo.value,
-        tipo.value
-      );
-      limpiarCampos();
+      if (editarDetalle.value == true) {
+        detalle.value.dias_Incidencias = days.value;
+        detalle.value.tipo_Justificantes = tipo.value;
+        detalle.value.motivo = motivo.value;
+        detalle.value.primer_Periodo = 0;
+        detalle.value.segundo_Periodo = 0;
+        detalle.value.dias_Economicos = 0;
+        resp = await justificanteStore.updateDetalle(detalle.value);
+        if (resp.success) {
+          justificanteStore.loadDetalleJustificantes(justificante.value.id);
+        }
+        limpiarCampos();
+      } else {
+        if (tipo.value == "Vacaciones") {
+          let periodo;
+          if (periodoVacacional.value == "Primero") {
+            periodo = 1;
+          } else {
+            periodo = 2;
+          }
+          const resultado = days.value.join(", ");
+          await justificanteStore.addIncidencia(
+            resultado,
+            motivo.value,
+            tipo.value,
+            periodo
+          );
+        } else {
+          const resultado = days.value.join(", ");
+          await justificanteStore.addIncidencia(
+            resultado,
+            motivo.value,
+            tipo.value,
+            0
+          );
+        }
+
+        limpiarCampos();
+      }
     }
   }
 };
@@ -376,12 +409,11 @@ const limpiarCampos = () => {
   tipo.value = null;
   days.value = null;
   motivo.value = null;
-  justificanteStore.initJustificante();
 };
 
 const onSubmit = async () => {
   let resp = null;
-  let respDetalle = null;
+
   $q.loading.show();
   if (listaIncidencias.value == "") {
     $q.dialog({
@@ -395,14 +427,19 @@ const onSubmit = async () => {
   } else {
     justificante.value.area_Id = area_Id.value.value;
     justificante.value.solicitante_Id = empleado_Id.value.value;
+    justificante.value.solicitante = empleado_Id.value.label;
+    justificante.value.puesto_Capturista_Id = empleado_Id.value.puesto_Id;
     justificante.value.puesto_Solicitante_Id = empleado_Id.value.puesto_Id;
+    justificante.value.capturista = justificante.value.capturista;
+    justificante.value.capturista_Id = justificante.value.capturista_Id;
     if (isEditar.value == true) {
+      resp = await justificanteStore.updateJustificante(justificante.value);
     } else {
       resp = await justificanteStore.createJustificante(justificante.value);
-      console.log("resp", resp);
+
       if (resp.success == true) {
-        listaIncidencias.value.forEach((element) => {
-          respDetalle = justificanteStore.createDetalleJustificantes(
+        listaIncidencias.value.forEach(async (element) => {
+          await justificanteStore.createDetalleJustificantes(
             resp.idJustificante,
             element
           );
@@ -415,7 +452,7 @@ const onSubmit = async () => {
     $q.notify({
       position: "top-right",
       type: "positive",
-      message: resp.data,
+      message: "Se creo con exito",
     });
     justificanteStore.loadJustificantes();
     actualizarModal(false);

@@ -5,6 +5,7 @@ export const useJustificanteStore = defineStore("justificante", {
   state: () => ({
     modal: false,
     isEditar: false,
+    editarDetalle: false,
     isVisualizar: false,
     listaConceptos: [],
     listEmpleados: [],
@@ -13,10 +14,13 @@ export const useJustificanteStore = defineStore("justificante", {
     justificantes: [],
     detalle: {
       id: null,
-      fecha: null,
-      tipo: null,
+      dias_Incidencias: null,
+      tipo_Justificantes: null,
       motivo: null,
       periodo_Vacacional: null,
+      primer_Periodo: null,
+      segundo_Periodo: null,
+      dias_Economicos: null,
     },
     justificante: {
       id: null,
@@ -52,6 +56,10 @@ export const useJustificanteStore = defineStore("justificante", {
       this.isVisualizar = valor;
     },
 
+    updateEditarDetalle(valor) {
+      this.editarDetalle = valor;
+    },
+
     initJustificante() {
       this.justificante.id = null;
       this.justificante.solicitante = null;
@@ -70,7 +78,7 @@ export const useJustificanteStore = defineStore("justificante", {
     //-----------------------------------------------------------
     async loadJustificantes() {
       try {
-        const resp = await api.get("/Justificantes_/ObtenTodos");
+        const resp = await api.get("/Justificantes/ObtenTodos");
         let { data } = resp.data;
         let listJustificantes = data.map((justificante) => {
           return {
@@ -86,8 +94,11 @@ export const useJustificanteStore = defineStore("justificante", {
             folio: justificante.folio,
             estatus: justificante.estatus,
             fecha_Creacion: justificante.fecha_Creacion,
+            fecha_Aprobacion_Rechazo: justificante.fecha_Aprobacion_Rechazo,
             capturista: justificante.capturista,
             puesto_Capturista: justificante.puesto_Capturista,
+            area: justificante.area,
+            area_Id: justificante.area_Id,
           };
         });
         this.justificantes = listJustificantes;
@@ -103,7 +114,7 @@ export const useJustificanteStore = defineStore("justificante", {
 
     async createJustificante(justificante) {
       try {
-        const resp = await api.post("/Justificantes_", justificante);
+        const resp = await api.post("/Justificantes", justificante);
         if (resp.status == 200) {
           const { success, data, idJustificante } = resp.data;
           if (success === true) {
@@ -127,9 +138,38 @@ export const useJustificanteStore = defineStore("justificante", {
 
     //-----------------------------------------------------------
 
+    async updateJustificante(justificante) {
+      try {
+        const resp = await api.put(
+          `/Justificantes/${justificante.id}`,
+          justificante
+        );
+        if (resp.status == 200) {
+          const { success, data } = resp.data;
+          if (success === true) {
+            return { success, data };
+          } else {
+            return { success, data };
+          }
+        } else {
+          return {
+            success: false,
+            data: "Ocurrió un error, inténtelo de nuevo. Si el error persiste, contacte a soporte",
+          };
+        }
+      } catch (error) {
+        return {
+          success: false,
+          data: "Ocurrió un error, inténtelo de nuevo. Si el error persiste, contacte a soporte",
+        };
+      }
+    },
+
+    //-----------------------------------------------------------
+
     async loadJustificante(id) {
       try {
-        const resp = await api.get(`/Justificantes_/${id}`);
+        const resp = await api.get(`/Justificantes/${id}`);
         if (resp.status == 200) {
           const { success, data } = resp.data;
           if (success == true) {
@@ -151,8 +191,9 @@ export const useJustificanteStore = defineStore("justificante", {
             this.justificante.fecha_Aprobacion_Rechazo =
               data.fecha_Aprobacion_Rechazo;
             this.justificante.fecha_Creacion = data.fecha_Creacion;
+
+            return { success, data };
           }
-          console.log("this", this.justificante);
         }
       } catch (error) {
         return {
@@ -240,7 +281,33 @@ export const useJustificanteStore = defineStore("justificante", {
 
     async cancelarJustificante(id) {
       try {
-        const resp = await api.get(`/Justificantes_/Cancelar/${id}`);
+        const resp = await api.get(`/Justificantes/Cancelar/${id}`);
+        if (resp.status == 200) {
+          const { success, data } = resp.data;
+          if (success === true) {
+            return { success, data };
+          } else {
+            return { success, data };
+          }
+        } else {
+          return {
+            success: false,
+            data: "Ocurrió un error, inténtelo de nuevo. Si el error persiste, contacte a soporte",
+          };
+        }
+      } catch (error) {
+        return {
+          success: false,
+          data: "Ocurrió un error, inténtelo de nuevo. Si el error persiste, contacte a soporte",
+        };
+      }
+    },
+
+    //-----------------------------------------------------------
+
+    async rechazarJustificante(id) {
+      try {
+        const resp = await api.get(`/Justificantes/Rechazar/${id}`);
         if (resp.status == 200) {
           const { success, data } = resp.data;
           if (success === true) {
@@ -266,7 +333,7 @@ export const useJustificanteStore = defineStore("justificante", {
 
     async aprobarJustificante(id) {
       try {
-        const resp = await api.get(`/Justificantes_/Aprobar/${id}`);
+        const resp = await api.get(`/Justificantes/Aprobar/${id}`);
         if (resp.status == 200) {
           const { success, data } = resp.data;
           if (success === true) {
@@ -290,20 +357,23 @@ export const useJustificanteStore = defineStore("justificante", {
 
     //-----------------------------------------------------------
 
-    async addIncidencia(dias_Incidencias, motivo, tipo_Justificantes) {
+    async addIncidencia(
+      dias_Incidencias,
+      motivo,
+      tipo_Justificantes,
+      periodo_Vacacional
+    ) {
       try {
-        var ultimoId =
-          this.listaIncidencias.length > 0
-            ? this.listaIncidencias[this.listaIncidencias.length - 1].id
-            : 0;
-
-        var nuevoId = ultimoId + 1;
         this.listaIncidencias.push({
-          id: nuevoId,
           tipo_Justificantes: tipo_Justificantes,
           dias_Incidencias: dias_Incidencias,
           motivo: motivo,
+          periodo_Vacacional: periodo_Vacacional,
+          primer_Periodo: 0,
+          segundo_Periodo: 0,
+          dias_Economicos: 0,
         });
+        console.log("list", this.listaIncidencias);
       } catch (error) {
         return {
           success: false,
@@ -315,7 +385,7 @@ export const useJustificanteStore = defineStore("justificante", {
     async loadDetalleJustificantes(id) {
       try {
         let resp = await api.get(
-          `/Detalle_Justificates_/ByJustificantes/${id}`
+          `/Detalle_Justificantes/ByJustificantes/${id}`
         );
         let { data } = resp.data;
         this.listaIncidencias = data.map((incidencia) => {
@@ -342,13 +412,13 @@ export const useJustificanteStore = defineStore("justificante", {
 
     async loadDetalle(id) {
       try {
-        let resp = await api.get(`/Detalle_Justificates_/${id}`);
+        let resp = await api.get(`/Detalle_Justificantes/${id}`);
         if (resp.status == 200) {
           const { success, data } = resp.data;
           if (success == true) {
             this.detalle.id = data.id;
-            this.detalle.fecha = data.dias_Incidencias;
-            this.detalle.tipo = data.tipo_Justificantes;
+            this.detalle.dias_Incidencias = data.dias_Incidencias;
+            this.detalle.tipo_Justificantes = data.tipo_Justificantes;
             this.detalle.motivo = data.motivo;
             this.detalle.periodo_Vacacional = data.periodo_Vacacional;
           }
@@ -365,7 +435,7 @@ export const useJustificanteStore = defineStore("justificante", {
 
     async createDetalleJustificantes(id, detalle) {
       try {
-        const resp = await api.post(`/Detalle_Justificates_/${id}`, detalle);
+        const resp = await api.post(`/Detalle_Justificantes/${id}`, detalle);
         if (resp.status == 200) {
           const { success, data } = resp.data;
           if (success === true) {
@@ -392,13 +462,12 @@ export const useJustificanteStore = defineStore("justificante", {
     async eliminarDetalleJusitifcante(id) {
       try {
         let nIndex = this.listaIncidencias.findIndex((x) => x.id == id);
-        console.log("nIndex", nIndex);
         if (nIndex == 0) {
           let nIndex = this.listaIncidencias.findIndex((x) => x.id == id);
           this.listaIncidencias.splice(nIndex, 1);
           return { success: true, data: "Se elimino de la lista" };
         } else {
-          const resp = await api.delete(`/Detalle_Justificates_/${id}`);
+          const resp = await api.delete(`/Detalle_Justificantes/${id}`);
           if (resp.status == 200) {
             const { success, data } = resp.data;
             if (success === true) {
@@ -424,28 +493,31 @@ export const useJustificanteStore = defineStore("justificante", {
     //-----------------------------------------------------------
 
     async updateDetalle(detalle) {
-      console.log("detalle", detalle);
-      // try {
-      //   const resp = await api.put(`/Detalle_Justificantes_/${id}`, detalle);
-      //   if (resp.status == 200) {
-      //     const { success, data } = resp.data;
-      //     if (success === true) {
-      //       return { success, data };
-      //     } else {
-      //       return { success, data };
-      //     }
-      //   } else {
-      //     return {
-      //       success: false,
-      //       data: "Ocurrió un error, inténtelo de nuevo. Si el error persiste, contacte a soporte",
-      //     };
-      //   }
-      // } catch (error) {
-      //   return {
-      //     success: false,
-      //     data: "Ocurrió un error, inténtelo de nuevo. Si el error persiste, contacte a soporte",
-      //   };
-      // }
+      try {
+        const resp = await api.put(
+          `/Detalle_Justificantes/${detalle.id}`,
+          detalle
+        );
+
+        if (resp.status == 200) {
+          const { success, data } = resp.data;
+          if (success === true) {
+            return { success, data };
+          } else {
+            return { success, data };
+          }
+        } else {
+          return {
+            success: false,
+            data: "Ocurrió un error, inténtelo de nuevo. Si el error persiste, contacte a soporte",
+          };
+        }
+      } catch (error) {
+        return {
+          success: false,
+          data: "Ocurrió un error, inténtelo de nuevo. Si el error persiste, contacte a soporte",
+        };
+      }
     },
 
     //-----------------------------------------------------------
@@ -482,8 +554,8 @@ export const useJustificanteStore = defineStore("justificante", {
         const resp = await api.get("/Empleados/ByUsuario");
         let { success, data } = resp.data;
         if (success) {
-          this.justificante.empleado_Id = data.id;
-          this.justificante.empleado = `${data.nombres}  ${data.apellido_Paterno} ${data.apellido_Materno}`;
+          this.justificante.capturista_Id = data.id;
+          this.justificante.capturista = `${data.nombres}  ${data.apellido_Paterno} ${data.apellido_Materno}`;
         }
       } catch (error) {
         return {
@@ -500,7 +572,7 @@ export const useJustificanteStore = defineStore("justificante", {
       let { success, data } = resp.data;
       if (success) {
         this.justificante.responsable_Area_Id = data.id;
-        this.justificante.responsable_Area = data.nombre_Completo;
+        this.justificante.responsable_Area = `${data.nombres} ${data.apellido_Paterno} ${data.apellido_Materno}`;
       }
     },
 

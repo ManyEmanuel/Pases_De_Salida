@@ -29,6 +29,7 @@
             <q-td v-for="col in props.cols" :key="col.name" :props="props">
               <div v-if="col.name === 'id'">
                 <q-btn
+                  v-if="isEditar"
                   flat
                   round
                   color="purple-ieen"
@@ -38,7 +39,6 @@
                   <q-tooltip>Editar incidencia</q-tooltip>
                 </q-btn>
                 <q-btn
-                  v-if="isEditar"
                   flat
                   round
                   color="purple-ieen"
@@ -67,7 +67,8 @@ import { onBeforeMount, ref } from "vue";
 
 const $q = useQuasar();
 const justificanteStore = useJustificanteStore();
-const { listaIncidencias, isEditar } = storeToRefs(justificanteStore);
+const { listaIncidencias, isVisualizar, isEditar } =
+  storeToRefs(justificanteStore);
 let columnasVisibles = [];
 
 //-----------------------------------------------------------
@@ -119,22 +120,21 @@ const pagination = ref({
 const filter = ref("");
 
 const cargarColumnas = async () => {
-  if (isEditar.value == true) {
+  if (isVisualizar.value == true) {
+    columnasVisibles = ["tipo_Justificantes", "dias_Incidencias", "motivo"];
+  } else {
     columnasVisibles = [
       "tipo_Justificantes",
       "dias_Incidencias",
       "motivo",
       "id",
     ];
-  } else {
-    columnasVisibles = ["tipo_Justificantes", "dias_Incidencias", "motivo"];
   }
 };
 
 //-----------------------------------------------------------
 
 const eliminar = async (id) => {
-  console.log("id", id);
   $q.dialog({
     title: "Eliminar asignación",
     message: "Al aceptar, se eliminara el detalle de la incidencia",
@@ -160,7 +160,8 @@ const eliminar = async (id) => {
         type: "positive",
         message: resp.data,
       });
-      justificanteStore.loadDetalleJustificantes(id);
+      if (isEditar.value == true)
+        justificanteStore.loadDetalleJustificantes(id);
     } else {
       $q.loading.hide();
       $q.notify({
@@ -175,7 +176,7 @@ const eliminar = async (id) => {
 const editar = async (id) => {
   $q.loading.show();
   await justificanteStore.loadDetalle(id);
-  justificanteStore.updateEditar(true);
+  justificanteStore.updateEditarDetalle(true);
   $q.loading.hide();
 };
 

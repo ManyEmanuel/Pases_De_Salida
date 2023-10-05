@@ -1,8 +1,12 @@
 import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
+import { storeToRefs } from "pinia";
+import { useJustificanteStore } from "src/stores/justificantes_store";
 
 const ValeJustificante = async () => {
   try {
+    const justificanteStore = useJustificanteStore();
+    const { justificante, listaIncidencias } = storeToRefs(justificanteStore);
     //--------------------------------------------------------------------------//
     const dateActual = new Date();
     const year = dateActual.getFullYear();
@@ -68,12 +72,12 @@ const ValeJustificante = async () => {
     doc.setFont("helvetica", "normal");
     doc.setFontSize(10);
     doc.text("Nombre del solicitante:", 47, 80, null, null, "right");
-    doc.text(`${solicitante}`, 55, 80, null, null);
+    doc.text(`${justificante.value.solicitante}`, 55, 80, null, null);
     doc.setDrawColor(0, 0, 0);
     doc.line(50, 81, 205, 81);
     //--------------------------------------------------------------------------//
     doc.text("Área de adscripción:", 47, 90, null, null, "right");
-    doc.text(`${area}`, 55, 90, null, null);
+    doc.text(`${justificante.value.area}`, 55, 90, null, null);
     doc.line(50, 91, 205, 91);
     //--------------------------------------------------------------------------//
     doc.setFillColor(134, 51, 153);
@@ -150,28 +154,28 @@ const ValeJustificante = async () => {
       [{ content: "Concepto" }, { content: "Fecha" }, { content: "Motivo" }],
     ];
 
-    var rows = [
-      [
-        "Omisión de entrada",
-        "13/09/2023",
-        "Esto es una prueba de escrito para los motivos en caso de justificante, los motivos no deberán de exceder de mas de 100 caracteres, la recomendación es no pasar de ese numero de caracteres ya que no hay tanto espacio en la hoja que se imprime con",
-      ],
-      [
-        "Omisión de salida",
-        "14/09/2023",
-        "Esto es una prueba de escrito para los motivos en caso de justificante, los motivos no deberán de exceder de mas de 100 caracteres, la recomendación es no pasar de ese numero de caracteres ya que no hay tanto espacio en la hoja que se imprime con",
-      ],
-      [
-        "Comisión oficial",
-        "14/09/2023",
-        "Esto es una prueba de escrito para los motivos en caso de justificante, los motivos no deberán de exceder de mas de 100 caracteres, la recomendación es no pasar de ese numero de caracteres ya que no hay tanto espacio en la hoja que se imprime con",
-      ],
-      [
-        "Permiso día económico",
-        "14/09/2023",
-        "Esto es una prueba de escrito para los motivos en caso de justificante, los motivos no deberán de exceder de mas de 100 caracteres, la recomendación es no pasar de ese numero de caracteres ya que no hay tanto espacio en la hoja que se imprime con",
-      ],
-    ];
+    // var rows = [
+    //   [
+    //     "Omisión de entrada",
+    //     "13/09/2023",
+    //     "Esto es una prueba de escrito para los motivos en caso de justificante, los motivos no deberán de exceder de mas de 100 caracteres, la recomendación es no pasar de ese numero de caracteres ya que no hay tanto espacio en la hoja que se imprime con",
+    //   ],
+    //   [
+    //     "Omisión de salida",
+    //     "14/09/2023",
+    //     "Esto es una prueba de escrito para los motivos en caso de justificante, los motivos no deberán de exceder de mas de 100 caracteres, la recomendación es no pasar de ese numero de caracteres ya que no hay tanto espacio en la hoja que se imprime con",
+    //   ],
+    //   [
+    //     "Comisión oficial",
+    //     "14/09/2023",
+    //     "Esto es una prueba de escrito para los motivos en caso de justificante, los motivos no deberán de exceder de mas de 100 caracteres, la recomendación es no pasar de ese numero de caracteres ya que no hay tanto espacio en la hoja que se imprime con",
+    //   ],
+    //   [
+    //     "Permiso día económico",
+    //     "14/09/2023",
+    //     "Esto es una prueba de escrito para los motivos en caso de justificante, los motivos no deberán de exceder de mas de 100 caracteres, la recomendación es no pasar de ese numero de caracteres ya que no hay tanto espacio en la hoja que se imprime con",
+    //   ],
+    // ];
 
     jsPDF.autoTableSetDefaults({
       headStyles: {
@@ -192,7 +196,11 @@ const ValeJustificante = async () => {
       startY: 112,
       margin: { left: 10, right: 10 },
       head: header,
-      body: [...rows],
+      body: listaIncidencias.value.map((item) => [
+        item.tipo_Justificantes,
+        item.dias_Incidencias,
+        item.motivo,
+      ]),
       bodyStyles: { fontSize: 10, textColor: [0, 0, 0] },
       tableLineColor: [0, 0, 0],
       columnStyles: columnStyles,
@@ -200,13 +208,27 @@ const ValeJustificante = async () => {
 
     //--------------------------------------------------------------------------//
     doc.setFont("helvetica", "normal");
-    doc.text(`${solicitante}`, 50, 239, null, null, "center");
+    doc.text(
+      `${justificante.value.solicitante}`,
+      50,
+      239,
+      null,
+      null,
+      "center"
+    );
     doc.line(10, 240, 90, 240);
     doc.text("Nombre y Firma", 50, 245, null, null, "center");
     doc.text("Solicitante", 50, 250, null, null, "center");
     //--------------------------------------------------------------------------//
     doc.line(125, 240, 205, 240);
-    doc.text(`${jefeInmediato}`, 165, 239, null, null, "center");
+    doc.text(
+      `${justificante.value.responsable_Area}`,
+      165,
+      239,
+      null,
+      null,
+      "center"
+    );
     doc.text("Nombre y Firma", 165, 245, null, null, "center");
     doc.text("Vo. Bo, Jefe/a inmediato/a", 165, 250, null, null, "center");
     //--------------------------------------------------------------------------//
