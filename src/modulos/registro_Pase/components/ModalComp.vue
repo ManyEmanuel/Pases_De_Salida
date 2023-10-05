@@ -115,6 +115,7 @@
                       v-model="pase.entrada"
                       :locale="myLocale"
                       mask="YYYY-MM-DD HH:mm"
+                      :options="FiltroFecha"
                       color="purple"
                     >
                       <div class="row items-center justify-end">
@@ -329,7 +330,7 @@
 <script setup>
 import { onBeforeMount, ref, watch, watchEffect } from "vue";
 import { storeToRefs } from "pinia";
-import { useQuasar } from "quasar";
+import { useQuasar, date } from "quasar";
 import { useAuthStore } from "../../../stores/auth_store";
 import { useRegistroPaseStore } from "../../../stores/registro_Pase_store";
 
@@ -350,6 +351,7 @@ let opcionesRol = ref([
 ]);
 const tipoPase = ref(null);
 const asuntoPase = ref(null);
+const filtrarFecha = ref("");
 const opcionTipoPase = ref(["Entrada", "Intermedio", "Salida"]);
 const opcionAsuntoPase = ref(["Oficial", "Médico", "Personal"]);
 const area_Id = ref(null);
@@ -402,6 +404,35 @@ watchEffect(async () => {
     loadingVehiculo.value = false;
   }
 });
+
+const FiltroFecha = (fechha) => {
+  const today = new Date();
+  let diaSemana = today.getDay();
+  let diasContar = 3;
+  if (diaSemana <= 3) {
+    diasContar = 5;
+  }
+
+  filtrarFecha.value = date.formatDate(today, "YYYY/MM/DD");
+  let filtro = calcularFechaNueva(filtrarFecha.value, diasContar);
+  return fechha >= filtro;
+};
+
+const calcularFechaNueva = (fecha, dias) => {
+  const [anio, mes, dia] = fecha.split("/");
+  const fechaFormato = new Date(anio, mes - 1, dia);
+  fechaFormato.setDate(fechaFormato.getDate() - dias);
+  let mesFiltro = fechaFormato.getMonth() + 1;
+  let diaFiltro = fechaFormato.getDate();
+  let formatoMes = mesFiltro <= 9 ? "0" + mesFiltro : mesFiltro;
+  let formatoDia = diaFiltro <= 9 ? "0" + diaFiltro : diaFiltro;
+  const anioPrevio = fechaFormato.getFullYear();
+  const mesPrevio = formatoMes;
+  const diaPrevio = formatoDia;
+
+  const fechaLimite = `${anioPrevio}/${mesPrevio}/${diaPrevio}`;
+  return fechaLimite;
+};
 
 watch(pase.value, (val) => {
   if (val.tipo_Pase != null) {
