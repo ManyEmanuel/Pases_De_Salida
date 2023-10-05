@@ -24,7 +24,7 @@ api.interceptors.response.use(
     if (error.response.status == 401) {
       alert("Su sesión ha expirado, sera redireccionado al logín");
       localStorage.clear();
-      window.location = "http://sistema.ieenayarit.org:9271?return=false";
+      window.location = "http://sistema.ieenayarit.org:9171?return=false";
     }
     return Promise.reject();
   }

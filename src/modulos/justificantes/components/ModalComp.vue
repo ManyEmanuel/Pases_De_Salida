@@ -134,7 +134,12 @@
                       transition-show="scale"
                       transition-hide="scale"
                     >
-                      <q-date color="purple" v-model="days" multiple />
+                      <q-date
+                        color="purple"
+                        v-model="days"
+                        multiple
+                        :locale="myLocale"
+                      />
                     </q-popup-proxy>
                   </q-icon>
                 </template>
@@ -233,6 +238,7 @@ const {
   listaIncidencias,
   detalle,
   editarDetalle,
+  myLocale,
 } = storeToRefs(justificanteStore);
 const tipoJustificante = ref([
   "Omisión de entrada",
