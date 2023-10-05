@@ -119,6 +119,19 @@
               >
             </q-item-section>
           </q-item>
+          <q-item
+            v-if="menuPasesList.some((element) => element == 'PS-REG-JUS')"
+            :to="{ name: 'registro_Justificante' }"
+          >
+            <q-item-section avatar>
+              <q-icon name="summarize" color="purple-ieen" />
+            </q-item-section>
+            <q-item-section>
+              <q-item-label class="text-purple-ieen label-title text-bold"
+                >Registro justificante</q-item-label
+              >
+            </q-item-section>
+          </q-item>
         </q-list>
       </q-scroll-area>
       <q-img
@@ -279,6 +292,9 @@ export default defineComponent({
             break;
           case "PS-REG-GEN":
             menuPasesList.value.push("PS-REG-GEN");
+            break;
+          case "PS-REG-JUS":
+            menuPasesList.value.push("PS-REG-JUS");
             break;
         }
       });
