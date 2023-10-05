@@ -233,6 +233,7 @@ const {
   isEditar,
   isVisualizar,
   listaIncidencias,
+  detalle,
 } = storeToRefs(justificanteStore);
 const tipoJustificante = ref([
   "Omisión de entrada",
@@ -261,10 +262,17 @@ onBeforeMount(() => {
 
 //-----------------------------------------------------------
 watch(justificante.value, (val) => {
-  console.log("envio val", val);
   if (val.id != null) {
     cargarArea(val);
     cargarSolicitante(val);
+  }
+});
+
+watch(detalle.value, (val) => {
+  if (val.id != null) {
+    cargarTipoJustificante(val);
+    motivo.value = val.motivo;
+    days.value = val.fecha;
   }
 });
 
@@ -297,6 +305,13 @@ watch(empleado_Id, (val) => {
 
 //-----------------------------------------------------------
 
+const cargarTipoJustificante = async (val) => {
+  if (tipo.value == null) {
+    let tipoFiltrado = tipoJustificante.value.find((x) => x == `${val.tipo}`);
+    tipo.value = tipoFiltrado;
+  }
+};
+
 const cargarArea = async (val) => {
   if (area_Id.value == null) {
     let areaFiltrado = areas.value.find((x) => x.value == `${val.area_Id}`);
@@ -305,7 +320,6 @@ const cargarArea = async (val) => {
 };
 
 const cargarSolicitante = async (val) => {
-  console.log("list empleados", listEmpleados.value);
   if (empleado_Id.value == null) {
     let solicitanteFiltrado = listEmpleados.value.find(
       (x) => x.label == `${val.solicitante}`
@@ -319,6 +333,7 @@ const actualizarModal = (valor) => {
   justificanteStore.actualizarModal(valor);
   justificanteStore.updateVisualizar(false);
   limpiarCampos();
+  listaIncidencias.value = [];
   $q.loading.hide();
 };
 
@@ -327,17 +342,33 @@ const onItemClick = (val) => {
 };
 
 const agregarIncidencia = async () => {
-  if (tipo.value == null || motivo.value == null || days.value == "") {
-    $q.notify({
-      position: "top-right",
-      type: "negative",
-      message: "Campos incompletos",
-    });
-  } else {
+  if (isEditar.value == true) {
+    console.log("entro", justificante.value.id);
     const resultado = days.value.join(", ");
-    console.log("motivo", tipo.value);
     await justificanteStore.addIncidencia(resultado, motivo.value, tipo.value);
     limpiarCampos();
+    // listaIncidencias.value.forEach((element) => {
+    //   respDetalle = justificanteStore.createDetalleJustificantes(
+    //     resp.idJustificante,
+    //     element
+    //   );
+    // });
+  } else {
+    if (tipo.value == null || motivo.value == null || days.value == "") {
+      $q.notify({
+        position: "top-right",
+        type: "negative",
+        message: "Campos incompletos",
+      });
+    } else {
+      const resultado = days.value.join(", ");
+      await justificanteStore.addIncidencia(
+        resultado,
+        motivo.value,
+        tipo.value
+      );
+      limpiarCampos();
+    }
   }
 };
 
@@ -368,6 +399,7 @@ const onSubmit = async () => {
     if (isEditar.value == true) {
     } else {
       resp = await justificanteStore.createJustificante(justificante.value);
+      console.log("resp", resp);
       if (resp.success == true) {
         listaIncidencias.value.forEach((element) => {
           respDetalle = justificanteStore.createDetalleJustificantes(
@@ -379,7 +411,7 @@ const onSubmit = async () => {
     }
   }
 
-  if (resp.success) {
+  if (resp.success === true) {
     $q.notify({
       position: "top-right",
       type: "positive",

@@ -6,6 +6,7 @@
         :columns="columns"
         :filter="filter"
         :pagination="pagination"
+        :visible-columns="columnasVisibles"
         row-key="id"
         rows-per-page-label="Filas por pagina"
         no-data-label="No hay registros"
@@ -28,25 +29,23 @@
             <q-td v-for="col in props.cols" :key="col.name" :props="props">
               <div v-if="col.name === 'id'">
                 <q-btn
-                  v-if="isEditar"
-                  disable
                   flat
                   round
                   color="purple-ieen"
-                  icon="cancel"
-                  @click="eliminar(col.value)"
+                  icon="edit"
+                  @click="editar(col.value)"
                 >
-                  <q-tooltip>Eliminar inventario</q-tooltip>
+                  <q-tooltip>Editar incidencia</q-tooltip>
                 </q-btn>
                 <q-btn
-                  v-else
+                  v-if="isEditar"
                   flat
                   round
                   color="purple-ieen"
                   icon="cancel"
                   @click="eliminar(col.value)"
                 >
-                  <q-tooltip>Eliminar inventario</q-tooltip>
+                  <q-tooltip>Eliminar incidencia</q-tooltip>
                 </q-btn>
               </div>
               <label v-else>{{ col.value }}</label>
@@ -62,13 +61,21 @@
 import { storeToRefs } from "pinia";
 import { useQuasar } from "quasar";
 import { useJustificanteStore } from "src/stores/justificantes_store";
-import { ref } from "vue";
+import { onBeforeMount, ref } from "vue";
 
 //-----------------------------------------------------------
 
 const $q = useQuasar();
 const justificanteStore = useJustificanteStore();
-const { listaIncidencias } = storeToRefs(justificanteStore);
+const { listaIncidencias, isEditar } = storeToRefs(justificanteStore);
+let columnasVisibles = [];
+
+//-----------------------------------------------------------
+
+onBeforeMount(() => {
+  cargarColumnas();
+});
+
 //-----------------------------------------------------------
 
 const columns = [
@@ -110,6 +117,69 @@ const pagination = ref({
 });
 
 const filter = ref("");
+
+const cargarColumnas = async () => {
+  if (isEditar.value == true) {
+    columnasVisibles = [
+      "tipo_Justificantes",
+      "dias_Incidencias",
+      "motivo",
+      "id",
+    ];
+  } else {
+    columnasVisibles = ["tipo_Justificantes", "dias_Incidencias", "motivo"];
+  }
+};
+
+//-----------------------------------------------------------
+
+const eliminar = async (id) => {
+  console.log("id", id);
+  $q.dialog({
+    title: "Eliminar asignación",
+    message: "Al aceptar, se eliminara el detalle de la incidencia",
+    icon: "Warning",
+    persistent: true,
+    transitionShow: "scale",
+    transitionHide: "scale",
+    ok: {
+      color: "positive",
+      label: "Si, Aceptar",
+    },
+    cancel: {
+      color: "negative",
+      label: "No cancelar",
+    },
+  }).onOk(async () => {
+    $q.loading.show();
+    const resp = await justificanteStore.eliminarDetalleJusitifcante(id);
+    if (resp.success) {
+      $q.loading.hide();
+      $q.notify({
+        position: "top-right",
+        type: "positive",
+        message: resp.data,
+      });
+      justificanteStore.loadDetalleJustificantes(id);
+    } else {
+      $q.loading.hide();
+      $q.notify({
+        position: "top-right",
+        type: "negative",
+        message: resp.data,
+      });
+    }
+  });
+};
+
+const editar = async (id) => {
+  $q.loading.show();
+  await justificanteStore.loadDetalle(id);
+  justificanteStore.updateEditar(true);
+  $q.loading.hide();
+};
+
+//-----------------------------------------------------------
 </script>
 
 <style></style>

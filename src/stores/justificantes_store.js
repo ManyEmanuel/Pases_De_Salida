@@ -11,6 +11,13 @@ export const useJustificanteStore = defineStore("justificante", {
     areas: [],
     listaIncidencias: [],
     justificantes: [],
+    detalle: {
+      id: null,
+      fecha: null,
+      tipo: null,
+      motivo: null,
+      periodo_Vacacional: null,
+    },
     justificante: {
       id: null,
       responsable_Area_Id: null,
@@ -84,7 +91,6 @@ export const useJustificanteStore = defineStore("justificante", {
           };
         });
         this.justificantes = listJustificantes;
-        console.log("this", this.justificantes);
       } catch (error) {
         return {
           success: false,
@@ -96,7 +102,6 @@ export const useJustificanteStore = defineStore("justificante", {
     //-----------------------------------------------------------
 
     async createJustificante(justificante) {
-      console.log("---justificante", justificante);
       try {
         const resp = await api.post("/Justificantes_", justificante);
         if (resp.status == 200) {
@@ -127,7 +132,6 @@ export const useJustificanteStore = defineStore("justificante", {
         const resp = await api.get(`/Justificantes_/${id}`);
         if (resp.status == 200) {
           const { success, data } = resp.data;
-          console.log("---", data);
           if (success == true) {
             this.justificante.id = data.id;
             this.justificante.responsable_Area_Id = data.responsable_Area_Id;
@@ -147,9 +151,8 @@ export const useJustificanteStore = defineStore("justificante", {
             this.justificante.fecha_Aprobacion_Rechazo =
               data.fecha_Aprobacion_Rechazo;
             this.justificante.fecha_Creacion = data.fecha_Creacion;
-
-            console.log("justificante", this.justificante);
           }
+          console.log("this", this.justificante);
         }
       } catch (error) {
         return {
@@ -158,66 +161,6 @@ export const useJustificanteStore = defineStore("justificante", {
         };
       }
     },
-
-    //-----------------------------------------------------------
-
-    async loadDetalleJustificantes(id) {
-      try {
-        let resp = await api.get(
-          `/Detalle_Justificates_/ByJustificantes/${id}`
-        );
-        let { data } = resp.data;
-        console.log("Detalle_Justificates_", data);
-        this.listaIncidencias = data.map((incidencia) => {
-          return {
-            id: incidencia.id,
-            tipo_Justificantes: incidencia.tipo_Justificantes,
-            dias_Incidencias: incidencia.dias_Incidencias,
-            periodo_Vacacional: incidencia.periodo_Vacacional,
-            primer_Periodo: incidencia.primer_Periodo,
-            segundo_Periodo: incidencia.segundo_Periodo,
-            dias_Economicos: incidencia.dias_Economicos,
-            motivo: incidencia.motivo,
-          };
-        });
-      } catch (error) {
-        return {
-          success: false,
-          data: "Ocurrió un error, inténtelo de nuevo. Si el error persiste, contacte a soporte",
-        };
-      }
-    },
-
-    //-----------------------------------------------------------
-
-    async createDetalleJustificantes(id, detalle) {
-      try {
-        console.log("id", id);
-        console.log("detalle", detalle);
-        const resp = await api.post(`/Detalle_Justificates_/${id}`, detalle);
-        if (resp.status == 200) {
-          const { success, data } = resp.data;
-          console.log("succes", success);
-          if (success === true) {
-            return { success, data };
-          } else {
-            return { success, data };
-          }
-        } else {
-          return {
-            success: false,
-            data: "Ocurrió un error, inténtelo de nuevo. Si el error persiste, contacte a soporte",
-          };
-        }
-      } catch (error) {
-        return {
-          success: false,
-          data: "Ocurrió un error, inténtelo de nuevo. Si el error persiste, contacte a soporte",
-        };
-      }
-    },
-
-    //-----------------------------------------------------------
 
     async loadInformacionJustificante() {
       try {
@@ -321,6 +264,192 @@ export const useJustificanteStore = defineStore("justificante", {
 
     //-----------------------------------------------------------
 
+    async aprobarJustificante(id) {
+      try {
+        const resp = await api.get(`/Justificantes_/Aprobar/${id}`);
+        if (resp.status == 200) {
+          const { success, data } = resp.data;
+          if (success === true) {
+            return { success, data };
+          } else {
+            return { success, data };
+          }
+        } else {
+          return {
+            success: false,
+            data: "Ocurrió un error, inténtelo de nuevo. Si el error persiste, contacte a soporte",
+          };
+        }
+      } catch (error) {
+        return {
+          success: false,
+          data: "Ocurrió un error, inténtelo de nuevo. Si el error persiste, contacte a soporte",
+        };
+      }
+    },
+
+    //-----------------------------------------------------------
+
+    async addIncidencia(dias_Incidencias, motivo, tipo_Justificantes) {
+      try {
+        var ultimoId =
+          this.listaIncidencias.length > 0
+            ? this.listaIncidencias[this.listaIncidencias.length - 1].id
+            : 0;
+
+        var nuevoId = ultimoId + 1;
+        this.listaIncidencias.push({
+          id: nuevoId,
+          tipo_Justificantes: tipo_Justificantes,
+          dias_Incidencias: dias_Incidencias,
+          motivo: motivo,
+        });
+      } catch (error) {
+        return {
+          success: false,
+          data: "Ocurrió un error, inténtelo de nuevo. Si el error persiste, contacte a soporte",
+        };
+      }
+    },
+    //-----------------------------------------------------------
+    async loadDetalleJustificantes(id) {
+      try {
+        let resp = await api.get(
+          `/Detalle_Justificates_/ByJustificantes/${id}`
+        );
+        let { data } = resp.data;
+        this.listaIncidencias = data.map((incidencia) => {
+          return {
+            id: incidencia.id,
+            tipo_Justificantes: incidencia.tipo_Justificantes,
+            dias_Incidencias: incidencia.dias_Incidencias,
+            periodo_Vacacional: incidencia.periodo_Vacacional,
+            primer_Periodo: incidencia.primer_Periodo,
+            segundo_Periodo: incidencia.segundo_Periodo,
+            dias_Economicos: incidencia.dias_Economicos,
+            motivo: incidencia.motivo,
+          };
+        });
+      } catch (error) {
+        return {
+          success: false,
+          data: "Ocurrió un error, inténtelo de nuevo. Si el error persiste, contacte a soporte",
+        };
+      }
+    },
+
+    //-----------------------------------------------------------
+
+    async loadDetalle(id) {
+      try {
+        let resp = await api.get(`/Detalle_Justificates_/${id}`);
+        if (resp.status == 200) {
+          const { success, data } = resp.data;
+          if (success == true) {
+            this.detalle.id = data.id;
+            this.detalle.fecha = data.dias_Incidencias;
+            this.detalle.tipo = data.tipo_Justificantes;
+            this.detalle.motivo = data.motivo;
+            this.detalle.periodo_Vacacional = data.periodo_Vacacional;
+          }
+        }
+      } catch (error) {
+        return {
+          success: false,
+          data: "Ocurrió un error, inténtelo de nuevo. Si el error persiste, contacte a soporte",
+        };
+      }
+    },
+
+    //-----------------------------------------------------------
+
+    async createDetalleJustificantes(id, detalle) {
+      try {
+        const resp = await api.post(`/Detalle_Justificates_/${id}`, detalle);
+        if (resp.status == 200) {
+          const { success, data } = resp.data;
+          if (success === true) {
+            return { success, data };
+          } else {
+            return { success, data };
+          }
+        } else {
+          return {
+            success: false,
+            data: "Ocurrió un error, inténtelo de nuevo. Si el error persiste, contacte a soporte",
+          };
+        }
+      } catch (error) {
+        return {
+          success: false,
+          data: "Ocurrió un error, inténtelo de nuevo. Si el error persiste, contacte a soporte",
+        };
+      }
+    },
+
+    //-----------------------------------------------------------
+
+    async eliminarDetalleJusitifcante(id) {
+      try {
+        let nIndex = this.listaIncidencias.findIndex((x) => x.id == id);
+        console.log("nIndex", nIndex);
+        if (nIndex == 0) {
+          let nIndex = this.listaIncidencias.findIndex((x) => x.id == id);
+          this.listaIncidencias.splice(nIndex, 1);
+          return { success: true, data: "Se elimino de la lista" };
+        } else {
+          const resp = await api.delete(`/Detalle_Justificates_/${id}`);
+          if (resp.status == 200) {
+            const { success, data } = resp.data;
+            if (success === true) {
+              return { success, data };
+            } else {
+              return { success, data };
+            }
+          } else {
+            return {
+              success: false,
+              data: "Ocurrió un error, inténtelo de nuevo. Si el error persiste, contacte a soporte",
+            };
+          }
+        }
+      } catch (error) {
+        return {
+          success: false,
+          data: "Ocurrió un error, inténtelo de nuevo. Si el error persiste, contacte a soporte",
+        };
+      }
+    },
+
+    //-----------------------------------------------------------
+
+    async updateDetalle(detalle) {
+      console.log("detalle", detalle);
+      // try {
+      //   const resp = await api.put(`/Detalle_Justificantes_/${id}`, detalle);
+      //   if (resp.status == 200) {
+      //     const { success, data } = resp.data;
+      //     if (success === true) {
+      //       return { success, data };
+      //     } else {
+      //       return { success, data };
+      //     }
+      //   } else {
+      //     return {
+      //       success: false,
+      //       data: "Ocurrió un error, inténtelo de nuevo. Si el error persiste, contacte a soporte",
+      //     };
+      //   }
+      // } catch (error) {
+      //   return {
+      //     success: false,
+      //     data: "Ocurrió un error, inténtelo de nuevo. Si el error persiste, contacte a soporte",
+      //   };
+      // }
+    },
+
+    //-----------------------------------------------------------
+
     async loadPersonalArea(id) {
       try {
         this.empleados = null;
@@ -339,7 +468,6 @@ export const useJustificanteStore = defineStore("justificante", {
           };
         });
       } catch (error) {
-        console.error(error);
         return {
           success: false,
           data: "Ocurrió un error, inténtelo de nuevo. Si el error persiste, contacte a soporte",
@@ -377,21 +505,5 @@ export const useJustificanteStore = defineStore("justificante", {
     },
 
     //-----------------------------------------------------------
-
-    async addIncidencia(dias_Incidencias, motivo, tipo_Justificantes) {
-      try {
-        this.listaIncidencias.push({
-          tipo_Justificantes: tipo_Justificantes,
-          dias_Incidencias: dias_Incidencias,
-          motivo: motivo,
-        });
-        console.log("listaIncidencias", this.listaIncidencias);
-      } catch (error) {
-        return {
-          success: false,
-          data: "Ocurrió un error, inténtelo de nuevo. Si el error persiste, contacte a soporte",
-        };
-      }
-    },
   },
 });

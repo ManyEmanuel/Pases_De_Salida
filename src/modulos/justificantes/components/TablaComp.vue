@@ -29,6 +29,16 @@
             <q-td v-for="col in props.cols" :key="col.name" :props="props">
               <div v-if="col.name === 'justificante_Id'">
                 <q-btn
+                  v-show="modulo.actualizar && props.row.estatus == 'Pendiente'"
+                  flat
+                  round
+                  color="purple-ieen"
+                  icon="send"
+                  @click="aprobar(col.value)"
+                >
+                  <q-tooltip>Ver asignación</q-tooltip>
+                </q-btn>
+                <q-btn
                   v-show="modulo.leer && props.row.estatus != 'Pendiente'"
                   flat
                   round
@@ -232,9 +242,47 @@ const visualizar = async (id) => {
   await justificanteStore.loadJustificante(id);
   await justificanteStore.loadDetalleJustificantes(id);
   justificanteStore.actualizarModal(true);
-  justificanteStore.updateEditar(true);
+  justificanteStore.updateEditar(false);
   justificanteStore.updateVisualizar(true);
   $q.loading.hide();
+};
+
+const aprobar = async (id) => {
+  $q.dialog({
+    title: "Afectar justificante",
+    message: "Al aceptar, se afectará el justificante",
+    icon: "Warning",
+    persistent: true,
+    transitionShow: "scale",
+    transitionHide: "scale",
+    ok: {
+      color: "positive",
+      label: "Si, Aceptar",
+    },
+    cancel: {
+      color: "negative",
+      label: "No cancelar",
+    },
+  }).onOk(async () => {
+    $q.loading.show();
+    const resp = await justificanteStore.aprobarJustificante(id);
+    if (resp.success) {
+      $q.loading.hide();
+      $q.notify({
+        position: "top-right",
+        type: "positive",
+        message: resp.data,
+      });
+      justificanteStore.loadJustificantes();
+    } else {
+      $q.loading.hide();
+      $q.notify({
+        position: "top-right",
+        type: "negative",
+        message: resp.data,
+      });
+    }
+  });
 };
 </script>
 
