@@ -39,7 +39,6 @@
               </q-input>
               <q-select
                 v-else
-                :readonly="areaRead"
                 v-model="area_Id"
                 :options="areas"
                 label="Area del empleado"
@@ -60,7 +59,7 @@
 
             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
               <q-input
-                v-if="isVisualizar"
+                v-if="isVisualizar || isPersonal"
                 readonly
                 v-model="justificante.solicitante"
                 label="Solicitante"
@@ -68,7 +67,6 @@
               </q-input>
               <q-select
                 v-else
-                :readonly="isPersonal"
                 stack-label
                 v-model="empleado_Id"
                 :options="listEmpleados"
@@ -234,6 +232,7 @@ const {
   editarDetalle,
   myLocale,
   isPersonal,
+  isAdmi,
 } = storeToRefs(justificanteStore);
 const tipoJustificante = ref([
   "Omisión de entrada",
@@ -251,7 +250,6 @@ const empleado_Id = ref(null);
 const personalAutoriza = ref(null);
 const area_Id = ref(null);
 const motivo = ref(null);
-let areaRead = ref(false);
 
 //-----------------------------------------------------------
 
@@ -278,33 +276,14 @@ watch(detalle.value, (val) => {
 
 watch(justificante.value, (val) => {
   cargarArea(val);
-  empleado_Id.value = val.solicitante;
+  cargarSolicitante(val);
 });
-
-watch(area_Id, (val) => {
-  if (area_Id.value != null) {
-    justificanteStore.loadPersonalArea(area_Id.value.value);
-    empleado_Id.value = null;
-    personalAutoriza.value = null;
-  }
-});
-watch(empleado_Id, async (val) => {
-  if (empleado_Id.value != null) {
-    await justificanteStore.loadResponsabeArea(val.value);
-    personalAutoriza.value = justificante.value.responsable_Area;
-  }
-});
-
-function esObjeto(variable) {
-  return variable !== null && typeof variable === "object";
-}
 
 const cargarArea = async (val) => {
   if (area_Id.value == null) {
     let areaFiltrado = areas.value.find((x) => x.value == `${val.area_Id}`);
-    area_Id.value = areaFiltrado;
-    await justificanteStore.loadPersonalArea(val.area_Id);
-    cargarSolicitante(val);
+    area_Id.value = areaFiltrado.label;
+    //cargarSolicitante(val);
   }
 };
 
@@ -318,11 +297,30 @@ const cargarSolicitante = async (val) => {
   }
 };
 
+watch(area_Id, async (val) => {
+  if (area_Id.value != null) {
+    await justificanteStore.loadPersonalArea(area_Id.value.value);
+    empleado_Id.value = null;
+    //personalAutoriza.value = null;
+  }
+});
+watch(empleado_Id, async (val) => {
+  if (empleado_Id.value != null) {
+    await justificanteStore.loadResponsabeArea(val.value);
+    personalAutoriza.value = justificante.value.responsable_Area;
+  }
+});
+
+function esObjeto(variable) {
+  return variable !== null && typeof variable === "object";
+}
+
 const actualizarModal = (valor) => {
   $q.loading.show();
   justificanteStore.actualizarModal(valor);
   justificanteStore.updateVisualizar(false);
   justificanteStore.updateEditar(false);
+  justificanteStore.loadInformacionJustificante();
   limpiarCampos();
   listaIncidencias.value = [];
   empleado_Id.value = null;
@@ -370,7 +368,9 @@ const agregarIncidencia = async () => {
 
         resp = await justificanteStore.updateDetalle(detalle.value);
         if (resp.success) {
-          justificanteStore.loadDetalleJustificantes(justificante.value.id);
+          await justificanteStore.loadDetalleJustificantes(
+            justificante.value.id
+          );
         }
         limpiarCampos();
       } else {
@@ -425,14 +425,19 @@ const onSubmit = async () => {
       transitionHide: "scale",
     });
   } else {
+    console.log("emplado", empleado_Id);
     justificante.value.area_Id = area_Id.value.value;
-    justificante.value.solicitante_Id = empleado_Id.value.value;
-    justificante.value.solicitante = empleado_Id.value.label;
-    justificante.value.puesto_Capturista_Id = empleado_Id.value.puesto_Id;
-    justificante.value.puesto_Solicitante_Id = empleado_Id.value.puesto_Id;
+
+    if (isPersonal.value == false) {
+      justificante.value.solicitante_Id = empleado_Id.value.value;
+      justificante.value.solicitante = empleado_Id.value.label;
+      justificante.value.puesto_Solicitante_Id = empleado_Id.value.puesto_Id;
+    }
     if (isEditar.value == true) {
+      console.log("envio", justificante.value);
       resp = await justificanteStore.updateJustificante(justificante.value);
     } else {
+      console.log("crear", justificante.value);
       resp = await justificanteStore.createJustificante(justificante.value);
 
       if (resp.success == true) {

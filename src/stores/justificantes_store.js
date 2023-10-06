@@ -8,6 +8,7 @@ export const useJustificanteStore = defineStore("justificante", {
     editarDetalle: false,
     isVisualizar: false,
     isPersonal: false,
+    isAdmi: false,
     listaConceptos: [],
     listEmpleados: [],
     areas: [],
@@ -92,7 +93,8 @@ export const useJustificanteStore = defineStore("justificante", {
     //-----------------------------------------------------------
     async loadJustificantes() {
       try {
-        let perfil = parseInt(localStorage.getItem("perfil"));
+        // let perfil = parseInt(localStorage.getItem("perfil"));
+        let perfil = 1;
         let resp = null;
         let listJustificantes = null;
         if (perfil == 1) {
@@ -189,9 +191,11 @@ export const useJustificanteStore = defineStore("justificante", {
 
     async createJustificante(justificante) {
       try {
+        console.log("justificante", justificante);
         const resp = await api.post("/Justificantes", justificante);
         if (resp.status == 200) {
           const { success, data, idJustificante } = resp.data;
+
           if (success === true) {
             return { success, data, idJustificante };
           } else {
@@ -266,6 +270,8 @@ export const useJustificanteStore = defineStore("justificante", {
             this.justificante.fecha_Aprobacion_Rechazo =
               data.fecha_Aprobacion_Rechazo;
             this.justificante.fecha_Creacion = data.fecha_Creacion;
+
+            console.log("load", this.justificante);
             return { success, data };
           }
         }
@@ -279,7 +285,8 @@ export const useJustificanteStore = defineStore("justificante", {
 
     async loadInformacionJustificante() {
       try {
-        let perfil = parseInt(localStorage.getItem("perfil"));
+        let perfil = 2;
+        //let perfil = parseInt(localStorage.getItem("perfil"));
         let area = parseInt(localStorage.getItem("area"));
         let resp = await api.get("/ResponsablesAreas/ResposableByUsuario");
         let dataResp = resp.data.data;
@@ -314,14 +321,17 @@ export const useJustificanteStore = defineStore("justificante", {
           this.justificante.responsable_Area_Id = dataResp.empleado_Id;
           this.justificante.responsable_Area = dataResp.empleado;
           this.justificante.puesto_Responsable_Area_Id = dataResp.puesto_Id;
+          this.isAdmi = true;
         } else if (perfil == 3) {
           this.listEmpleados = [];
           let respArea = await api.get("/Areas/AreaByUsuario");
           let { data } = respArea.data;
+
           let listAreas = [{ value: data.area_Id, label: data.area }];
 
           let respPer = await api.get("/Empleados/ByUsuario");
           let data2 = respPer.data.data;
+          console.log("---------", data2);
           let listPersonal = [
             {
               value: data2.id,
@@ -335,7 +345,10 @@ export const useJustificanteStore = defineStore("justificante", {
           this.areas = listAreas;
           this.justificante.solicitante = `${data2.nombres} ${data2.apellido_Paterno} ${data2.apellido_Materno}`;
           this.listEmpleados = listPersonal;
+          this.justificante.puesto_Solicitante_Id = data2.puesto_Id;
           this.isPersonal = true;
+
+          console.log("111", this.justificante);
         }
       } catch (error) {
         return {
@@ -599,8 +612,12 @@ export const useJustificanteStore = defineStore("justificante", {
 
     async loadPersonalArea(id) {
       try {
+        let area = parseInt(localStorage.getItem("area"));
+        let idNuevo;
+        id == undefined ? (idNuevo = area) : (idNuevo = id);
+
         this.empleados = null;
-        let resp = await api.get(`/Empleados/ByArea/${id}`);
+        let resp = await api.get(`/Empleados/ByArea/${idNuevo}`);
         let { data } = resp.data;
         this.listEmpleados = data.map((personal) => {
           return {
@@ -628,7 +645,10 @@ export const useJustificanteStore = defineStore("justificante", {
       try {
         const resp = await api.get("/Empleados/ByUsuario");
         let { success, data } = resp.data;
+        console.log("daaaa", data);
         if (success) {
+          this.justificante.puesto_Capturista_Id = data.puesto_Id;
+          this.justificante.puesto_Capturista = data.puesto;
           this.justificante.capturista_Id = data.id;
           this.justificante.capturista = `${data.nombres}  ${data.apellido_Paterno} ${data.apellido_Materno}`;
         }
