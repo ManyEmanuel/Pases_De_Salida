@@ -33,7 +33,6 @@ export const useNotificacionStore = defineStore("Notificaciones", {
                 }
               );
               this.notificaciones = notificaciones_array;
-              console.log("Esto es notificiacion", notificaciones_array);
               this.no_notificaciones = data.no_Notificaciones;
             }
           }
@@ -95,7 +94,6 @@ export const useNotificacionStore = defineStore("Notificaciones", {
         const resp = await api.get(
           `/NotificacionesPases/Leer/${notificacionId}`
         );
-        console.log("Esto es resp", resp);
         if (resp.status == 200) {
           const { success, data } = resp.data;
           return { success, data };

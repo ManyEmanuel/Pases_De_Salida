@@ -54,7 +54,6 @@ export const useAuthStore = defineStore("auth", {
         const resp = await api.get(`/ResponsablesAreas/ResposableByUsuario`);
         if (resp.status == 200) {
           const { success, data } = resp.data;
-          console.log("Esto es data del rol", data);
           if (success === true) {
             if (data != null) {
               if (
