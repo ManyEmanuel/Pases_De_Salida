@@ -110,7 +110,6 @@ const columns = [
   },
 ];
 const pagination = ref({
-  //********** */
   page: 1,
   rowsPerPage: 25,
   sortBy: "name",
@@ -160,8 +159,6 @@ const eliminar = async (id) => {
         type: "positive",
         message: resp.data,
       });
-      if (isEditar.value == true)
-        justificanteStore.loadDetalleJustificantes(id);
     } else {
       $q.loading.hide();
       $q.notify({

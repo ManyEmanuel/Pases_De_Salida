@@ -39,32 +39,15 @@
               </q-input>
               <q-select
                 v-else
+                :readonly="areaRead"
                 v-model="area_Id"
                 :options="areas"
                 label="Area del empleado"
                 hint="Seleccione un area"
                 lazy-rules
-                :readonly="areaRead"
                 :rules="[(val) => !!val || 'El area es requerida']"
               >
               </q-select>
-            </div>
-            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-              <q-input
-                v-if="isVisualizar"
-                readonly
-                v-model="justificante.responsable_Area"
-                label="Responsable del área"
-              >
-              </q-input>
-              <q-input
-                v-else
-                stack-label
-                v-model="justificante.responsable_Area"
-                label="Responsable de área"
-                readonly
-              >
-              </q-input>
             </div>
             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
               <q-input
@@ -85,6 +68,7 @@
               </q-input>
               <q-select
                 v-else
+                :readonly="isPersonal"
                 stack-label
                 v-model="empleado_Id"
                 :options="listEmpleados"
@@ -94,6 +78,15 @@
                 :rules="[(val) => !!val || 'El solicitante es requerido']"
               >
               </q-select>
+            </div>
+
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+              <q-input
+                readonly
+                v-model="personalAutoriza"
+                label="Personal que autoriza"
+              >
+              </q-input>
               <br />
               <div class="text-h6 q-pt-xs text-bold">Incidencia</div>
             </div>
@@ -203,6 +196,7 @@
                 @click="actualizarModal(false)"
               />
               <q-btn
+                v-if="!isVisualizar"
                 :disable="listaIncidencias.value == ''"
                 label="Guardar"
                 type="submit"
@@ -239,6 +233,7 @@ const {
   detalle,
   editarDetalle,
   myLocale,
+  isPersonal,
 } = storeToRefs(justificanteStore);
 const tipoJustificante = ref([
   "Omisión de entrada",
@@ -249,13 +244,14 @@ const tipoJustificante = ref([
   "Vacaciones",
 ]);
 const days = ref([]);
+const cambioDays = ref(false);
 const tipo = ref(null);
 const periodoVacacional = ref("Primero");
 const empleado_Id = ref(null);
+const personalAutoriza = ref(null);
 const area_Id = ref(null);
 const motivo = ref(null);
 let areaRead = ref(false);
-let personalRead = ref(false);
 
 //-----------------------------------------------------------
 
@@ -265,63 +261,50 @@ onBeforeMount(() => {
 });
 
 //-----------------------------------------------------------
-watch(justificante.value, (val) => {
-  if (val.id != null) {
-    cargarArea(val);
-    cargarSolicitante(val);
-  }
-});
 
 watch(detalle.value, (val) => {
   if (val.id != null) {
-    cargarTipoJustificante(val);
+    if (tipo.value == null) {
+      let tipoFiltrado = tipoJustificante.value.find(
+        (x) => x == `${val.tipo_Justificantes}`
+      );
+      tipo.value = tipoFiltrado;
+    }
     motivo.value = val.motivo;
     days.value = val.dias_Incidencias;
+    cambioDays.value = false;
   }
 });
 
 watch(justificante.value, (val) => {
-  if (val.area_Id != null) {
-    let areaFiltrada = areas.value.find((x) => x.value == val.area_Id);
-    area_Id.value = areaFiltrada;
-    areaRead.value = true;
-  }
-  if (val.solicitante_Id != null) {
-    let personalFiltrado = listEmpleados.value.find(
-      (x) => x.value == val.solicitante_Id
-    );
-    empleado_Id.value = personalFiltrado;
-    personalRead.value = true;
-  }
+  cargarArea(val);
+  empleado_Id.value = val.solicitante;
 });
 
 watch(area_Id, (val) => {
   if (area_Id.value != null) {
-    empleado_Id.value = null;
     justificanteStore.loadPersonalArea(area_Id.value.value);
+    empleado_Id.value = null;
+    personalAutoriza.value = null;
   }
 });
-watch(empleado_Id, (val) => {
+watch(empleado_Id, async (val) => {
   if (empleado_Id.value != null) {
-    justificanteStore.loadResponsabeArea(val.value);
+    await justificanteStore.loadResponsabeArea(val.value);
+    personalAutoriza.value = justificante.value.responsable_Area;
   }
 });
 
-//-----------------------------------------------------------
-
-const cargarTipoJustificante = async (val) => {
-  if (tipo.value == null) {
-    let tipoFiltrado = tipoJustificante.value.find(
-      (x) => x == `${val.tipo_Justificantes}`
-    );
-    tipo.value = tipoFiltrado;
-  }
-};
+function esObjeto(variable) {
+  return variable !== null && typeof variable === "object";
+}
 
 const cargarArea = async (val) => {
   if (area_Id.value == null) {
     let areaFiltrado = areas.value.find((x) => x.value == `${val.area_Id}`);
     area_Id.value = areaFiltrado;
+    await justificanteStore.loadPersonalArea(val.area_Id);
+    cargarSolicitante(val);
   }
 };
 
@@ -331,6 +314,7 @@ const cargarSolicitante = async (val) => {
       (x) => x.label == `${val.solicitante}`
     );
     empleado_Id.value = solicitanteFiltrado;
+    personalAutoriza.value = val.responsable_Area;
   }
 };
 
@@ -342,6 +326,8 @@ const actualizarModal = (valor) => {
   limpiarCampos();
   listaIncidencias.value = [];
   empleado_Id.value = null;
+  area_Id.value = null;
+  personalAutoriza.value = null;
   $q.loading.hide();
 };
 
@@ -369,12 +355,19 @@ const agregarIncidencia = async () => {
       });
     } else {
       if (editarDetalle.value == true) {
-        detalle.value.dias_Incidencias = days.value;
+        let respObjeto = esObjeto(days.value);
+        if (respObjeto == true) {
+          const resultado = days.value.join(", ");
+          detalle.value.dias_Incidencias = resultado;
+        } else {
+          detalle.value.dias_Incidencias = detalle.value.dias_Incidencias;
+        }
         detalle.value.tipo_Justificantes = tipo.value;
         detalle.value.motivo = motivo.value;
         detalle.value.primer_Periodo = 0;
         detalle.value.segundo_Periodo = 0;
         detalle.value.dias_Economicos = 0;
+
         resp = await justificanteStore.updateDetalle(detalle.value);
         if (resp.success) {
           justificanteStore.loadDetalleJustificantes(justificante.value.id);
@@ -415,6 +408,7 @@ const limpiarCampos = () => {
   tipo.value = null;
   days.value = null;
   motivo.value = null;
+  cambioDays.value = false;
 };
 
 const onSubmit = async () => {
@@ -436,8 +430,6 @@ const onSubmit = async () => {
     justificante.value.solicitante = empleado_Id.value.label;
     justificante.value.puesto_Capturista_Id = empleado_Id.value.puesto_Id;
     justificante.value.puesto_Solicitante_Id = empleado_Id.value.puesto_Id;
-    justificante.value.capturista = justificante.value.capturista;
-    justificante.value.capturista_Id = justificante.value.capturista_Id;
     if (isEditar.value == true) {
       resp = await justificanteStore.updateJustificante(justificante.value);
     } else {
