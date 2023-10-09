@@ -43,6 +43,7 @@ export const useJustificanteStore = defineStore("justificante", {
       folio: null,
       fecha_Aprobacion_Rechazo: null,
       fecha_Creacion: null,
+      responsable_Administracion: null,
     },
     myLocale: {
       days: "Domingo_Lunes_Martes_Miércoles_Jueves_Viernes_Sábado".split("_"),
@@ -330,7 +331,6 @@ export const useJustificanteStore = defineStore("justificante", {
 
           let respPer = await api.get("/Empleados/ByUsuario");
           let data2 = respPer.data.data;
-          console.log("---------", data2);
           let listPersonal = [
             {
               value: data2.id,
@@ -346,8 +346,6 @@ export const useJustificanteStore = defineStore("justificante", {
           this.listEmpleados = listPersonal;
           this.justificante.puesto_Solicitante_Id = data2.puesto_Id;
           this.isPersonal = true;
-
-          console.log("111", this.justificante);
         }
       } catch (error) {
         return {
@@ -646,7 +644,6 @@ export const useJustificanteStore = defineStore("justificante", {
       try {
         const resp = await api.get("/Empleados/ByUsuario");
         let { success, data } = resp.data;
-        console.log("daaaa", data);
         if (success) {
           this.justificante.puesto_Capturista_Id = data.puesto_Id;
           this.justificante.puesto_Capturista = data.puesto;
