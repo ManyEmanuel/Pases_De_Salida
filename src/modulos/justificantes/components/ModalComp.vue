@@ -31,7 +31,7 @@
           <div class="row">
             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
               <q-input
-                v-if="isVisualizar"
+                v-if="isVisualizar || isEditar"
                 readonly
                 v-model="justificante.area"
                 label="Área"
@@ -59,7 +59,7 @@
 
             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
               <q-input
-                v-if="isVisualizar || isPersonal"
+                v-if="isVisualizar || isEditar || isPersonal"
                 readonly
                 v-model="justificante.solicitante"
                 label="Solicitante"
@@ -80,8 +80,16 @@
 
             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
               <q-input
+                v-if="isEditar"
                 readonly
                 v-model="personalAutoriza"
+                label="Personal que autoriza"
+              >
+              </q-input>
+              <q-input
+                v-else
+                readonly
+                v-model="justificante.responsable_Area"
                 label="Personal que autoriza"
               >
               </q-input>
@@ -194,7 +202,7 @@
                 @click="actualizarModal(false)"
               />
               <q-btn
-                v-if="!isVisualizar"
+                v-if="!isVisualizar && !isEditar"
                 :disable="listaIncidencias.value == ''"
                 label="Guardar"
                 type="submit"
@@ -282,8 +290,7 @@ watch(justificante.value, (val) => {
 const cargarArea = async (val) => {
   if (area_Id.value == null) {
     let areaFiltrado = areas.value.find((x) => x.value == `${val.area_Id}`);
-    area_Id.value = areaFiltrado.label;
-    //cargarSolicitante(val);
+    area_Id.value = { value: val.area_Id, label: areaFiltrado.label };
   }
 };
 
@@ -301,9 +308,11 @@ watch(area_Id, async (val) => {
   if (area_Id.value != null) {
     await justificanteStore.loadPersonalArea(area_Id.value.value);
     empleado_Id.value = null;
-    //personalAutoriza.value = null;
+    personalAutoriza.value = null;
+    justificante.value.responsable_Area = null;
   }
 });
+
 watch(empleado_Id, async (val) => {
   if (empleado_Id.value != null) {
     await justificanteStore.loadResponsabeArea(val.value);
@@ -425,19 +434,12 @@ const onSubmit = async () => {
       transitionHide: "scale",
     });
   } else {
-    console.log("emplado", empleado_Id);
+    console.log("area", area_Id);
     justificante.value.area_Id = area_Id.value.value;
-
-    if (isPersonal.value == false) {
-      justificante.value.solicitante_Id = empleado_Id.value.value;
-      justificante.value.solicitante = empleado_Id.value.label;
-      justificante.value.puesto_Solicitante_Id = empleado_Id.value.puesto_Id;
-    }
+    justificante.value.solicitante_Id = empleado_Id.value.value;
+    justificante.value.puesto_Solicitante_Id = empleado_Id.value.puesto_Id;
     if (isEditar.value == true) {
-      console.log("envio", justificante.value);
-      resp = await justificanteStore.updateJustificante(justificante.value);
     } else {
-      console.log("crear", justificante.value);
       resp = await justificanteStore.createJustificante(justificante.value);
 
       if (resp.success == true) {

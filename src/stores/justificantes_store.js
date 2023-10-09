@@ -285,8 +285,7 @@ export const useJustificanteStore = defineStore("justificante", {
 
     async loadInformacionJustificante() {
       try {
-        let perfil = 2;
-        //let perfil = parseInt(localStorage.getItem("perfil"));
+        let perfil = parseInt(localStorage.getItem("perfil"));
         let area = parseInt(localStorage.getItem("area"));
         let resp = await api.get("/ResponsablesAreas/ResposableByUsuario");
         let dataResp = resp.data.data;
@@ -619,6 +618,7 @@ export const useJustificanteStore = defineStore("justificante", {
         this.empleados = null;
         let resp = await api.get(`/Empleados/ByArea/${idNuevo}`);
         let { data } = resp.data;
+
         this.listEmpleados = data.map((personal) => {
           return {
             value: personal.id,
@@ -629,6 +629,7 @@ export const useJustificanteStore = defineStore("justificante", {
               " " +
               personal.apellido_Materno,
             puesto_Id: personal.puesto_Id,
+            area_Id: personal.area_Id,
           };
         });
       } catch (error) {
