@@ -1,3 +1,4 @@
+import { api } from "src/boot/axios";
 import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
 import { storeToRefs } from "pinia";
@@ -7,15 +8,19 @@ const ValeJustificante = async () => {
   try {
     const justificanteStore = useJustificanteStore();
     const { justificante, listaIncidencias } = storeToRefs(justificanteStore);
+
+    const resp = await api.get(`/Empleados/GetResponsableByArea/${6}`);
+    let { success, data } = resp.data;
+
+    if (success) {
+      justificante.value.responsable_Administracion = `${data.nombres}  ${data.apellido_Paterno} ${data.apellido_Materno}`;
+    }
     //--------------------------------------------------------------------------//
     const dateActual = new Date();
     const year = dateActual.getFullYear();
     const month = String(dateActual.getMonth() + 1).padStart(2, "0");
     const monthNameLong = dateActual.toLocaleString("es-ES", { month: "long" });
     const day = String(dateActual.getDate()).padStart(2, "0");
-    const vacaciones = true;
-    const solicitante = "Karla Gameros";
-    const jefeInmediato = "Edgar Daniel Jiménez Cabrera";
     let img = new Image();
 
     img.src = require("../assets/IEEN300.png");
@@ -233,6 +238,14 @@ const ValeJustificante = async () => {
     doc.text("Vo. Bo, Jefe/a inmediato/a", 165, 250, null, null, "center");
     //--------------------------------------------------------------------------//
     doc.line(60, 260, 150, 260);
+    doc.text(
+      `${justificante.value.responsable_Administracion}`,
+      105,
+      259,
+      null,
+      null,
+      "center"
+    );
     doc.text("Nombre y Firma", 105, 265, null, null, "center");
     doc.text("Dirección de Administración", 105, 270, null, null, "center");
     //--------------------------------------------------------------------------//

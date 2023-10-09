@@ -36,13 +36,11 @@
 <script setup>
 import { storeToRefs } from "pinia";
 import { useQuasar } from "quasar";
-import { store } from "quasar/wrappers";
 import { useJustificanteStore } from "src/stores/justificantes_store";
-import { onBeforeMount } from "vue";
+import { onBeforeMount, onMounted } from "vue";
 import { useAuthStore } from "../../../stores/auth_store";
 import ModalCompVue from "../components/ModalComp.vue";
 import TablaComp from "../components/TablaComp.vue";
-import ValeJustificante from "../../../helpers/ValeJustificante";
 
 const $q = useQuasar();
 const authStore = useAuthStore();
