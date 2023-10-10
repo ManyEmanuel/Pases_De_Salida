@@ -61,6 +61,7 @@ const calendarOptions = ref({
     interactionPlugin, // needed for dateClick
   ],
   headerToolbar: {
+    left: "prev,next today",
     center: "title",
     right: "dayGridMonth,timeGridWeek,timeGridDay",
   },

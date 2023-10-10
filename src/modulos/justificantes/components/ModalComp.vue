@@ -408,7 +408,8 @@ const actualizarModal = (valor) => {
   listaIncidencias.value = [];
   empleado_Id.value = null;
   area_Id.value = null;
-  personalAutoriza.value = null;
+  //personalAutoriza.value = null;
+  console.log("modal", area_Id.value);
   $q.loading.hide();
 };
 

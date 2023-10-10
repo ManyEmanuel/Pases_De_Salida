@@ -31,7 +31,7 @@
                   v-show="
                     modulo.actualizar &&
                     props.row.estatus == 'Pendiente' &&
-                    jefeArea
+                    props.row.responsable_Area == byUsuario
                   "
                   flat
                   round
@@ -62,7 +62,11 @@
                   <q-tooltip>Imprimir justificante</q-tooltip>
                 </q-btn>
                 <q-btn
-                  v-if="modulo.actualizar && props.row.estatus == 'Pendiente'"
+                  v-if="
+                    modulo.actualizar &&
+                    props.row.estatus == 'Pendiente' &&
+                    props.row.responsable_Area != byUsuario
+                  "
                   flat
                   round
                   color="purple-ieen"
@@ -72,7 +76,11 @@
                   <q-tooltip>Editar justificante</q-tooltip>
                 </q-btn>
                 <q-btn
-                  v-if="modulo.actualizar && props.row.estatus == 'Pendiente'"
+                  v-if="
+                    modulo.actualizar &&
+                    props.row.estatus == 'Pendiente' &&
+                    props.row.responsable_Area != byUsuario
+                  "
                   flat
                   round
                   color="purple-ieen"
@@ -85,7 +93,7 @@
                   v-if="
                     modulo.eliminar &&
                     props.row.estatus == 'Pendiente' &&
-                    jefeArea
+                    props.row.responsable_Area == byUsuario
                   "
                   flat
                   round
@@ -116,7 +124,7 @@ import ValeJustificante from "src/helpers/ValeJustificante";
 
 const $q = useQuasar();
 const justificanteStore = useJustificanteStore();
-const { justificantes, isAdmi, isPersonal, jefeArea } =
+const { justificantes, isAdmi, isPersonal, jefeArea, byUsuario } =
   storeToRefs(justificanteStore);
 const authStore = useAuthStore();
 const { modulo } = storeToRefs(authStore);
@@ -127,7 +135,7 @@ onBeforeMount(() => {
   justificanteStore.loadJustificantes();
   justificanteStore.loadResponsabeByArea();
 });
-
+console.log("by", byUsuario, justificantes);
 //-----------------------------------------------------------
 
 const columns = [
