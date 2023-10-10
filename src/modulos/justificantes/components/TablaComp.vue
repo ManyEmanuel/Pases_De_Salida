@@ -146,14 +146,14 @@ const columns = [
   {
     name: "capturista",
     align: "center",
-    label: "Campturista",
+    label: "Capturista",
     field: "capturista",
     sortable: false,
   },
   {
     name: "area",
     align: "center",
-    label: "Area",
+    label: "Área",
     field: "area",
     sortable: false,
   },
@@ -175,7 +175,7 @@ const columns = [
   {
     name: "fecha_Aprobacion_Rechazo",
     align: "center",
-    label: "Fecha de aprobacion o rechazo",
+    label: "Fecha de aprobación o rechazo",
     field: "fecha_Aprobacion_Rechazo",
     sortable: false,
   },

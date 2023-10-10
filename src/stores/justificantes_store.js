@@ -616,7 +616,6 @@ export const useJustificanteStore = defineStore("justificante", {
         this.empleados = null;
         let resp = await api.get(`/Empleados/ByArea/${idNuevo}`);
         let { data } = resp.data;
-
         this.listEmpleados = data.map((personal) => {
           return {
             value: personal.id,

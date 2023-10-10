@@ -41,10 +41,10 @@
                 v-else
                 v-model="area_Id"
                 :options="areas"
-                label="Area del empleado"
-                hint="Seleccione un area"
+                label="Área del empleado"
+                hint="Seleccione un área"
                 lazy-rules
-                :rules="[(val) => !!val || 'El area es requerida']"
+                :rules="[(val) => !!val || 'El área es requerida']"
               >
               </q-select>
             </div>
@@ -103,7 +103,7 @@
             >
               <q-btn-dropdown
                 class="bg-purple-ieen-3 text-white"
-                :label="tipo == null ? 'Seleccione una opcion' : tipo"
+                :label="tipo == null ? 'Seleccione una opción' : tipo"
                 dropdown-icon="change_history"
               >
                 <q-list>
@@ -134,11 +134,41 @@
                       transition-hide="scale"
                     >
                       <q-date
+                        v-if="
+                          tipo == 'Omisión de entrada' ||
+                          tipo == 'Omisión de salida'
+                        "
                         color="purple"
                         v-model="days"
                         multiple
                         :locale="myLocale"
-                      />
+                        :options="FiltroFecha"
+                      >
+                        <div class="row items-center justify-end">
+                          <q-btn
+                            v-close-popup
+                            label="Cerrar"
+                            color="black"
+                            flat
+                          /></div
+                      ></q-date>
+                      <q-date
+                        v-else
+                        color="purple"
+                        v-model="days"
+                        multiple
+                        :max="3"
+                        :locale="myLocale"
+                        @click="validateDates"
+                      >
+                        <div class="row items-center justify-end">
+                          <q-btn
+                            v-close-popup
+                            label="Cerrar"
+                            color="black"
+                            flat
+                          /></div
+                      ></q-date>
                     </q-popup-proxy>
                   </q-icon>
                 </template>
@@ -219,7 +249,7 @@
 
 <script setup>
 import { storeToRefs } from "pinia";
-import { useQuasar } from "quasar";
+import { useQuasar, date } from "quasar";
 import { useJustificanteStore } from "src/stores/justificantes_store";
 import { onBeforeMount, ref, watch } from "vue";
 import TablaConceptos from "./TablaConceptos.vue";
@@ -240,7 +270,6 @@ const {
   editarDetalle,
   myLocale,
   isPersonal,
-  isAdmi,
 } = storeToRefs(justificanteStore);
 const tipoJustificante = ref([
   "Omisión de entrada",
@@ -258,6 +287,7 @@ const empleado_Id = ref(null);
 const personalAutoriza = ref(null);
 const area_Id = ref(null);
 const motivo = ref(null);
+const filtrarFecha = ref("");
 
 //-----------------------------------------------------------
 
@@ -282,9 +312,31 @@ watch(detalle.value, (val) => {
   }
 });
 
-watch(justificante.value, (val) => {
+watch(justificante.value, async (val) => {
   cargarArea(val);
   cargarSolicitante(val);
+  await justificanteStore.loadPersonalArea(area_Id.value.value);
+});
+
+watch(area_Id, async (val) => {
+  if (area_Id.value != null) {
+    await justificanteStore.loadPersonalArea(area_Id.value.value);
+    empleado_Id.value = null;
+    personalAutoriza.value = null;
+    justificante.value.responsable_Area = null;
+  }
+});
+
+watch(empleado_Id, async (val) => {
+  if (empleado_Id.value != null) {
+    await justificanteStore.loadResponsabeArea(val.value);
+    personalAutoriza.value = justificante.value.responsable_Area;
+  }
+});
+
+watch(tipo, (val) => {
+  days.value = null;
+  motivo.value = null;
 });
 
 const cargarArea = async (val) => {
@@ -304,25 +356,45 @@ const cargarSolicitante = async (val) => {
   }
 };
 
-watch(area_Id, async (val) => {
-  if (area_Id.value != null) {
-    await justificanteStore.loadPersonalArea(area_Id.value.value);
-    empleado_Id.value = null;
-    personalAutoriza.value = null;
-    justificante.value.responsable_Area = null;
+const validateDates = () => {
+  if (days.value.length > 3 && tipo.value == "Permiso día económico") {
+    days.value = days.value.slice(0, 3);
+  } else if (days.value.length > 10 && tipo.value == "Vacaciones") {
+    days.value = days.value.slice(0, 10);
   }
-});
-
-watch(empleado_Id, async (val) => {
-  if (empleado_Id.value != null) {
-    await justificanteStore.loadResponsabeArea(val.value);
-    personalAutoriza.value = justificante.value.responsable_Area;
-  }
-});
+};
 
 function esObjeto(variable) {
   return variable !== null && typeof variable === "object";
 }
+
+const FiltroFecha = (fecha) => {
+  const today = new Date();
+  let diaSemana = today.getDay();
+  let diasContar = 3;
+  if (diaSemana <= 3) {
+    diasContar = 5;
+  }
+  filtrarFecha.value = date.formatDate(today, "YYYY/MM/DD");
+  let filtro = calcularFechaNueva(filtrarFecha.value, diasContar);
+  return fecha >= filtro;
+};
+
+const calcularFechaNueva = (fecha, dias) => {
+  const [anio, mes, dia] = fecha.split("/");
+  const fechaFormato = new Date(anio, mes - 1, dia);
+  fechaFormato.setDate(fechaFormato.getDate() - dias);
+  let mesFiltro = fechaFormato.getMonth() + 1;
+  let diaFiltro = fechaFormato.getDate();
+  let formatoMes = mesFiltro <= 9 ? "0" + mesFiltro : mesFiltro;
+  let formatoDia = diaFiltro <= 9 ? "0" + diaFiltro : diaFiltro;
+  const anioPrevio = fechaFormato.getFullYear();
+  const mesPrevio = formatoMes;
+  const diaPrevio = formatoDia;
+
+  const fechaLimite = `${anioPrevio}/${mesPrevio}/${diaPrevio}`;
+  return fechaLimite;
+};
 
 const actualizarModal = (valor) => {
   $q.loading.show();
@@ -331,6 +403,7 @@ const actualizarModal = (valor) => {
   justificanteStore.updateEditar(false);
   justificanteStore.loadInformacionJustificante();
   limpiarCampos();
+  justificante.value.solicitante = null;
   listaIncidencias.value = [];
   empleado_Id.value = null;
   area_Id.value = null;
@@ -420,6 +493,22 @@ const limpiarCampos = () => {
   cambioDays.value = false;
 };
 
+const validar = async () => {
+  if (listaIncidencias.value == "") {
+    $q.dialog({
+      title: "Atención",
+      message: "Debes de agregar minimo una incidencia",
+      icon: "Warning",
+      persistent: true,
+      transitionShow: "scale",
+      transitionHide: "scale",
+    });
+    return false;
+  } else {
+    return true;
+  }
+};
+
 const onSubmit = async () => {
   let resp = null;
 
@@ -434,7 +523,6 @@ const onSubmit = async () => {
       transitionHide: "scale",
     });
   } else {
-    console.log("area", area_Id);
     justificante.value.area_Id = area_Id.value.value;
     justificante.value.solicitante_Id = empleado_Id.value.value;
     justificante.value.puesto_Solicitante_Id = empleado_Id.value.puesto_Id;
@@ -451,23 +539,24 @@ const onSubmit = async () => {
         });
       }
     }
+
+    if (resp.success === true) {
+      $q.notify({
+        position: "top-right",
+        type: "positive",
+        message: "Se creo con exito",
+      });
+      justificanteStore.loadJustificantes();
+      actualizarModal(false);
+    } else {
+      $q.notify({
+        position: "top-right",
+        type: "negative",
+        message: resp.data,
+      });
+    }
   }
 
-  if (resp.success === true) {
-    $q.notify({
-      position: "top-right",
-      type: "positive",
-      message: "Se creo con exito",
-    });
-    justificanteStore.loadJustificantes();
-    actualizarModal(false);
-  } else {
-    $q.notify({
-      position: "top-right",
-      type: "negative",
-      message: resp.data,
-    });
-  }
   $q.loading.hide();
 };
 </script>
