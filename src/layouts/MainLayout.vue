@@ -132,6 +132,16 @@
               >
             </q-item-section>
           </q-item>
+          <q-item :to="{ name: 'misChecadas' }">
+            <q-item-section avatar>
+              <q-icon name="calendar_month" color="purple-ieen" />
+            </q-item-section>
+            <q-item-section>
+              <q-item-label class="text-purple-ieen label-title text-bold"
+                >Mis checadas</q-item-label
+              >
+            </q-item-section>
+          </q-item>
         </q-list>
       </q-scroll-area>
       <q-img
