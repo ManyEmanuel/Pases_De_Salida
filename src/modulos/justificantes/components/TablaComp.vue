@@ -5,7 +5,6 @@
         :rows="justificantes"
         :columns="columns"
         :filter="filter"
-        :loading="loading"
         :pagination="pagination"
         row-key="id"
         rows-per-page-label="Filas por pagina"
@@ -29,7 +28,11 @@
             <q-td v-for="col in props.cols" :key="col.name" :props="props">
               <div v-if="col.name === 'justificante_Id'">
                 <q-btn
-                  v-show="modulo.actualizar && props.row.estatus == 'Pendiente'"
+                  v-show="
+                    modulo.actualizar &&
+                    props.row.estatus == 'Pendiente' &&
+                    jefeArea
+                  "
                   flat
                   round
                   color="purple-ieen"
@@ -79,7 +82,11 @@
                   <q-tooltip>Cancelar justificante</q-tooltip>
                 </q-btn>
                 <q-btn
-                  v-if="modulo.eliminar && props.row.estatus == 'Pendiente'"
+                  v-if="
+                    modulo.eliminar &&
+                    props.row.estatus == 'Pendiente' &&
+                    jefeArea
+                  "
                   flat
                   round
                   color="purple-ieen"
@@ -109,13 +116,16 @@ import ValeJustificante from "src/helpers/ValeJustificante";
 
 const $q = useQuasar();
 const justificanteStore = useJustificanteStore();
-const { justificantes } = storeToRefs(justificanteStore);
+const { justificantes, isAdmi, isPersonal, jefeArea } =
+  storeToRefs(justificanteStore);
 const authStore = useAuthStore();
 const { modulo } = storeToRefs(authStore);
+
 //-----------------------------------------------------------
 
 onBeforeMount(() => {
   justificanteStore.loadJustificantes();
+  justificanteStore.loadResponsabeByArea();
 });
 
 //-----------------------------------------------------------
@@ -138,7 +148,7 @@ const columns = [
   {
     name: "responsable_Area",
     align: "center",
-    label: "Responsable area",
+    label: "Responsable área",
     field: "responsable_Area",
     sortable: false,
   },
@@ -146,14 +156,14 @@ const columns = [
   {
     name: "capturista",
     align: "center",
-    label: "Campturista",
+    label: "Capturista",
     field: "capturista",
     sortable: false,
   },
   {
     name: "area",
     align: "center",
-    label: "Area",
+    label: "Área",
     field: "area",
     sortable: false,
   },
@@ -175,7 +185,7 @@ const columns = [
   {
     name: "fecha_Aprobacion_Rechazo",
     align: "center",
-    label: "Fecha de aprobacion o rechazo",
+    label: "Fecha de aprobación o rechazo",
     field: "fecha_Aprobacion_Rechazo",
     sortable: false,
   },
