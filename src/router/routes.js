@@ -25,6 +25,11 @@ const routes = [
         name: "registro_Justificante",
         component: () => import("../modulos/justificantes/pages/IndexPage"),
       },
+      {
+        path: "/misChecadas",
+        name: "misChecadas",
+        component: () => import("../modulos/calendario/pages/IndexPage"),
+      },
     ],
   },
 
