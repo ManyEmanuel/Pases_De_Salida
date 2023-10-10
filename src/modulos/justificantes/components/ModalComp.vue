@@ -31,14 +31,14 @@
           <div class="row">
             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
               <q-input
-                v-if="isVisualizar || isEditar"
+                v-if="isEditar"
                 readonly
                 v-model="justificante.area"
                 label="Área"
-              >
-              </q-input>
+              ></q-input>
               <q-select
                 v-else
+                :readonly="isAdmi || isPersonal"
                 v-model="area_Id"
                 :options="areas"
                 label="Área del empleado"
@@ -270,6 +270,7 @@ const {
   editarDetalle,
   myLocale,
   isPersonal,
+  isAdmi,
 } = storeToRefs(justificanteStore);
 const tipoJustificante = ref([
   "Omisión de entrada",
@@ -312,15 +313,14 @@ watch(detalle.value, (val) => {
   }
 });
 
-watch(justificante.value, async (val) => {
+watch(justificante.value, (val) => {
   cargarArea(val);
   cargarSolicitante(val);
-  await justificanteStore.loadPersonalArea(area_Id.value.value);
 });
 
 watch(area_Id, async (val) => {
   if (area_Id.value != null) {
-    await justificanteStore.loadPersonalArea(area_Id.value.value);
+    await justificanteStore.loadPersonalArea(val.value);
     empleado_Id.value = null;
     personalAutoriza.value = null;
     justificante.value.responsable_Area = null;
@@ -342,7 +342,8 @@ watch(tipo, (val) => {
 const cargarArea = async (val) => {
   if (area_Id.value == null) {
     let areaFiltrado = areas.value.find((x) => x.value == `${val.area_Id}`);
-    area_Id.value = { value: val.area_Id, label: areaFiltrado.label };
+    area_Id.value = areaFiltrado;
+    await justificanteStore.loadPersonalArea(val.area_Id);
   }
 };
 
@@ -364,9 +365,9 @@ const validateDates = () => {
   }
 };
 
-function esObjeto(variable) {
+const esObjeto = (variable) => {
   return variable !== null && typeof variable === "object";
-}
+};
 
 const FiltroFecha = (fecha) => {
   const today = new Date();
@@ -493,22 +494,6 @@ const limpiarCampos = () => {
   cambioDays.value = false;
 };
 
-const validar = async () => {
-  if (listaIncidencias.value == "") {
-    $q.dialog({
-      title: "Atención",
-      message: "Debes de agregar minimo una incidencia",
-      icon: "Warning",
-      persistent: true,
-      transitionShow: "scale",
-      transitionHide: "scale",
-    });
-    return false;
-  } else {
-    return true;
-  }
-};
-
 const onSubmit = async () => {
   let resp = null;
 
@@ -528,6 +513,7 @@ const onSubmit = async () => {
     justificante.value.puesto_Solicitante_Id = empleado_Id.value.puesto_Id;
     if (isEditar.value == true) {
     } else {
+      console.log("jus", justificante.value);
       resp = await justificanteStore.createJustificante(justificante.value);
 
       if (resp.success == true) {
