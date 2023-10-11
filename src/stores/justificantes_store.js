@@ -9,6 +9,7 @@ export const useJustificanteStore = defineStore("justificante", {
     isVisualizar: false,
     isPersonal: false,
     isAdmi: false,
+    isSuperAdmi: false,
     jefeArea: false,
     listaConceptos: [],
     listEmpleados: [],
@@ -67,7 +68,6 @@ export const useJustificanteStore = defineStore("justificante", {
 
     updateEditar(valor) {
       this.isEditar = valor;
-      console.log("this is editar", this.isEditar);
     },
 
     updateVisualizar(valor) {
@@ -101,8 +101,8 @@ export const useJustificanteStore = defineStore("justificante", {
         tipoEmp == "JefeArea"
           ? (this.jefeArea = true)
           : (this.jefeArea = false);
-        let perfil = parseInt(localStorage.getItem("perfil"));
-
+        // let perfil = parseInt(localStorage.getItem("perfil"));
+        let perfil = 1;
         let resp = null;
         let listJustificantes = null;
         if (perfil == 1) {
@@ -132,6 +132,7 @@ export const useJustificanteStore = defineStore("justificante", {
             };
           });
           this.justificantes = listJustificantes;
+          this.isSuperAdmi = true;
         } else if (perfil == 2) {
           resp = await api.get("/Justificantes/ByArea");
           let { data } = resp.data;
@@ -322,7 +323,8 @@ export const useJustificanteStore = defineStore("justificante", {
 
     async loadInformacionJustificante() {
       try {
-        let perfil = parseInt(localStorage.getItem("perfil"));
+        //let perfil = parseInt(localStorage.getItem("perfil"));
+        let perfil = 1;
         let area = parseInt(localStorage.getItem("area"));
         let resp = await api.get("/ResponsablesAreas/ResposableByUsuario");
         let dataResp = resp.data.data;
@@ -507,6 +509,7 @@ export const useJustificanteStore = defineStore("justificante", {
           `/Detalle_Justificantes/ByJustificantes/${id}`
         );
         let { data } = resp.data;
+
         this.listaIncidencias = data.map((incidencia) => {
           return {
             id: incidencia.id,

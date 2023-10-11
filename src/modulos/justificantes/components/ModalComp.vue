@@ -80,19 +80,18 @@
 
             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
               <q-input
-                v-if="isEditar"
                 readonly
                 v-model="personalAutoriza"
                 label="Personal que autoriza"
               >
               </q-input>
-              <q-input
+              <!-- <q-input
                 v-else
                 readonly
                 v-model="justificante.responsable_Area"
                 label="Personal que autoriza"
               >
-              </q-input>
+              </q-input> -->
               <br />
               <div class="text-h6 q-pt-xs text-bold">Incidencia</div>
             </div>
@@ -209,7 +208,7 @@
           <div v-if="!isVisualizar" class="col-12">
             <div class="text-right">
               <q-btn
-                label="Agregar"
+                :label="editarDetalle ? 'Editar' : 'Agregar'"
                 icon="add"
                 color="secondary"
                 size="sm"
@@ -271,6 +270,7 @@ const {
   myLocale,
   isPersonal,
   isAdmi,
+  isSuperAdmi,
 } = storeToRefs(justificanteStore);
 const tipoJustificante = ref([
   "Omisión de entrada",
@@ -301,15 +301,9 @@ onBeforeMount(() => {
 
 watch(detalle.value, (val) => {
   if (val.id != null) {
-    if (tipo.value == null) {
-      let tipoFiltrado = tipoJustificante.value.find(
-        (x) => x == `${val.tipo_Justificantes}`
-      );
-      tipo.value = tipoFiltrado;
-    }
     motivo.value = val.motivo;
     days.value = val.dias_Incidencias;
-    cambioDays.value = false;
+    cargarTipo(val);
   }
 });
 
@@ -334,10 +328,19 @@ watch(empleado_Id, async (val) => {
   }
 });
 
-watch(tipo, (val) => {
-  days.value = null;
-  motivo.value = null;
-});
+// watch(tipo, (val) => {
+//   days.value = null;
+//   motivo.value = null;
+// });
+
+const cargarTipo = async (val) => {
+  if (tipo.value == null) {
+    let tipoFiltrado = tipoJustificante.value.find(
+      (x) => x == `${val.tipo_Justificantes}`
+    );
+    tipo.value = tipoFiltrado;
+  }
+};
 
 const cargarArea = async (val) => {
   if (area_Id.value == null) {
@@ -408,8 +411,6 @@ const actualizarModal = (valor) => {
   listaIncidencias.value = [];
   empleado_Id.value = null;
   area_Id.value = null;
-  //personalAutoriza.value = null;
-  console.log("modal", area_Id.value);
   $q.loading.hide();
 };
 
@@ -438,24 +439,54 @@ const agregarIncidencia = async () => {
     } else {
       if (editarDetalle.value == true) {
         let respObjeto = esObjeto(days.value);
-        if (respObjeto == true) {
-          const resultado = days.value.join(", ");
-          detalle.value.dias_Incidencias = resultado;
-        } else {
-          detalle.value.dias_Incidencias = detalle.value.dias_Incidencias;
-        }
-        detalle.value.tipo_Justificantes = tipo.value;
-        detalle.value.motivo = motivo.value;
-        detalle.value.primer_Periodo = 0;
-        detalle.value.segundo_Periodo = 0;
-        detalle.value.dias_Economicos = 0;
+        if (tipo.value == "Vacaciones") {
+          let periodo;
+          if (respObjeto == true) {
+            const resultado = days.value.join(", ");
+            detalle.value.dias_Incidencias = resultado;
+          } else {
+            detalle.value.dias_Incidencias = detalle.value.dias_Incidencias;
+          }
 
-        resp = await justificanteStore.updateDetalle(detalle.value);
-        if (resp.success) {
-          await justificanteStore.loadDetalleJustificantes(
-            justificante.value.id
-          );
+          if (periodoVacacional.value == "Primero") {
+            periodo = 1;
+          } else {
+            periodo = 2;
+          }
+          detalle.value.tipo_Justificantes = tipo.value;
+          detalle.value.motivo = motivo.value;
+          detalle.value.primer_Periodo = 0;
+          detalle.value.segundo_Periodo = 0;
+          detalle.value.dias_Economicos = 0;
+          detalle.value.periodo_Vacacional = periodo;
+          resp = await justificanteStore.updateDetalle(detalle.value);
+          if (resp.success) {
+            await justificanteStore.loadDetalleJustificantes(
+              justificante.value.id
+            );
+          }
+        } else {
+          if (respObjeto == true) {
+            const resultado = days.value.join(", ");
+            detalle.value.dias_Incidencias = resultado;
+          } else {
+            detalle.value.dias_Incidencias = detalle.value.dias_Incidencias;
+          }
+          detalle.value.tipo_Justificantes = tipo.value;
+          detalle.value.motivo = motivo.value;
+          detalle.value.primer_Periodo = 0;
+          detalle.value.segundo_Periodo = 0;
+          detalle.value.dias_Economicos = 0;
+          detalle.value.periodo_Vacacional = 0;
+          resp = await justificanteStore.updateDetalle(detalle.value);
+          if (resp.success) {
+            await justificanteStore.loadDetalleJustificantes(
+              justificante.value.id
+            );
+          }
         }
+
+        justificanteStore.updateEditarDetalle(false);
         limpiarCampos();
       } else {
         if (tipo.value == "Vacaciones") {
@@ -466,19 +497,41 @@ const agregarIncidencia = async () => {
             periodo = 2;
           }
           const resultado = days.value.join(", ");
+          detalle.value.dias_Incidencias = resultado;
+          detalle.value.tipo_Justificantes = tipo.value;
+          detalle.value.motivo = motivo.value;
+          detalle.value.periodo_Vacacional = periodo;
+          detalle.value.dias_Economicos = 0;
+          detalle.value.primer_Periodo = 0;
+          detalle.value.segundo_Periodo = 0;
           await justificanteStore.addIncidencia(
             resultado,
             motivo.value,
             tipo.value,
             periodo
           );
+          await justificanteStore.createDetalleJustificantes(
+            justificante.value.id,
+            detalle.value
+          );
         } else {
           const resultado = days.value.join(", ");
+          detalle.value.dias_Incidencias = resultado;
+          detalle.value.tipo_Justificantes = tipo.value;
+          detalle.value.motivo = motivo.value;
+          detalle.value.periodo_Vacacional = 0;
+          detalle.value.primer_Periodo = 0;
+          detalle.value.segundo_Periodo = 0;
+          detalle.value.dias_Economicos = 0;
           await justificanteStore.addIncidencia(
             resultado,
             motivo.value,
             tipo.value,
             0
+          );
+          await justificanteStore.createDetalleJustificantes(
+            justificante.value.id,
+            detalle.value
           );
         }
 
@@ -514,7 +567,6 @@ const onSubmit = async () => {
     justificante.value.puesto_Solicitante_Id = empleado_Id.value.puesto_Id;
     if (isEditar.value == true) {
     } else {
-      console.log("jus", justificante.value);
       resp = await justificanteStore.createJustificante(justificante.value);
 
       if (resp.success == true) {
