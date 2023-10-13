@@ -156,7 +156,6 @@
                         color="purple"
                         v-model="days"
                         multiple
-                        :max="3"
                         :locale="myLocale"
                         @click="validateDates"
                       >
@@ -271,6 +270,8 @@ const {
   isPersonal,
   isAdmi,
   isSuperAdmi,
+  dias_restantes,
+  configuracion,
 } = storeToRefs(justificanteStore);
 const tipoJustificante = ref([
   "Omisión de entrada",
@@ -289,7 +290,7 @@ const personalAutoriza = ref(null);
 const area_Id = ref(null);
 const motivo = ref(null);
 const filtrarFecha = ref("");
-
+const diasEconomicos = ref(null);
 //-----------------------------------------------------------
 
 onBeforeMount(() => {
@@ -322,16 +323,15 @@ watch(area_Id, async (val) => {
 });
 
 watch(empleado_Id, async (val) => {
+  console.log(val);
   if (empleado_Id.value != null) {
     await justificanteStore.loadResponsabeArea(val.value);
+    await justificanteStore.loadDiasRestantes(val.value);
+    await justificanteStore.loadAsignacionesVacaciones();
     personalAutoriza.value = justificante.value.responsable_Area;
+    limpiarCampos();
   }
 });
-
-// watch(tipo, (val) => {
-//   days.value = null;
-//   motivo.value = null;
-// });
 
 const cargarTipo = async (val) => {
   if (tipo.value == null) {
@@ -361,10 +361,16 @@ const cargarSolicitante = async (val) => {
 };
 
 const validateDates = () => {
-  if (days.value.length > 3 && tipo.value == "Permiso día económico") {
-    days.value = days.value.slice(0, 3);
-  } else if (days.value.length > 10 && tipo.value == "Vacaciones") {
-    days.value = days.value.slice(0, 10);
+  if (
+    days.value.length > dias_restantes.value.dias_Economicos &&
+    tipo.value == "Permiso día económico"
+  ) {
+    days.value = days.value.slice(0, dias_restantes.value.dias_Economicos);
+  } else if (
+    days.value.length > dias_restantes.value.segundo_Periodo &&
+    tipo.value == "Vacaciones"
+  ) {
+    days.value = days.value.slice(0, dias_restantes.value.segundo_Periodo);
   }
 };
 
@@ -414,8 +420,15 @@ const actualizarModal = (valor) => {
   $q.loading.hide();
 };
 
-const onItemClick = (val) => {
+const onItemClick = async (val) => {
   tipo.value = val;
+  await justificanteStore.loadAsignacionesVacaciones();
+  if (configuracion.value.periodo_Vacacional == 1) {
+    periodoVacacional.value = "Primero";
+  } else {
+    periodoVacacional.value = "Segundo";
+  }
+  days.value = null;
 };
 
 const agregarIncidencia = async () => {
