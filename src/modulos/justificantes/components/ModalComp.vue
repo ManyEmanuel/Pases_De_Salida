@@ -153,6 +153,7 @@
                       ></q-date>
                       <q-date
                         v-else
+                        :disable="tipo == null"
                         color="purple"
                         v-model="days"
                         multiple
@@ -171,6 +172,12 @@
                   </q-icon>
                 </template>
               </q-input>
+              <div
+                class="text-body2 q-pt-md"
+                v-show="tipo == 'Vacaciones' || tipo == 'Permiso día económico'"
+              >
+                Días disponibles {{ restanDias }}
+              </div>
             </div>
           </div>
           <div class="row" v-if="tipo == 'Vacaciones' && !isVisualizar">
@@ -183,14 +190,11 @@
                 checked-icon="task_alt"
                 unchecked-icon="panorama_fish_eye"
                 val="Primero"
-                label="Primero"
-              />
-              <q-radio
-                v-model="periodoVacacional"
-                checked-icon="task_alt"
-                unchecked-icon="panorama_fish_eye"
-                val="Segundo"
-                label="Segundo"
+                :label="
+                  configuracion.periodo_Vacacional == 2
+                    ? 'Segundo periodo'
+                    : 'Primer periodo'
+                "
               />
             </div>
           </div>
@@ -291,6 +295,7 @@ const area_Id = ref(null);
 const motivo = ref(null);
 const filtrarFecha = ref("");
 const diasEconomicos = ref(null);
+const restanDias = ref(null);
 //-----------------------------------------------------------
 
 onBeforeMount(() => {
@@ -323,13 +328,22 @@ watch(area_Id, async (val) => {
 });
 
 watch(empleado_Id, async (val) => {
-  console.log(val);
   if (empleado_Id.value != null) {
     await justificanteStore.loadResponsabeArea(val.value);
     await justificanteStore.loadDiasRestantes(val.value);
     await justificanteStore.loadAsignacionesVacaciones();
     personalAutoriza.value = justificante.value.responsable_Area;
     limpiarCampos();
+  }
+});
+
+watch(days, (val) => {
+  if (days.value != null) {
+    if (tipo.value == "Vacaciones") {
+      restanDias.value = dias_restantes.value.segundo_Periodo - val.length;
+    } else if (tipo.value == "Permiso día económico") {
+      restanDias.value = dias_restantes.value.dias_Economicos - val.length;
+    }
   }
 });
 
@@ -423,12 +437,9 @@ const actualizarModal = (valor) => {
 const onItemClick = async (val) => {
   tipo.value = val;
   await justificanteStore.loadAsignacionesVacaciones();
-  if (configuracion.value.periodo_Vacacional == 1) {
-    periodoVacacional.value = "Primero";
-  } else {
-    periodoVacacional.value = "Segundo";
-  }
+
   days.value = null;
+  restanDias.value = null;
 };
 
 const agregarIncidencia = async () => {
@@ -559,6 +570,7 @@ const limpiarCampos = () => {
   days.value = null;
   motivo.value = null;
   cambioDays.value = false;
+  restanDias.value = null;
 };
 
 const onSubmit = async () => {

@@ -731,7 +731,6 @@ export const useJustificanteStore = defineStore("justificante", {
     //-----------------------------------------------------------
 
     async loadDiasRestantes(id) {
-      console.log("id", id);
       const resp = await api.get(`/Justificantes/Dias_Restantes/${id}`);
       let {
         success,
@@ -747,7 +746,6 @@ export const useJustificanteStore = defineStore("justificante", {
           primer_Periodo == undefined ? dias_Primer_Periodo : primer_Periodo;
         this.dias_restantes.segundo_Periodo =
           segundo_Periodo == undefined ? dias_Segundo_Periodo : segundo_Periodo;
-        console.log("dias_restantes", this.dias_restantes);
       }
     },
 
@@ -756,7 +754,6 @@ export const useJustificanteStore = defineStore("justificante", {
     async loadAsignacionesVacaciones() {
       const resp = await api.get("Asignaciones_Vacaciones/ObtenTodos");
       let { success, data } = resp.data;
-      console.log("data", data[1]);
       if (success) {
         this.configuracion.dias_Economicos = data.dias_Economicos;
         this.configuracion.periodo_Vacacional = data[1].periodo_Vacacional;
