@@ -731,21 +731,31 @@ export const useJustificanteStore = defineStore("justificante", {
     //-----------------------------------------------------------
 
     async loadDiasRestantes(id) {
-      const resp = await api.get(`/Justificantes/Dias_Restantes/${id}`);
-      let {
-        success,
-        dias_Economicos,
-        primer_Periodo,
-        segundo_Periodo,
-        dias_Segundo_Periodo,
-        dias_Primer_Periodo,
-      } = resp.data;
-      if (success) {
-        this.dias_restantes.dias_Economicos = dias_Economicos;
-        this.dias_restantes.primer_Periodo =
-          primer_Periodo == undefined ? dias_Primer_Periodo : primer_Periodo;
-        this.dias_restantes.segundo_Periodo =
-          segundo_Periodo == undefined ? dias_Segundo_Periodo : segundo_Periodo;
+      try {
+        console.log(id);
+        const resp = await api.get(`/Justificantes/Dias_Restantes/${id}`);
+        let {
+          success,
+          dias_Economicos,
+          primer_Periodo,
+          segundo_Periodo,
+          dias_Segundo_Periodo,
+          dias_Primer_Periodo,
+        } = resp.data;
+        if (success) {
+          this.dias_restantes.dias_Economicos = dias_Economicos;
+          this.dias_restantes.primer_Periodo =
+            primer_Periodo == undefined ? dias_Primer_Periodo : primer_Periodo;
+          this.dias_restantes.segundo_Periodo =
+            segundo_Periodo == undefined
+              ? dias_Segundo_Periodo
+              : segundo_Periodo;
+        }
+      } catch (error) {
+        return {
+          success: false,
+          data: "Ocurrió un error, inténtelo de nuevo. Si el error persiste, contacte a soporte",
+        };
       }
     },
 

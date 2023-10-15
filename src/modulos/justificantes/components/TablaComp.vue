@@ -31,7 +31,7 @@
                   v-show="
                     modulo.actualizar &&
                     props.row.estatus == 'Pendiente' &&
-                    props.row.responsable_Area == byUsuario
+                    jefeArea
                   "
                   flat
                   round
@@ -62,11 +62,7 @@
                   <q-tooltip>Imprimir justificante</q-tooltip>
                 </q-btn>
                 <q-btn
-                  v-if="
-                    modulo.actualizar &&
-                    props.row.estatus == 'Pendiente' &&
-                    props.row.responsable_Area != byUsuario
-                  "
+                  v-if="modulo.actualizar && props.row.estatus == 'Pendiente'"
                   flat
                   round
                   color="purple-ieen"
@@ -79,7 +75,7 @@
                   v-if="
                     modulo.actualizar &&
                     props.row.estatus == 'Pendiente' &&
-                    props.row.responsable_Area != byUsuario
+                    !jefeArea
                   "
                   flat
                   round
@@ -93,7 +89,7 @@
                   v-if="
                     modulo.eliminar &&
                     props.row.estatus == 'Pendiente' &&
-                    props.row.responsable_Area == byUsuario
+                    jefeArea
                   "
                   flat
                   round
