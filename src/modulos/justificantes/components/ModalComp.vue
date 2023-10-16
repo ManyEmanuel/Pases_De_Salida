@@ -318,8 +318,14 @@ watch(detalle.value, (val) => {
 watch(justificante.value, (val) => {
   cargarArea(val);
   cargarSolicitante(val);
+  justificanteStore.loadPersonalArea(val.area_Id);
 });
-
+watch(areas, (val) => {
+  if (isSuperAdmi.value == true) {
+    area_Id.value = null;
+    personalAutoriza.value = null;
+  }
+});
 watch(area_Id, async (val) => {
   if (area_Id.value != null) {
     await justificanteStore.loadPersonalArea(val.value);
@@ -345,7 +351,6 @@ const empleado = async (val) => {
 
 watch(days, (val) => {
   if (val != null) {
-    console.log(val.length);
     if (tipo.value == "Vacaciones") {
       restanDias.value = dias_restantes.value.segundo_Periodo - val.length;
     } else if (tipo.value == "Permiso día económico") {
@@ -381,7 +386,6 @@ const cargarArea = async (val) => {
   if (area_Id.value == null) {
     let areaFiltrado = areas.value.find((x) => x.value == `${val.area_Id}`);
     area_Id.value = areaFiltrado;
-    console.log("areaFiltrado", areaFiltrado);
     await justificanteStore.loadPersonalArea(val.area_Id);
   }
 };
@@ -449,12 +453,12 @@ const actualizarModal = (valor) => {
   justificanteStore.actualizarModal(valor);
   justificanteStore.updateVisualizar(false);
   justificanteStore.updateEditar(false);
-  justificanteStore.loadInformacionJustificante();
   limpiarCampos();
   justificante.value.solicitante = null;
   listaIncidencias.value = [];
   empleado_Id.value = null;
   area_Id.value = null;
+  personalAutoriza.value = null;
   $q.loading.hide();
 };
 
@@ -590,10 +594,10 @@ const agregarIncidencia = async () => {
             tipo.value,
             0
           );
-          await justificanteStore.createDetalleJustificantes(
-            justificante.value.id,
-            detalle.value
-          );
+          // await justificanteStore.createDetalleJustificantes(
+          //   justificante.value.id,
+          //   detalle.value
+          // );
         }
 
         limpiarCampos();
@@ -625,6 +629,7 @@ const onSubmit = async () => {
     });
   } else {
     justificante.value.area_Id = area_Id.value.value;
+    justificante.value.area = area_Id.value.label;
     justificante.value.solicitante_Id = empleado_Id.value.value;
     justificante.value.puesto_Solicitante_Id = empleado_Id.value.puesto_Id;
     if (isEditar.value == true) {

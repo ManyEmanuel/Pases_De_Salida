@@ -146,7 +146,6 @@ export const useJustificanteStore = defineStore("justificante", {
         } else if (perfil == 2) {
           resp = await api.get("/Justificantes/ByArea");
           let { data } = resp.data;
-
           listJustificantes = data.map((justificante) => {
             return {
               justificante_Id: justificante.id,
@@ -347,28 +346,37 @@ export const useJustificanteStore = defineStore("justificante", {
               label: areas.label,
             };
           });
+          this.isSuperAdmi = true;
+          this.isAdmi = false;
+          this.personal = false;
         } else if (perfil == 2) {
           let respArea = await api.get("/Areas/AreaByUsuario");
-          let { data } = respArea.data;
+          let { data, success } = respArea.data;
 
-          let listAreas = [{ value: data.area_Id, label: data.area }];
+          if (success == true) {
+            let listAreas = [{ value: data.area_Id, label: data.area }];
 
-          let respPer = await api.get(`/Empleados/ByArea/${area}`);
-          let data2 = respPer.data.data;
-          let listPersonal = data2.map((personal) => {
-            return {
-              value: personal.id,
-              label: `${data2.nombres} ${data2.apellido_Paterno} ${data2.apellido_Materno}`,
-            };
-          });
-          this.areas = listAreas;
-          this.justificante.area_Id = data.area_Id;
-          this.justificante.area = data.area;
-          this.listEmpleados = listPersonal;
-          this.justificante.responsable_Area_Id = dataResp.empleado_Id;
-          this.justificante.responsable_Area = dataResp.empleado;
-          this.justificante.puesto_Responsable_Area_Id = dataResp.puesto_Id;
-          this.isAdmi = true;
+            let respPer = await api.get(`/Empleados/ByArea/${area}`);
+            let data2 = respPer.data.data;
+            let listPersonal = data2.map((personal) => {
+              return {
+                value: personal.id,
+                label: `${data2.nombres} ${data2.apellido_Paterno} ${data2.apellido_Materno}`,
+              };
+            });
+            this.areas = listAreas;
+            this.justificante.area_Id = data.area_Id;
+            this.justificante.area = data.area;
+            this.listEmpleados = listPersonal;
+            this.justificante.responsable_Area_Id = dataResp.empleado_Id;
+            this.justificante.responsable_Area = dataResp.empleado;
+            this.justificante.puesto_Responsable_Area_Id = dataResp.puesto_Id;
+            this.isSuperAdmi = false;
+            this.isAdmi = true;
+            this.personal = false;
+          } else {
+            console.log("error");
+          }
         } else if (perfil == 3) {
           this.listEmpleados = [];
           let respArea = await api.get("/Areas/AreaByUsuario");
@@ -393,6 +401,8 @@ export const useJustificanteStore = defineStore("justificante", {
           this.listEmpleados = listPersonal;
           this.justificante.puesto_Solicitante_Id = data2.puesto_Id;
           this.isPersonal = true;
+          this.isSuperAdmi = false;
+          this.isAdmi = false;
         }
       } catch (error) {
         return {
@@ -732,7 +742,6 @@ export const useJustificanteStore = defineStore("justificante", {
 
     async loadDiasRestantes(id) {
       try {
-        console.log(id);
         const resp = await api.get(`/Justificantes/Dias_Restantes/${id}`);
         let {
           success,
