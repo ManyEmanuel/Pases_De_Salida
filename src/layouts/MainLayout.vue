@@ -132,7 +132,6 @@
             label="Justificantes"
             class="text-purple-ieen label-title text-bold"
           >
-
             <q-item
               v-if="menuPasesList.some((element) => element == 'PS-REG-JUS')"
               :to="{ name: 'registro_Justificante' }"
@@ -160,8 +159,7 @@
               </q-item-section>
             </q-item>
           </q-expansion-item>
-          <q-item :to="{ name: 'misChecadas' }">
-=======
+          <!-- <q-item :to="{ name: 'misChecadas' }">
             <q-item-section avatar>
               <q-icon name="summarize" color="purple-ieen" />
             </q-item-section>
@@ -170,12 +168,11 @@
                 >Registro justificante</q-item-label
               >
             </q-item-section>
-          </q-item>
+          </q-item> -->
           <q-item
             v-if="menuPasesList.some((element) => element == 'PS-MISCHECADAS')"
             :to="{ name: 'misChecadas' }"
           >
-
             <q-item-section avatar>
               <q-icon name="calendar_month" color="purple-ieen" />
             </q-item-section>
