@@ -31,13 +31,14 @@
           <div class="row">
             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
               <q-input
-                v-if="isEditar || isAdmi || isPersonal || isVisualizar"
+                v-if="isEditar || isPersonal || isVisualizar"
                 readonly
                 v-model="justificante.area"
                 label="Área"
               ></q-input>
               <q-select
                 v-else
+                :readonly="isAdmi"
                 v-model="area_Id"
                 :options="areas"
                 label="Área del empleado"
