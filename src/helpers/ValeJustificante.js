@@ -107,45 +107,6 @@ const ValeJustificante = async () => {
       "left"
     );
     //--------------------------------------------------------------------------//
-    // doc.setFont("helvetica", "bold");
-    // doc.text("Fecha o dias de incidencia:", 10, 130, null, null, "left");
-    // doc.setDrawColor(0, 0, 0);
-    // doc.line(60, 130, 150, 130);
-    //--------------------------------------------------------------------------//
-    // doc.setFont("helvetica", "normal");
-    // doc.rect(10, 140, 7, 7);
-    // doc.text("Omisión de entrada", 20, 145, null, null, "left");
-
-    // doc.rect(10, 150, 7, 7);
-    // doc.text("Omisión de entrada", 20, 155, null, null, "left");
-
-    // doc.rect(10, 160, 7, 7);
-    // doc.text("Comisión oficial", 20, 165, null, null, "left");
-
-    // doc.rect(10, 170, 7, 7);
-    // doc.text("Permiso día económico", 20, 175, null, null, "left");
-
-    // doc.rect(100, 140, 7, 7);
-    // doc.text("Permuta por día laborado", 110, 145, null, null, "left");
-
-    // doc.rect(100, 150, 7, 7);
-    // doc.text("Vacaciones", 110, 155, null, null, "left");
-
-    // doc.rect(100, 160, 7, 7);
-    // doc.text("Otro", 110, 165, null, null, "left");
-    // doc.line(120, 166, 180, 166);
-    //--------------------------------------------------------------------------//
-    // doc.setFont("helvetica", "bold");
-    // doc.text(
-    //   "Motivo: (Especificar en todos los casos)",
-    //   10,
-    //   190,
-    //   null,
-    //   null,
-    //   "left"
-    // );
-    // doc.rect(10, 195, 195, 30);
-    //--------------------------------------------------------------------------//
     var columnStyles = {
       0: {
         cellWidth: 30,
@@ -158,29 +119,6 @@ const ValeJustificante = async () => {
     var header = [
       [{ content: "Concepto" }, { content: "Fecha" }, { content: "Motivo" }],
     ];
-
-    // var rows = [
-    //   [
-    //     "Omisión de entrada",
-    //     "13/09/2023",
-    //     "Esto es una prueba de escrito para los motivos en caso de justificante, los motivos no deberán de exceder de mas de 100 caracteres, la recomendación es no pasar de ese numero de caracteres ya que no hay tanto espacio en la hoja que se imprime con",
-    //   ],
-    //   [
-    //     "Omisión de salida",
-    //     "14/09/2023",
-    //     "Esto es una prueba de escrito para los motivos en caso de justificante, los motivos no deberán de exceder de mas de 100 caracteres, la recomendación es no pasar de ese numero de caracteres ya que no hay tanto espacio en la hoja que se imprime con",
-    //   ],
-    //   [
-    //     "Comisión oficial",
-    //     "14/09/2023",
-    //     "Esto es una prueba de escrito para los motivos en caso de justificante, los motivos no deberán de exceder de mas de 100 caracteres, la recomendación es no pasar de ese numero de caracteres ya que no hay tanto espacio en la hoja que se imprime con",
-    //   ],
-    //   [
-    //     "Permiso día económico",
-    //     "14/09/2023",
-    //     "Esto es una prueba de escrito para los motivos en caso de justificante, los motivos no deberán de exceder de mas de 100 caracteres, la recomendación es no pasar de ese numero de caracteres ya que no hay tanto espacio en la hoja que se imprime con",
-    //   ],
-    // ];
 
     jsPDF.autoTableSetDefaults({
       headStyles: {

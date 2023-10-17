@@ -128,7 +128,7 @@
           </q-expansion-item>
           <q-expansion-item
             expand-separator
-            icon="menu_book"
+            icon="library_books"
             label="Justificantes"
             class="text-purple-ieen label-title text-bold"
           >
@@ -252,32 +252,32 @@ export default defineComponent({
       notificacionStore.loadNotificacionesAll();
     });
 
-    // const connection = new HubConnectionBuilder()
-    //   .withUrl("http://sistema.ieenayarit.org:9270/hubPases", {
-    //     headers: {
-    //       Authorization: `Bearer ${localStorage.getItem("key")}`,
-    //     },
-    //   })
-    //   .configureLogging(LogLevel.Information)
-    //   .build();
+    const connection = new HubConnectionBuilder()
+      .withUrl("http://sistema.ieenayarit.org:9270/hubPases", {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("key")}`,
+        },
+      })
+      .configureLogging(LogLevel.Information)
+      .build();
 
-    // connection.on("notificar", (data) => {
-    //   notificacionStore.loadNotificaciones();
-    //   notificacionStore.loadNotificacionesAll();
-    //   $q.notify({
-    //     message: data,
-    //     icon: "announcement",
-    //   });
-    // });
+    connection.on("notificar", (data) => {
+      notificacionStore.loadNotificaciones();
+      notificacionStore.loadNotificacionesAll();
+      $q.notify({
+        message: data,
+        icon: "announcement",
+      });
+    });
 
-    // connection
-    //   .start()
-    //   .then(() => {
-    //     console.log("connected");
-    //   })
-    //   .catch((err) => {
-    //     console.log(err);
-    //   });
+    connection
+      .start()
+      .then(() => {
+        console.log("connected");
+      })
+      .catch((err) => {
+        console.log(err);
+      });
 
     const show = () => {
       $q.bottomSheet({
@@ -287,9 +287,9 @@ export default defineComponent({
       }).onOk((action) => {
         if (action.label == "Cerrar sesión") {
           localStorage.clear();
-          window.location = "http://sistema.ieenayarit.org:9171?return=false";
+          window.location = "http://sistema.ieenayarit.org:9271?return=false";
         } else if (action.label == "Ir a universo") {
-          window.location = "http://sistema.ieenayarit.org:9171?return=true";
+          window.location = "http://sistema.ieenayarit.org:9271?return=true";
         } else {
           window.location =
             action.url +

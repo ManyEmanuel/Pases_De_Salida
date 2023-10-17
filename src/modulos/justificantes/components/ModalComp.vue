@@ -79,7 +79,7 @@
 
             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
               <q-input
-                disabl
+                readonly
                 v-model="justificante.responsable_Area"
                 label="Personal que autoriza"
               >
@@ -296,7 +296,11 @@ onBeforeMount(() => {
 //-----------------------------------------------------------
 
 watch(justificante.value, (val) => {
-  if (isEditar.value == true || isAdmi.value == true) {
+  if (
+    isEditar.value == true ||
+    isAdmi.value == true ||
+    isPersonal.value == true
+  ) {
     cargarArea(val);
     cargarSolicitante(val);
   }
@@ -311,7 +315,6 @@ watch(area_Id, async (val) => {
 });
 
 watch(detalle.value, async (val) => {
-  console.log(val);
   if (val.id != null) {
     cargarTipo(val);
     motivo.value = val.motivo;
@@ -350,29 +353,31 @@ const cargarArea = async (val) => {
   }
 };
 
-// watch(modal, (val) => {
-//   if (val == true) {
-//     justificanteStore.loadInformacionJustificante();
-//     cargarArea(justificante.value);
-//   }
-//   if (isSuperAdmi.value == true) {
-//     area_Id.value = null;
-//     personalAutoriza.value = null;
-//   }
-//   tipoJustificante.value = [
-//     "Omisión de entrada",
-//     "Omisión de salida",
-//     "Comisión oficial",
-//     "Permuta por día laborado",
-//     "Permiso día económico",
-//     "Vacaciones",
-//   ];
-// });
+watch(modal, (val) => {
+  if (val == true) {
+    justificanteStore.loadInformacionJustificante();
+    //cargarArea(justificante.value);
+  }
+  // if (isSuperAdmi.value == true) {
+  //   area_Id.value = null;
+  //   personalAutoriza.value = null;
+  // }
+  // tipoJustificante.value = [
+  //   "Omisión de entrada",
+  //   "Omisión de salida",
+  //   "Comisión oficial",
+  //   "Permuta por día laborado",
+  //   "Permiso día económico",
+  //   "Vacaciones",
+  // ];
+});
 
 watch(empleado_Id, async (val) => {
   if (empleado_Id.value != null) {
     empleado(val);
-    justificante.value.responsable_Area = null;
+    if (isPersonal == false) {
+      justificante.value.responsable_Area = null;
+    }
   }
 });
 

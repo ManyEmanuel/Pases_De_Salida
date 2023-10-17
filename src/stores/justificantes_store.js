@@ -360,7 +360,6 @@ export const useJustificanteStore = defineStore("justificante", {
         let area = parseInt(localStorage.getItem("area"));
         let resp = await api.get("/ResponsablesAreas/ResposableByUsuario");
         let dataResp = resp.data.data;
-
         if (perfil == 1) {
           let respArea = await api.get("/Areas/GetLista");
           let { data } = respArea.data;
@@ -394,7 +393,6 @@ export const useJustificanteStore = defineStore("justificante", {
           this.areas = listAreas;
           this.justificante.area_Id = data.area_Id;
           this.justificante.area = data.area;
-
           this.justificante.responsable_Area_Id = dataResp.empleado_Id;
           this.justificante.responsable_Area = dataResp.empleado;
           this.justificante.puesto_Responsable_Area_Id = dataResp.puesto_Id;

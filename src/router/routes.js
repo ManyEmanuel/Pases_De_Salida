@@ -33,8 +33,7 @@ const routes = [
       {
         path: "/misChecadas",
         name: "misChecadas",
-        component: () =>
-          import("../modulos/solicitudes_Justificantes/pages/IndexPage"),
+        component: () => import("../modulos/calendario/pages/IndexPage"),
       },
     ],
   },
