@@ -9,7 +9,7 @@ import axios from "axios";
 // for each client)
 
 const api = axios.create({
-  baseURL: "http://sistema.ieenayarit.org:9170/api",
+  baseURL: "http://sistema.ieenayarit.org:9270/api",
 });
 // const api = axios.create({
 //   baseURL: "http://sistema.ieenayarit.org:9270/api",
@@ -20,6 +20,7 @@ api.interceptors.request.use((config) => {
   };
   return config;
 });
+
 
 api.interceptors.response.use(
   (response) => response,
@@ -32,6 +33,7 @@ api.interceptors.response.use(
     return Promise.reject();
   }
 );
+
 
 export default boot(({ app }) => {
   // for use inside Vue files (Options API) through this.$axios and this.$api

@@ -159,7 +159,10 @@
               </q-item-section>
             </q-item>
           </q-expansion-item>
+
+          <q-item :to="{ name: 'misChecadas' }">
           <!-- <q-item :to="{ name: 'misChecadas' }">
+
             <q-item-section avatar>
               <q-icon name="summarize" color="purple-ieen" />
             </q-item-section>

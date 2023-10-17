@@ -12,13 +12,15 @@
             color="yellow"
           />
           <q-badge
-            v-if="arg.event.title == 'Entrada' || arg.event.title == 'Salida'"
+            v-else-if="
+              arg.event.title == 'Entrada' || arg.event.title == 'Salida'
+            "
             rounded
             color="green"
           />
-          <q-badge v-if="arg.event.title == 'Falta'" rounded color="red" />
+          <q-badge v-else-if="arg.event.title == 'Falta'" rounded color="red" />
           <q-badge
-            v-if="
+            v-else-if="
               arg.event.title.includes('permiso') ||
               arg.event.title.includes('Pase') ||
               arg.event.title.includes('Comisión') ||
@@ -27,6 +29,7 @@
             rounded
             color="blue"
           />
+          <q-badge v-else rounded color="orange" />
           <b>{{ arg.timeText }}</b>
           <i>{{ arg.event.title }}</i>
 
