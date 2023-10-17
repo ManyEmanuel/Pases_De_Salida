@@ -76,6 +76,15 @@ const obtenColor = (title) => {
   if (title.includes("Falta")) {
     return "red";
   }
+  if (
+    title.includes("Omisión") ||
+    title.includes("Comisión oficial") ||
+    title.includes("Permuta") ||
+    title.includes("Permiso") ||
+    title.includes("Vacaciones")
+  ) {
+    return "orange";
+  }
 };
 
 function hasEventOnDay(resourceId, day) {
