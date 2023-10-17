@@ -159,19 +159,6 @@
               </q-item-section>
             </q-item>
           </q-expansion-item>
-
-          <q-item :to="{ name: 'misChecadas' }">
-          <!-- <q-item :to="{ name: 'misChecadas' }">
-
-            <q-item-section avatar>
-              <q-icon name="summarize" color="purple-ieen" />
-            </q-item-section>
-            <q-item-section>
-              <q-item-label class="text-purple-ieen label-title text-bold"
-                >Registro justificante</q-item-label
-              >
-            </q-item-section>
-          </q-item> -->
           <q-item
             v-if="menuPasesList.some((element) => element == 'PS-MISCHECADAS')"
             :to="{ name: 'misChecadas' }"

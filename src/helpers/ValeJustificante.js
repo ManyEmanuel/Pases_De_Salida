@@ -31,7 +31,7 @@ const ValeJustificante = async () => {
     doc.setFont("helvetica", "bold");
     let area = "UNIDAD TÉCNICA DE INFORMÁTICA Y ESTADÍSTICA";
     doc.text(
-      "INSTITUTO ESTATAL ELECTORAL DEL ESTADO DE NAYARIT \n \n" + area + "",
+      "INSTITUTO ESTATAL ELECTORAL DE NAYARIT \n \n" + area + "",
       110,
       10,
       null,
@@ -71,7 +71,7 @@ const ValeJustificante = async () => {
     doc.setTextColor(255, 255, 255);
     doc.setFont("helvetica", "bold");
     doc.setFontSize(10);
-    doc.text("Datos del Trabajdor", 105, 70, null, null, "center");
+    doc.text("Datos del Personal", 105, 70, null, null, "center");
     //--------------------------------------------------------------------------//
     doc.setTextColor(0, 0, 0);
     doc.setFont("helvetica", "normal");
