@@ -31,7 +31,7 @@ const ValeJustificante = async () => {
     doc.setFont("helvetica", "bold");
     let area = "UNIDAD TÉCNICA DE INFORMÁTICA Y ESTADÍSTICA";
     doc.text(
-      "INSTITULO ESTATAL ELECTORAL DEL ESTADO DE NAYARIT \n \n" + area + "",
+      "INSTITUTO ESTATAL ELECTORAL DEL ESTADO DE NAYARIT \n \n" + area + "",
       110,
       10,
       null,

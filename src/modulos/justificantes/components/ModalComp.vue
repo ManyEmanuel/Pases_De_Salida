@@ -31,13 +31,14 @@
           <div class="row">
             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
               <q-input
-                v-if="isEditar || isAdmi || isPersonal || isVisualizar"
+                v-if="isEditar || isPersonal || isVisualizar"
                 readonly
                 v-model="justificante.area"
                 label="Área"
               ></q-input>
               <q-select
                 v-else
+                :readonly="isAdmi"
                 v-model="area_Id"
                 :options="areas"
                 label="Área del empleado"
@@ -296,6 +297,7 @@ onBeforeMount(() => {
 //-----------------------------------------------------------
 
 watch(justificante.value, (val) => {
+  console.log("val", val);
   if (
     isEditar.value == true ||
     isAdmi.value == true ||
@@ -306,7 +308,7 @@ watch(justificante.value, (val) => {
   }
 });
 
-watch(area_Id, async (val) => {
+watch(area_Id, (val) => {
   if (area_Id.value != null) {
     empleado_Id.value = null;
     personalAutoriza.value = null;
@@ -347,9 +349,20 @@ const diasRestantes = () => {
 };
 
 const cargarArea = async (val) => {
+  console.log("entro", val);
   if (area_Id.value == null) {
     let areaFiltrado = areas.value.find((x) => x.value == `${val.area_Id}`);
     area_Id.value = areaFiltrado;
+  }
+};
+
+const cargarSolicitante = async (val) => {
+  if (empleado_Id.value == null) {
+    let solicitanteFiltrado = listEmpleados.value.find(
+      (x) => x.label == `${val.solicitante}`
+    );
+    empleado_Id.value = solicitanteFiltrado;
+    personalAutoriza.value = val.responsable_Area;
   }
 };
 
@@ -452,16 +465,6 @@ const cargarTipo = async (val) => {
       (x) => x == `${val.tipo_Justificantes}`
     );
     tipo.value = tipoFiltrado;
-  }
-};
-
-const cargarSolicitante = async (val) => {
-  if (empleado_Id.value == null) {
-    let solicitanteFiltrado = listEmpleados.value.find(
-      (x) => x.label == `${val.solicitante}`
-    );
-    empleado_Id.value = solicitanteFiltrado;
-    personalAutoriza.value = val.responsable_Area;
   }
 };
 
@@ -648,10 +651,10 @@ const agregarIncidencia = async () => {
             tipo.value,
             periodo
           );
-          await justificanteStore.createDetalleJustificantes(
-            justificante.value.id,
-            detalle.value
-          );
+          // await justificanteStore.createDetalleJustificantes(
+          //   justificante.value.id,
+          //   detalle.value
+          // );
         } else {
           const resultado = days.value.join(", ");
           detalle.value.dias_Incidencias = resultado;
