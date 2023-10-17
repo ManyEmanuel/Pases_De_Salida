@@ -16,6 +16,7 @@
     "@quasar/extras": "^1.0.0",
     "axios": "^1.2.1",
     "core-js": "^3.6.5",
+    "date-fns": "^2.30.0",
     "fullcalendar": "^6.1.9",
     "jspdf": "^2.5.1",
     "jspdf-autotable": "^3.5.28",

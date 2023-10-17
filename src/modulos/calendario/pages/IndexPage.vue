@@ -17,12 +17,12 @@
             color="green"
           />
           <q-badge v-if="arg.event.title == 'Falta'" rounded color="red" />
-          <q-badge v-if="arg.event.title == 'Retardo'" rounded color="yellow" />
           <q-badge
             v-if="
               arg.event.title.includes('permiso') ||
-              arg.event.title.includes('pase') ||
-              arg.event.title.includes('Comisión')
+              arg.event.title.includes('Pase') ||
+              arg.event.title.includes('Comisión') ||
+              arg.event.title.includes('Incapacidad')
             "
             rounded
             color="blue"
@@ -61,6 +61,7 @@ const calendarOptions = ref({
     interactionPlugin, // needed for dateClick
   ],
   headerToolbar: {
+    left: "prev,next today",
     center: "title",
     right: "dayGridMonth,timeGridWeek,timeGridDay",
   },

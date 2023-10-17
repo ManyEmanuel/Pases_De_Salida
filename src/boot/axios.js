@@ -10,7 +10,10 @@ import axios from "axios";
 const api = axios.create({
   baseURL: "https://localhost:7289/api",
 });
-//const api = axios.create({ baseURL: "https://sistema.ieenayarit.org:9270/api" });
+// const api = axios.create({
+//   baseURL: "http://sistema.ieenayarit.org:9270/api",
+// });
+
 api.interceptors.request.use((config) => {
   config.headers = {
     Authorization: `Bearer ${localStorage.getItem("key")}`,
@@ -24,7 +27,7 @@ api.interceptors.request.use((config) => {
 //     if (error.response.status == 401) {
 //       alert("Su sesión ha expirado, sera redireccionado al logín");
 //       localStorage.clear();
-//       window.location = "http://sistema.ieenayarit.org:9171?return=false";
+//       window.location = "http://sistema.ieenayarit.org:9271?return=false";
 //     }
 //     return Promise.reject();
 //   }

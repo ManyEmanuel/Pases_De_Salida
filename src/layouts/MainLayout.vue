@@ -132,13 +132,29 @@
               >
             </q-item-section>
           </q-item>
-          <q-item :to="{ name: 'misChecadas' }">
+          <q-item
+            v-if="menuPasesList.some((element) => element == 'PS-MISCHECADAS')"
+            :to="{ name: 'misChecadas' }"
+          >
             <q-item-section avatar>
               <q-icon name="calendar_month" color="purple-ieen" />
             </q-item-section>
             <q-item-section>
               <q-item-label class="text-purple-ieen label-title text-bold"
                 >Mis checadas</q-item-label
+              >
+            </q-item-section>
+          </q-item>
+          <q-item
+            v-if="menuPasesList.some((element) => element == 'PS-CHECADAS')"
+            :to="{ name: 'checadas' }"
+          >
+            <q-item-section avatar>
+              <q-icon name="calendar_month" color="purple-ieen" />
+            </q-item-section>
+            <q-item-section>
+              <q-item-label class="text-purple-ieen label-title text-bold"
+                >Checadas</q-item-label
               >
             </q-item-section>
           </q-item>
@@ -305,6 +321,12 @@ export default defineComponent({
             break;
           case "PS-REG-JUS":
             menuPasesList.value.push("PS-REG-JUS");
+            break;
+          case "PS-MISCHECADAS":
+            menuPasesList.value.push("PS-MISCHECADAS");
+            break;
+          case "PS-CHECADAS":
+            menuPasesList.value.push("PS-CHECADAS");
             break;
         }
       });

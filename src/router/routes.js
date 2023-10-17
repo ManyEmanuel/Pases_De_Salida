@@ -30,6 +30,11 @@ const routes = [
         name: "misChecadas",
         component: () => import("../modulos/calendario/pages/IndexPage"),
       },
+      {
+        path: "/checadas",
+        name: "checadas",
+        component: () => import("../modulos/calendario_global/pages/IndexPage"),
+      },
     ],
   },
 
