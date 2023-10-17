@@ -64,8 +64,6 @@ export const useJustificanteStore = defineStore("justificante", {
       primer_Periodo: null,
       segundo_Periodo: null,
       dias_Economicos: null,
-      dias_Segundo_Periodo: null,
-      dias_Primer_Periodo: null,
     },
     configuracion: {
       dias_Economicos: null,
@@ -141,7 +139,6 @@ export const useJustificanteStore = defineStore("justificante", {
               area_Id: justificante.area_Id,
             };
           });
-          this.justificantes = listJustificantes;
           this.isSuperAdmi = true;
         } else if (perfil == 2) {
           resp = await api.get("/Justificantes/ByArea");
@@ -168,66 +165,92 @@ export const useJustificanteStore = defineStore("justificante", {
               area_Id: justificante.area_Id,
             };
           });
-          this.justificantes = listJustificantes;
           this.isAdmi = true;
         } else if (perfil == 3) {
-          if (tipoEmp == "JefeArea") {
-            resp = await api.get("/Justificantes/ByArea");
-            let { data } = resp.data;
+          resp = await api.get("/Justificantes/MisJustificantes");
+          let { data } = resp.data;
 
-            listJustificantes = data.map((justificante) => {
-              return {
-                justificante_Id: justificante.id,
-                responsable_Area_Id: justificante.responsable_Area_Id,
-                responsable_Area: justificante.responsable_Area,
-                puesto_Responsable_Area_Id:
-                  justificante.puesto_Responsable_Area_Id,
-                puesto_Responsable_Area: justificante.puesto_Responsable_Area,
-                solicitante_Id: justificante.solicitante_Id,
-                solicitante: justificante.solicitante,
-                puesto_Solicitante_Id: justificante.puesto_Solicitante_Id,
-                puesto_Solicitante: justificante.puesto_Solicitante,
-                folio: justificante.folio,
-                estatus: justificante.estatus,
-                fecha_Creacion: justificante.fecha_Creacion,
-                fecha_Aprobacion_Rechazo: justificante.fecha_Aprobacion_Rechazo,
-                capturista: justificante.capturista,
-                puesto_Capturista: justificante.puesto_Capturista,
-                area: justificante.area,
-                area_Id: justificante.area_Id,
-              };
-            });
-            this.justificantes = listJustificantes;
-          } else {
-            resp = await api.get("/Justificantes/MisJustificantes");
-            let { data } = resp.data;
+          listJustificantes = data.map((justificante) => {
+            return {
+              justificante_Id: justificante.id,
+              responsable_Area_Id: justificante.responsable_Area_Id,
+              responsable_Area: justificante.responsable_Area,
+              puesto_Responsable_Area_Id:
+                justificante.puesto_Responsable_Area_Id,
+              puesto_Responsable_Area: justificante.puesto_Responsable_Area,
+              solicitante_Id: justificante.solicitante_Id,
+              solicitante: justificante.solicitante,
+              puesto_Solicitante_Id: justificante.puesto_Solicitante_Id,
+              puesto_Solicitante: justificante.puesto_Solicitante,
+              folio: justificante.folio,
+              estatus: justificante.estatus,
+              fecha_Creacion: justificante.fecha_Creacion,
+              fecha_Aprobacion_Rechazo: justificante.fecha_Aprobacion_Rechazo,
+              capturista: justificante.capturista,
+              puesto_Capturista: justificante.puesto_Capturista,
+              area: justificante.area,
+              area_Id: justificante.area_Id,
+            };
+          });
+          // if (tipoEmp == "JefeArea") {
+          //   resp = await api.get("/Justificantes/ByArea");
+          //   let { data } = resp.data;
 
-            listJustificantes = data.map((justificante) => {
-              return {
-                justificante_Id: justificante.id,
-                responsable_Area_Id: justificante.responsable_Area_Id,
-                responsable_Area: justificante.responsable_Area,
-                puesto_Responsable_Area_Id:
-                  justificante.puesto_Responsable_Area_Id,
-                puesto_Responsable_Area: justificante.puesto_Responsable_Area,
-                solicitante_Id: justificante.solicitante_Id,
-                solicitante: justificante.solicitante,
-                puesto_Solicitante_Id: justificante.puesto_Solicitante_Id,
-                puesto_Solicitante: justificante.puesto_Solicitante,
-                folio: justificante.folio,
-                estatus: justificante.estatus,
-                fecha_Creacion: justificante.fecha_Creacion,
-                fecha_Aprobacion_Rechazo: justificante.fecha_Aprobacion_Rechazo,
-                capturista: justificante.capturista,
-                puesto_Capturista: justificante.puesto_Capturista,
-                area: justificante.area,
-                area_Id: justificante.area_Id,
-              };
-            });
-            this.justificantes = listJustificantes;
-            this.isPersonal = true;
-          }
+          //   listJustificantes = data.map((justificante) => {
+          //     return {
+          //       justificante_Id: justificante.id,
+          //       responsable_Area_Id: justificante.responsable_Area_Id,
+          //       responsable_Area: justificante.responsable_Area,
+          //       puesto_Responsable_Area_Id:
+          //         justificante.puesto_Responsable_Area_Id,
+          //       puesto_Responsable_Area: justificante.puesto_Responsable_Area,
+          //       solicitante_Id: justificante.solicitante_Id,
+          //       solicitante: justificante.solicitante,
+          //       puesto_Solicitante_Id: justificante.puesto_Solicitante_Id,
+          //       puesto_Solicitante: justificante.puesto_Solicitante,
+          //       folio: justificante.folio,
+          //       estatus: justificante.estatus,
+          //       fecha_Creacion: justificante.fecha_Creacion,
+          //       fecha_Aprobacion_Rechazo: justificante.fecha_Aprobacion_Rechazo,
+          //       capturista: justificante.capturista,
+          //       puesto_Capturista: justificante.puesto_Capturista,
+          //       area: justificante.area,
+          //       area_Id: justificante.area_Id,
+          //     };
+          //   });
+          //   this.justificantes = listJustificantes;
+          // } else {
+          //   resp = await api.get("/Justificantes/MisJustificantes");
+          //   let { data } = resp.data;
+
+          //   listJustificantes = data.map((justificante) => {
+          //     return {
+          //       justificante_Id: justificante.id,
+          //       responsable_Area_Id: justificante.responsable_Area_Id,
+          //       responsable_Area: justificante.responsable_Area,
+          //       puesto_Responsable_Area_Id:
+          //         justificante.puesto_Responsable_Area_Id,
+          //       puesto_Responsable_Area: justificante.puesto_Responsable_Area,
+          //       solicitante_Id: justificante.solicitante_Id,
+          //       solicitante: justificante.solicitante,
+          //       puesto_Solicitante_Id: justificante.puesto_Solicitante_Id,
+          //       puesto_Solicitante: justificante.puesto_Solicitante,
+          //       folio: justificante.folio,
+          //       estatus: justificante.estatus,
+          //       fecha_Creacion: justificante.fecha_Creacion,
+          //       fecha_Aprobacion_Rechazo: justificante.fecha_Aprobacion_Rechazo,
+          //       capturista: justificante.capturista,
+          //       puesto_Capturista: justificante.puesto_Capturista,
+          //       area: justificante.area,
+          //       area_Id: justificante.area_Id,
+          //     };
+          //   });
+          //   this.justificantes = listJustificantes;
+          //   this.isPersonal = true;
+          // }
+          this.isPersonal = true;
         }
+        this.justificantes = listJustificantes;
       } catch (error) {
         return {
           success: false,
@@ -296,7 +319,8 @@ export const useJustificanteStore = defineStore("justificante", {
 
     async loadJustificante(id) {
       try {
-        const resp = await api.get(`/Justificantes/${id}`);
+        let resp = null;
+        resp = await api.get(`/Justificantes/${id}`);
         if (resp.status == 200) {
           const { success, data } = resp.data;
           if (success == true) {
@@ -351,32 +375,29 @@ export const useJustificanteStore = defineStore("justificante", {
           this.personal = false;
         } else if (perfil == 2) {
           let respArea = await api.get("/Areas/AreaByUsuario");
-          let { data, success } = respArea.data;
+          let { data } = respArea.data;
 
-          if (success == true) {
-            let listAreas = [{ value: data.area_Id, label: data.area }];
+          let listAreas = [{ value: data.area_Id, label: data.area }];
 
-            let respPer = await api.get(`/Empleados/ByArea/${area}`);
-            let data2 = respPer.data.data;
-            let listPersonal = data2.map((personal) => {
-              return {
-                value: personal.id,
-                label: `${data2.nombres} ${data2.apellido_Paterno} ${data2.apellido_Materno}`,
-              };
-            });
-            this.areas = listAreas;
-            this.justificante.area_Id = data.area_Id;
-            this.justificante.area = data.area;
-            this.listEmpleados = listPersonal;
-            this.justificante.responsable_Area_Id = dataResp.empleado_Id;
-            this.justificante.responsable_Area = dataResp.empleado;
-            this.justificante.puesto_Responsable_Area_Id = dataResp.puesto_Id;
-            this.isSuperAdmi = false;
-            this.isAdmi = true;
-            this.personal = false;
-          } else {
-            console.log("error");
-          }
+          let respPer = await api.get(`/Empleados/ByArea/${area}`);
+          let data2 = respPer.data.data;
+          let listPersonal = data2.map((personal) => {
+            return {
+              value: personal.id,
+              label: `${data2.nombres} ${data2.apellido_Paterno} ${data2.apellido_Materno}`,
+            };
+          });
+          this.listEmpleados = listPersonal;
+          this.isSuperAdmi = false;
+          this.isAdmi = true;
+          this.personal = false;
+          this.areas = listAreas;
+          this.justificante.area_Id = data.area_Id;
+          this.justificante.area = data.area;
+
+          this.justificante.responsable_Area_Id = dataResp.empleado_Id;
+          this.justificante.responsable_Area = dataResp.empleado;
+          this.justificante.puesto_Responsable_Area_Id = dataResp.puesto_Id;
         } else if (perfil == 3) {
           this.listEmpleados = [];
           let respArea = await api.get("/Areas/AreaByUsuario");
@@ -575,6 +596,7 @@ export const useJustificanteStore = defineStore("justificante", {
     //-----------------------------------------------------------
 
     async createDetalleJustificantes(id, detalle) {
+      console.log("detalle", detalle);
       try {
         const resp = await api.post(`/Detalle_Justificantes/${id}`, detalle);
         if (resp.status == 200) {
@@ -729,36 +751,27 @@ export const useJustificanteStore = defineStore("justificante", {
 
     //-----------------------------------------------------------
 
-    async loadResponsabeByArea() {
-      const resp = await api.get(`/Empleados/ByUsuario`);
-      let { success, data } = resp.data;
-      if (success) {
-        //this.byUsuario = "Edgar Daniel Jiménez Cabrera";
-        this.byUsuario = `${data.nombres} ${data.apellido_Paterno} ${data.apellido_Materno}`;
-      }
-    },
-
     //-----------------------------------------------------------
 
     async loadDiasRestantes(id) {
       try {
+        this.dias_restantes.dias_Economicos = null;
+        this.dias_restantes.primer_Periodo = null;
+        this.dias_restantes.segundo_Periodo = null;
+
         const resp = await api.get(`/Justificantes/Dias_Restantes/${id}`);
-        let {
-          success,
-          dias_Economicos,
-          primer_Periodo,
-          segundo_Periodo,
-          dias_Segundo_Periodo,
-          dias_Primer_Periodo,
-        } = resp.data;
+        let { success, data } = resp.data;
+        console.log("data", data);
         if (success) {
-          this.dias_restantes.dias_Economicos = dias_Economicos;
+          this.dias_restantes.dias_Economicos = data.dias_Economicos;
           this.dias_restantes.primer_Periodo =
-            primer_Periodo == undefined ? dias_Primer_Periodo : primer_Periodo;
+            data.primer_Periodo == undefined
+              ? data.dias_Primer_Periodo
+              : data.primer_Periodo;
           this.dias_restantes.segundo_Periodo =
-            segundo_Periodo == undefined
-              ? dias_Segundo_Periodo
-              : segundo_Periodo;
+            data.segundo_Periodo == undefined
+              ? data.dias_Segundo_Periodo
+              : data.segundo_Periodo;
         }
       } catch (error) {
         return {

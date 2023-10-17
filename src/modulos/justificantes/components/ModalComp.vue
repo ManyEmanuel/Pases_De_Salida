@@ -174,6 +174,7 @@
                 </template>
               </q-input>
               <div
+                v-if="!isEditar"
                 class="text-body2 q-pt-md"
                 v-show="tipo == 'Vacaciones' || tipo == 'Permiso día económico'"
               >
@@ -283,8 +284,8 @@ const tipoJustificante = ref([
   "Omisión de entrada",
   "Omisión de salida",
   "Comisión oficial",
-  "Permiso día económico",
   "Permuta por día laborado",
+  "Permiso día económico",
   "Vacaciones",
 ]);
 const days = ref([]);
@@ -296,16 +297,24 @@ const personalAutoriza = ref(null);
 const area_Id = ref(null);
 const motivo = ref(null);
 const filtrarFecha = ref("");
-const diasEconomicos = ref(null);
 const restanDias = ref(null);
 //-----------------------------------------------------------
 
 onMounted(() => {
   justificanteStore.loadInformacionJustificante();
-  justificanteStore.loadEmpleadosByUsuario();
+  //justificanteStore.loadEmpleadosByUsuario();
 });
 
 //-----------------------------------------------------------
+
+watch(area_Id, (val) => {
+  if (area_Id.value != null) {
+    empleado_Id.value = null;
+    personalAutoriza.value = null;
+    justificante.value.responsable_Area = null;
+    justificanteStore.loadPersonalArea(val.value);
+  }
+});
 
 watch(detalle.value, (val) => {
   if (val.id != null) {
@@ -314,25 +323,28 @@ watch(detalle.value, (val) => {
     cargarTipo(val);
   }
 });
-
-watch(justificante.value, (val) => {
-  cargarArea(val);
-  cargarSolicitante(val);
-  justificanteStore.loadPersonalArea(val.area_Id);
-});
-watch(areas, (val) => {
+watch(modal, (val) => {
+  if (val == true) {
+    justificanteStore.loadInformacionJustificante();
+    cargarArea(justificante.value);
+  }
   if (isSuperAdmi.value == true) {
     area_Id.value = null;
     personalAutoriza.value = null;
   }
+  tipoJustificante.value = [
+    "Omisión de entrada",
+    "Omisión de salida",
+    "Comisión oficial",
+    "Permuta por día laborado",
+    "Permiso día económico",
+    "Vacaciones",
+  ];
 });
-watch(area_Id, async (val) => {
-  if (area_Id.value != null) {
-    await justificanteStore.loadPersonalArea(val.value);
-    empleado_Id.value = null;
-    personalAutoriza.value = null;
-    justificante.value.responsable_Area = null;
-  }
+watch(justificante.value, (val) => {
+  cargarArea(val);
+  cargarSolicitante(val);
+  justificanteStore.loadPersonalArea(val.area_Id);
 });
 
 watch(empleado_Id, async (val) => {
@@ -346,8 +358,46 @@ const empleado = async (val) => {
   await justificanteStore.loadDiasRestantes(val.value);
   await justificanteStore.loadAsignacionesVacaciones();
   personalAutoriza.value = justificante.value.responsable_Area;
+  if (dias_restantes.value.dias_Economicos == 0) {
+    tipoJustificante.value.splice(4, 1);
+  } else if (
+    configuracion.value.periodo_Vacacional == 1 &&
+    dias_restantes.value.primer_Periodo == 0
+  ) {
+    tipoJustificante.value = [
+      "Omisión de entrada",
+      "Omisión de salida",
+      "Comisión oficial",
+      "Permuta por día laborado",
+      "Permiso día económico",
+    ];
+  } else if (
+    configuracion.value.periodo_Vacacional == 2 &&
+    dias_restantes.value.segundo_Periodo == 0
+  ) {
+    tipoJustificante.value = [
+      "Omisión de entrada",
+      "Omisión de salida",
+      "Comisión oficial",
+      "Permuta por día laborado",
+      "Permiso día económico",
+    ];
+  } else {
+    tipoJustificante.value = [
+      "Omisión de entrada",
+      "Omisión de salida",
+      "Comisión oficial",
+      "Permuta por día laborado",
+      "Permiso día económico",
+      "Vacaciones",
+    ];
+  }
   limpiarCampos();
 };
+
+watch(periodoVacacional, (val) => {
+  console.log(val);
+});
 
 watch(days, (val) => {
   if (val != null) {
@@ -453,6 +503,7 @@ const actualizarModal = (valor) => {
   justificanteStore.actualizarModal(valor);
   justificanteStore.updateVisualizar(false);
   justificanteStore.updateEditar(false);
+  justificanteStore.loadEmpleadosByUsuario();
   limpiarCampos();
   justificante.value.solicitante = null;
   listaIncidencias.value = [];
@@ -478,9 +529,10 @@ const onItemClick = async (val) => {
     tipo.value == "Vacaciones" &&
     configuracion.value.periodo_Vacacional == 2
   ) {
+    console.log("entro ", dias_restantes);
     restanDias.value = dias_restantes.value.segundo_Periodo;
+    console.log("restan", restanDias.value);
   }
-  //restanDias.value = null;
 };
 
 const agregarIncidencia = async () => {
@@ -513,9 +565,9 @@ const agregarIncidencia = async () => {
             detalle.value.dias_Incidencias = detalle.value.dias_Incidencias;
           }
 
-          if (periodoVacacional.value == "Primero") {
+          if (configuracion.value.periodo_Vacacional == 1) {
             periodo = 1;
-          } else {
+          } else if (configuracion.value.periodo_Vacacional == 2) {
             periodo = 2;
           }
           detalle.value.tipo_Justificantes = tipo.value;
@@ -556,9 +608,9 @@ const agregarIncidencia = async () => {
       } else {
         if (tipo.value == "Vacaciones") {
           let periodo;
-          if (periodoVacacional.value == "Primero") {
+          if (configuracion.value.periodo_Vacacional == 1) {
             periodo = 1;
-          } else {
+          } else if (configuracion.value.periodo_Vacacional == 2) {
             periodo = 2;
           }
           const resultado = days.value.join(", ");

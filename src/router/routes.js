@@ -26,9 +26,16 @@ const routes = [
         component: () => import("../modulos/justificantes/pages/IndexPage"),
       },
       {
+        path: "/solicitudes_Justificantes",
+        name: "solicitudes_Justificantes",
+        component: () =>
+          import("../modulos/solicitudes_Justificantes/pages/IndexPage"),
+      },
+      {
         path: "/misChecadas",
         name: "misChecadas",
-        component: () => import("../modulos/calendario/pages/IndexPage"),
+        component: () =>
+          import("../modulos/solicitudes_Justificantes/pages/IndexPage"),
       },
     ],
   },

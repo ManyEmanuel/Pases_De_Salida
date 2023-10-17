@@ -129,9 +129,7 @@ const { modulo } = storeToRefs(authStore);
 
 onBeforeMount(() => {
   justificanteStore.loadJustificantes();
-  justificanteStore.loadResponsabeByArea();
 });
-console.log("by", byUsuario, justificantes);
 //-----------------------------------------------------------
 
 const columns = [

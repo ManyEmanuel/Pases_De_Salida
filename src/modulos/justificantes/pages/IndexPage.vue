@@ -58,10 +58,9 @@ const leerPermisos = async () => {
   $q.loading.hide();
 };
 
-const actualizarModal = async (valor) => {
+const actualizarModal = (valor) => {
   $q.loading.show();
   justificanteStore.actualizarModal(valor);
-  await justificanteStore.loadInformacionJustificante();
   $q.loading.hide();
 };
 </script>
