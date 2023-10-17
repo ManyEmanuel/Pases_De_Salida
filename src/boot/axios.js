@@ -7,8 +7,9 @@ import axios from "axios";
 // good idea to move this instance creation inside of the
 // "export default () => {}" function below (which runs individually
 // for each client)
+
 const api = axios.create({
-  baseURL: "https://localhost:7289/api",
+  baseURL: "http://sistema.ieenayarit.org:9170/api",
 });
 // const api = axios.create({
 //   baseURL: "http://sistema.ieenayarit.org:9270/api",
@@ -21,17 +22,7 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-// api.interceptors.response.use(
-//   (response) => response,
-//   (error) => {
-//     if (error.response.status == 401) {
-//       alert("Su sesión ha expirado, sera redireccionado al logín");
-//       localStorage.clear();
-//       window.location = "http://sistema.ieenayarit.org:9271?return=false";
-//     }
-//     return Promise.reject();
-//   }
-// );
+
 
 export default boot(({ app }) => {
   // for use inside Vue files (Options API) through this.$axios and this.$api

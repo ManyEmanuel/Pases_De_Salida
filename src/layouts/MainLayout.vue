@@ -80,49 +80,88 @@
         "
       >
         <q-list padding class="margin top">
-          <q-item
-            v-if="menuPasesList.some((element) => element == 'PS-REG-PAS')"
-            :to="{ name: 'registro_Pases' }"
+          <q-expansion-item
+            expand-separator
+            icon="menu_book"
+            label="Pases de salida"
+            class="text-purple-ieen label-title text-bold"
           >
-            <q-item-section avatar>
-              <q-icon name="person" color="purple-ieen" />
-            </q-item-section>
-            <q-item-section>
-              <q-item-label class="text-purple-ieen label-title text-bold"
-                >Mis solicitudes</q-item-label
-              >
-            </q-item-section>
-          </q-item>
-          <q-item
-            v-if="menuPasesList.some((element) => element == 'PS-SOL-PAS')"
-            :to="{ name: 'solicitudes_Pases' }"
+            <q-item
+              v-if="menuPasesList.some((element) => element == 'PS-REG-PAS')"
+              :to="{ name: 'registro_Pases' }"
+            >
+              <q-item-section avatar>
+                <q-icon name="person" color="purple-ieen" />
+              </q-item-section>
+              <q-item-section>
+                <q-item-label class="text-purple-ieen label-title text-bold"
+                  >Mis solicitudes</q-item-label
+                >
+              </q-item-section>
+            </q-item>
+            <q-item
+              v-if="menuPasesList.some((element) => element == 'PS-SOL-PAS')"
+              :to="{ name: 'solicitudes_Pases' }"
+            >
+              <q-item-section avatar>
+                <q-icon name="groups" color="purple-ieen" />
+              </q-item-section>
+              <q-item-section>
+                <q-item-label class="text-purple-ieen label-title text-bold"
+                  >Solicitudes del área</q-item-label
+                >
+              </q-item-section>
+            </q-item>
+            <q-item
+              v-if="menuPasesList.some((element) => element == 'PS-REG-GEN')"
+              :to="{ name: 'registro_General' }"
+            >
+              <q-item-section avatar>
+                <q-icon name="list_alt" color="purple-ieen" />
+              </q-item-section>
+              <q-item-section>
+                <q-item-label class="text-purple-ieen label-title text-bold"
+                  >Registro general</q-item-label
+                >
+              </q-item-section>
+            </q-item>
+          </q-expansion-item>
+          <q-expansion-item
+            expand-separator
+            icon="library_books"
+            label="Justificantes"
+            class="text-purple-ieen label-title text-bold"
           >
-            <q-item-section avatar>
-              <q-icon name="groups" color="purple-ieen" />
-            </q-item-section>
-            <q-item-section>
-              <q-item-label class="text-purple-ieen label-title text-bold"
-                >Solicitudes del área</q-item-label
-              >
-            </q-item-section>
-          </q-item>
-          <q-item
-            v-if="menuPasesList.some((element) => element == 'PS-REG-GEN')"
-            :to="{ name: 'registro_General' }"
-          >
-            <q-item-section avatar>
-              <q-icon name="list_alt" color="purple-ieen" />
-            </q-item-section>
-            <q-item-section>
-              <q-item-label class="text-purple-ieen label-title text-bold"
-                >Registro general</q-item-label
-              >
-            </q-item-section>
-          </q-item>
-          <q-item
-            v-if="menuPasesList.some((element) => element == 'PS-REG-JUS')"
-            :to="{ name: 'registro_Justificante' }"
-          >
+
+            <q-item
+              v-if="menuPasesList.some((element) => element == 'PS-REG-JUS')"
+              :to="{ name: 'registro_Justificante' }"
+            >
+              <q-item-section avatar>
+                <q-icon name="person" color="purple-ieen" />
+              </q-item-section>
+              <q-item-section>
+                <q-item-label class="text-purple-ieen label-title text-bold"
+                  >Mis solicitudes</q-item-label
+                >
+              </q-item-section>
+            </q-item>
+            <q-item
+              v-if="menuPasesList.some((element) => element == 'PS-MIS-JUS')"
+              :to="{ name: 'solicitudes_Justificantes' }"
+            >
+              <q-item-section avatar>
+                <q-icon name="groups" color="purple-ieen" />
+              </q-item-section>
+              <q-item-section>
+                <q-item-label class="text-purple-ieen label-title text-bold"
+                  >Solicitudes del área</q-item-label
+                >
+              </q-item-section>
+            </q-item>
+          </q-expansion-item>
+          <q-item :to="{ name: 'misChecadas' }">
+=======
             <q-item-section avatar>
               <q-icon name="summarize" color="purple-ieen" />
             </q-item-section>
@@ -136,6 +175,7 @@
             v-if="menuPasesList.some((element) => element == 'PS-MISCHECADAS')"
             :to="{ name: 'misChecadas' }"
           >
+
             <q-item-section avatar>
               <q-icon name="calendar_month" color="purple-ieen" />
             </q-item-section>
@@ -276,9 +316,9 @@ export default defineComponent({
       }).onOk((action) => {
         if (action.label == "Cerrar sesión") {
           localStorage.clear();
-          window.location = "http://sistema.ieenayarit.org:9171?return=false";
+          window.location = "http://sistema.ieenayarit.org:9271?return=false";
         } else if (action.label == "Ir a universo") {
-          window.location = "http://sistema.ieenayarit.org:9171?return=true";
+          window.location = "http://sistema.ieenayarit.org:9271?return=true";
         } else {
           window.location =
             action.url +
@@ -321,6 +361,10 @@ export default defineComponent({
             break;
           case "PS-REG-JUS":
             menuPasesList.value.push("PS-REG-JUS");
+            break;
+
+          case "PS-MIS-JUS":
+            menuPasesList.value.push("PS-MIS-JUS");
             break;
           case "PS-MISCHECADAS":
             menuPasesList.value.push("PS-MISCHECADAS");

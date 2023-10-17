@@ -1,7 +1,6 @@
 const routes = [
   {
     path: "/",
-    name: "home",
     component: () => import("layouts/MainLayout.vue"),
     children: [
       { path: "", component: () => import("pages/IndexPage.vue") },
@@ -24,6 +23,12 @@ const routes = [
         path: "/registro_Justificante",
         name: "registro_Justificante",
         component: () => import("../modulos/justificantes/pages/IndexPage"),
+      },
+      {
+        path: "/solicitudes_Justificantes",
+        name: "solicitudes_Justificantes",
+        component: () =>
+          import("../modulos/solicitudes_Justificantes/pages/IndexPage"),
       },
       {
         path: "/misChecadas",
