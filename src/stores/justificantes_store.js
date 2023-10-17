@@ -717,6 +717,15 @@ export const useJustificanteStore = defineStore("justificante", {
       }
     },
 
+    async loadResponsabeArea(id) {
+      const resp = await api.get(`/ResponsablesAreas/ResposableByArea/${id}`);
+      let { data } = resp.data;
+      let filtro = data.find((x) => x.area_Id == id);
+
+      this.justificante.responsable_Area = filtro.empleado;
+      this.justificante.responsable_Area_Id = filtro.empleado_Id;
+    },
+
     //-----------------------------------------------------------
 
     async loadEmpleadosByUsuario() {
@@ -761,7 +770,6 @@ export const useJustificanteStore = defineStore("justificante", {
 
         const resp = await api.get(`/Justificantes/Dias_Restantes/${id}`);
         let { success, data } = resp.data;
-        console.log("data", data);
         if (success) {
           this.dias_restantes.dias_Economicos = data.dias_Economicos;
           this.dias_restantes.primer_Periodo =

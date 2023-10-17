@@ -5,7 +5,6 @@
         :rows="solicitudes"
         :columns="columns"
         :filter="filter"
-        :loading="loading"
         :pagination="pagination"
         row-key="id"
         rows-per-page-label="Filas por pagina"
@@ -37,7 +36,7 @@
                   icon="check_circle"
                   @click="aceptar(col.value)"
                 >
-                  <q-tooltip>Aceptar pase</q-tooltip>
+                  <q-tooltip>Aceptar justificante</q-tooltip>
                 </q-btn>
                 <q-btn
                   v-if="modulo.eliminar"
@@ -47,7 +46,7 @@
                   icon="cancel"
                   @click="rechazar(col.value)"
                 >
-                  <q-tooltip>Rechazar pase</q-tooltip>
+                  <q-tooltip>Rechazar justificante</q-tooltip>
                 </q-btn>
                 <q-btn
                   v-if="modulo.eliminar"
@@ -57,7 +56,7 @@
                   icon="search"
                   @click="visualizar(col.value)"
                 >
-                  <q-tooltip>Ver pase</q-tooltip>
+                  <q-tooltip>Ver justificante</q-tooltip>
                 </q-btn>
               </div>
 
@@ -161,6 +160,8 @@ const pagination = ref({
   sortBy: "name",
   descending: false,
 });
+
+const filter = ref("");
 
 const visualizar = async (id) => {
   justificanteStore.loadJustificante(id);

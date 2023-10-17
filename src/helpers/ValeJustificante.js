@@ -270,7 +270,7 @@ const ValeJustificante = async () => {
     //--------------------------------------------------------------------------//
 
     footer();
-    doc.save("Justificante" + ".pdf");
+    doc.save(`Justificante-${justificante.value.solicitante}` + ".pdf");
     return {
       success: true,
       msj: "Recibo generado con éxito",

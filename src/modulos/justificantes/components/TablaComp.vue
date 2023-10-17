@@ -28,20 +28,6 @@
             <q-td v-for="col in props.cols" :key="col.name" :props="props">
               <div v-if="col.name === 'justificante_Id'">
                 <q-btn
-                  v-show="
-                    modulo.actualizar &&
-                    props.row.estatus == 'Pendiente' &&
-                    jefeArea
-                  "
-                  flat
-                  round
-                  color="purple-ieen"
-                  icon="send"
-                  @click="aprobar(col.value)"
-                >
-                  <q-tooltip>Aprobar justificante</q-tooltip>
-                </q-btn>
-                <q-btn
                   v-show="modulo.leer && props.row.estatus != 'Pendiente'"
                   flat
                   round
@@ -80,24 +66,10 @@
                   flat
                   round
                   color="purple-ieen"
-                  icon="cancel_schedule_send"
+                  icon="cancel"
                   @click="cancelar(col.value)"
                 >
                   <q-tooltip>Cancelar justificante</q-tooltip>
-                </q-btn>
-                <q-btn
-                  v-if="
-                    modulo.eliminar &&
-                    props.row.estatus == 'Pendiente' &&
-                    jefeArea
-                  "
-                  flat
-                  round
-                  color="purple-ieen"
-                  icon="cancel"
-                  @click="rechazar(col.value)"
-                >
-                  <q-tooltip>Rechazar justificante</q-tooltip>
                 </q-btn>
               </div>
               <label v-else>{{ col.value }}</label>

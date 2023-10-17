@@ -5,7 +5,6 @@
         :rows="historial"
         :columns="columns"
         :filter="filter"
-        :loading="loading"
         :pagination="pagination"
         row-key="id"
         rows-per-page-label="Filas por pagina"
@@ -43,7 +42,7 @@
                   icon="search"
                   @click="visualizar(col.value)"
                 >
-                  <q-tooltip>Ver pase</q-tooltip>
+                  <q-tooltip>Ver justificante</q-tooltip>
                 </q-btn>
               </div>
               <div
@@ -55,9 +54,9 @@
                   round
                   color="purple-ieen"
                   icon="print"
-                  @click="generarPase(col.value)"
+                  @click="generarVale(col.value)"
                 >
-                  <q-tooltip>Imprimir pase</q-tooltip>
+                  <q-tooltip>Imprimir justificante</q-tooltip>
                 </q-btn>
                 <q-btn
                   v-if="modulo.eliminar"
@@ -67,7 +66,7 @@
                   icon="search"
                   @click="visualizar(col.value)"
                 >
-                  <q-tooltip>Ver pase</q-tooltip>
+                  <q-tooltip>Ver justificante</q-tooltip>
                 </q-btn>
               </div>
               <label v-else>{{ col.value }}</label>
@@ -188,7 +187,7 @@ const visualizar = async (id) => {
   justificanteStore.actualizarModal(true);
 };
 
-const generarPase = async (id) => {
+const generarVale = async (id) => {
   let resp = null;
   $q.loading.show();
   resp = await justificanteStore.loadJustificante(id);

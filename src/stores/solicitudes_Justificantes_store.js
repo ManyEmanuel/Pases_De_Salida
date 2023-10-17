@@ -59,44 +59,43 @@ export const useSolicitudJustificanteStore = defineStore(
               area_Id: justificante.area_Id,
             };
           });
-          if (localStorage.getItem("tipoEmp").toString() == "JefeArea") {
-            let respTodos = await api.get("/Justificantes/ObtenTodos");
-            let listTodos = respTodos.data.data;
-            let listPendientesTodos = listTodos.map((justificante) => {
-              return {
-                id: justificante.id,
-                responsable_Area_Id: justificante.responsable_Area_Id,
-                responsable_Area: justificante.responsable_Area,
-                puesto_Responsable_Area_Id:
-                  justificante.puesto_Responsable_Area_Id,
-                puesto_Responsable_Area: justificante.puesto_Responsable_Area,
-                solicitante_Id: justificante.solicitante_Id,
-                solicitante: justificante.solicitante,
-                puesto_Solicitante_Id: justificante.puesto_Solicitante_Id,
-                puesto_Solicitante: justificante.puesto_Solicitante,
-                folio: justificante.folio,
-                estatus: justificante.estatus,
-                fecha_Creacion: justificante.fecha_Creacion,
-                fecha_Aprobacion_Rechazo: justificante.fecha_Aprobacion_Rechazo,
-                capturista: justificante.capturista,
-                puesto_Capturista: justificante.puesto_Capturista,
-                area: justificante.area,
-                area_Id: justificante.area_Id,
-              };
-            });
-            console.log("Lista de pendientes", listPendientesTodos);
-            let listFiltro = listPendientesTodos.filter(
-              (x) =>
-                x.area_Id != parseInt(localStorage.getItem("area")) &&
-                x.estatus === "Pendiente" &&
-                x.responsable_Area_Id ==
-                  parseInt(localStorage.getItem("empleado"))
-            );
-            listPendientes = listPendientesArea.concat(listFiltro);
-          } else {
-            listPendientes = listPendientesArea;
-          }
-          this.solicitudes = listPendientes.filter(
+          // if (localStorage.getItem("tipoEmp").toString() == "JefeArea") {
+          //   let respTodos = await api.get("/Justificantes/ObtenTodos");
+          //   let listTodos = respTodos.data.data;
+          //   let listPendientesTodos = listTodos.map((justificante) => {
+          //     return {
+          //       id: justificante.id,
+          //       responsable_Area_Id: justificante.responsable_Area_Id,
+          //       responsable_Area: justificante.responsable_Area,
+          //       puesto_Responsable_Area_Id:
+          //         justificante.puesto_Responsable_Area_Id,
+          //       puesto_Responsable_Area: justificante.puesto_Responsable_Area,
+          //       solicitante_Id: justificante.solicitante_Id,
+          //       solicitante: justificante.solicitante,
+          //       puesto_Solicitante_Id: justificante.puesto_Solicitante_Id,
+          //       puesto_Solicitante: justificante.puesto_Solicitante,
+          //       folio: justificante.folio,
+          //       estatus: justificante.estatus,
+          //       fecha_Creacion: justificante.fecha_Creacion,
+          //       fecha_Aprobacion_Rechazo: justificante.fecha_Aprobacion_Rechazo,
+          //       capturista: justificante.capturista,
+          //       puesto_Capturista: justificante.puesto_Capturista,
+          //       area: justificante.area,
+          //       area_Id: justificante.area_Id,
+          //     };
+          //   });
+          //   let listFiltro = listPendientesTodos.filter(
+          //     (x) =>
+          //       x.area_Id != parseInt(localStorage.getItem("area")) &&
+          //       x.estatus === "Pendiente" &&
+          //       x.responsable_Area_Id ==
+          //         parseInt(localStorage.getItem("empleado"))
+          //   );
+          //   listPendientes = listPendientesArea.concat(listFiltro);
+          // } else {
+          //   listPendientes = listPendientesArea;
+          // }
+          this.solicitudes = listPendientesArea.filter(
             (x) =>
               x.solicitante_Id != parseInt(localStorage.getItem("empleado"))
           );
@@ -137,43 +136,43 @@ export const useSolicitudJustificanteStore = defineStore(
               area_Id: justificante.area_Id,
             };
           });
-          if (localStorage.getItem("tipoEmp").toString() == "JefeArea") {
-            let respTodos = await api.get("/Justificantes/ObtenTodos");
-            let listTodos = respTodos.data.data;
-            let listHistorialTodos = listTodos.map((todos) => {
-              return {
-                id: justificante.id,
-                responsable_Area_Id: justificante.responsable_Area_Id,
-                responsable_Area: justificante.responsable_Area,
-                puesto_Responsable_Area_Id:
-                  justificante.puesto_Responsable_Area_Id,
-                puesto_Responsable_Area: justificante.puesto_Responsable_Area,
-                solicitante_Id: justificante.solicitante_Id,
-                solicitante: justificante.solicitante,
-                puesto_Solicitante_Id: justificante.puesto_Solicitante_Id,
-                puesto_Solicitante: justificante.puesto_Solicitante,
-                folio: justificante.folio,
-                estatus: justificante.estatus,
-                fecha_Creacion: justificante.fecha_Creacion,
-                fecha_Aprobacion_Rechazo: justificante.fecha_Aprobacion_Rechazo,
-                capturista: justificante.capturista,
-                puesto_Capturista: justificante.puesto_Capturista,
-                area: justificante.area,
-                area_Id: justificante.area_Id,
-              };
-            });
-            let listFiltro = listHistorialTodos.filter(
-              (x) =>
-                x.area_Id != parseInt(localStorage.getItem("area")) &&
-                x.estatus != "Pendiente" &&
-                x.responsable_Area_Id ==
-                  parseInt(localStorage.getItem("empleado"))
-            );
-            listHistorial = listHistorialArea.concat(listFiltro);
-          } else {
-            listHistorial = listHistorialArea;
-          }
-          this.historial = listHistorial.filter(
+          // if (localStorage.getItem("tipoEmp").toString() == "JefeArea") {
+          //   let respTodos = await api.get("/Justificantes/ObtenTodos");
+          //   let listTodos = respTodos.data.data;
+          //   let listHistorialTodos = listTodos.map((todos) => {
+          //     return {
+          //       id: justificante.id,
+          //       responsable_Area_Id: justificante.responsable_Area_Id,
+          //       responsable_Area: justificante.responsable_Area,
+          //       puesto_Responsable_Area_Id:
+          //         justificante.puesto_Responsable_Area_Id,
+          //       puesto_Responsable_Area: justificante.puesto_Responsable_Area,
+          //       solicitante_Id: justificante.solicitante_Id,
+          //       solicitante: justificante.solicitante,
+          //       puesto_Solicitante_Id: justificante.puesto_Solicitante_Id,
+          //       puesto_Solicitante: justificante.puesto_Solicitante,
+          //       folio: justificante.folio,
+          //       estatus: justificante.estatus,
+          //       fecha_Creacion: justificante.fecha_Creacion,
+          //       fecha_Aprobacion_Rechazo: justificante.fecha_Aprobacion_Rechazo,
+          //       capturista: justificante.capturista,
+          //       puesto_Capturista: justificante.puesto_Capturista,
+          //       area: justificante.area,
+          //       area_Id: justificante.area_Id,
+          //     };
+          //   });
+          //   let listFiltro = listHistorialTodos.filter(
+          //     (x) =>
+          //       x.area_Id != parseInt(localStorage.getItem("area")) &&
+          //       x.estatus != "Pendiente" &&
+          //       x.responsable_Area_Id ==
+          //         parseInt(localStorage.getItem("empleado"))
+          //   );
+          //   listHistorial = listHistorialArea.concat(listFiltro);
+          // } else {
+          //   listHistorial = listHistorialArea;
+          // }
+          this.historial = listHistorialArea.filter(
             (x) => x.estatus != "Pendiente"
           );
         } catch (error) {
