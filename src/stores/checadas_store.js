@@ -5,15 +5,17 @@ export const useChecadaStore = defineStore("checadas", {
   state: () => ({
     checadas: [],
     mis_checadas: [],
+    empleados: [],
   }),
+
   actions: {
-    async load_checadas() {
+    async load_mis_checadas() {
       try {
-        const resp = await api.get("/Checador");
+        const resp = await api.get("/Checador/MisChecadas");
         if (resp.status == 200) {
           const { success, data } = resp.data;
           if (success) {
-            this.checadas = data.map((element) => {
+            this.mis_checadas = data.map((element) => {
               return {
                 id: element.id,
                 title: element.title,
@@ -37,33 +39,47 @@ export const useChecadaStore = defineStore("checadas", {
       }
     },
 
-    async load_mis_checadas() {
+    async load_empleados_calendario() {
       try {
-        const resp = await api.get("/Checador/MisChecadas");
+        const resp = await api.get("/Checador/Calendario");
         if (resp.status == 200) {
           const { success, data } = resp.data;
           if (success) {
-            this.mis_checadas = data.map((element) => {
-              console.log(element);
+            this.empleados = data.map((element) => {
               return {
                 id: element.id,
-                title: element.title,
-                start: element.fecha,
+                title: element.label,
               };
             });
-            return { success };
-          } else {
-            return {
-              success: false,
-              data: "Ocurrió un error, inténtelo de nuevo. Si el error persiste, contacte a soporte",
-            };
           }
         }
+      } catch (error) {}
+    },
+
+    async load_checadas(fecha_inicio, fecha_fin) {
+      try {
+        this.checadas = [];
+        const resp = await api.get(
+          `/Checador/Eventos?Fecha_Inicio=${fecha_inicio}&fecha_fin=${fecha_fin}`
+        );
+        if (resp.status == 200) {
+          const { success, data } = resp.data;
+          if (success) {
+            console.log(data);
+            this.checadas = data;
+          } else {
+            return { success, data };
+          }
+        } else {
+          return {
+            success: false,
+            data: "Ocurrio un error intentelo de nuevo, si el error persiste comuniquese con el administrador del sistema",
+          };
+        }
       } catch (error) {
-        console.log(error);
         return {
           success: false,
-          data: "Ocurrió un error, inténtelo de nuevo. Si el error persiste, contacte a soporte",
+          data: "Ocurrio un error intentelo de nuevo, si el error persiste comuniquese con el administrador del sistema",
         };
       }
     },
