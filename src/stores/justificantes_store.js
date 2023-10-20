@@ -32,6 +32,7 @@ export const useJustificanteStore = defineStore("justificante", {
       responsable_Area_Id: null,
       responsable_Area: null,
       puesto_Responsable_Area_Id: null,
+      puesto_Responsable_Area: null,
       solicitante: null,
       solicitante_Id: null,
       puesto_Solicitante_Id: null,
@@ -46,6 +47,13 @@ export const useJustificanteStore = defineStore("justificante", {
       folio: null,
       fecha_Aprobacion_Rechazo: null,
       fecha_Creacion: null,
+      recursos_Humanos_Id: null,
+      recursos_Humanos: null,
+      puesto_Recursos_Humanos_Id: null,
+      puesto_Recursos_Humanos: null,
+      puesto_Responsable_Administracion_Id: null,
+      puesto_Responsable_Administracion: null,
+      responsable_Admistracion_Id: null,
       responsable_Administracion: null,
     },
     myLocale: {
@@ -68,6 +76,7 @@ export const useJustificanteStore = defineStore("justificante", {
     configuracion: {
       dias_Economicos: null,
       periodo_Vacacional: null,
+      dias_Segundo_Periodo: null,
     },
   }),
   actions: {
@@ -192,62 +201,6 @@ export const useJustificanteStore = defineStore("justificante", {
               area_Id: justificante.area_Id,
             };
           });
-          // if (tipoEmp == "JefeArea") {
-          //   resp = await api.get("/Justificantes/ByArea");
-          //   let { data } = resp.data;
-
-          //   listJustificantes = data.map((justificante) => {
-          //     return {
-          //       justificante_Id: justificante.id,
-          //       responsable_Area_Id: justificante.responsable_Area_Id,
-          //       responsable_Area: justificante.responsable_Area,
-          //       puesto_Responsable_Area_Id:
-          //         justificante.puesto_Responsable_Area_Id,
-          //       puesto_Responsable_Area: justificante.puesto_Responsable_Area,
-          //       solicitante_Id: justificante.solicitante_Id,
-          //       solicitante: justificante.solicitante,
-          //       puesto_Solicitante_Id: justificante.puesto_Solicitante_Id,
-          //       puesto_Solicitante: justificante.puesto_Solicitante,
-          //       folio: justificante.folio,
-          //       estatus: justificante.estatus,
-          //       fecha_Creacion: justificante.fecha_Creacion,
-          //       fecha_Aprobacion_Rechazo: justificante.fecha_Aprobacion_Rechazo,
-          //       capturista: justificante.capturista,
-          //       puesto_Capturista: justificante.puesto_Capturista,
-          //       area: justificante.area,
-          //       area_Id: justificante.area_Id,
-          //     };
-          //   });
-          //   this.justificantes = listJustificantes;
-          // } else {
-          //   resp = await api.get("/Justificantes/MisJustificantes");
-          //   let { data } = resp.data;
-
-          //   listJustificantes = data.map((justificante) => {
-          //     return {
-          //       justificante_Id: justificante.id,
-          //       responsable_Area_Id: justificante.responsable_Area_Id,
-          //       responsable_Area: justificante.responsable_Area,
-          //       puesto_Responsable_Area_Id:
-          //         justificante.puesto_Responsable_Area_Id,
-          //       puesto_Responsable_Area: justificante.puesto_Responsable_Area,
-          //       solicitante_Id: justificante.solicitante_Id,
-          //       solicitante: justificante.solicitante,
-          //       puesto_Solicitante_Id: justificante.puesto_Solicitante_Id,
-          //       puesto_Solicitante: justificante.puesto_Solicitante,
-          //       folio: justificante.folio,
-          //       estatus: justificante.estatus,
-          //       fecha_Creacion: justificante.fecha_Creacion,
-          //       fecha_Aprobacion_Rechazo: justificante.fecha_Aprobacion_Rechazo,
-          //       capturista: justificante.capturista,
-          //       puesto_Capturista: justificante.puesto_Capturista,
-          //       area: justificante.area,
-          //       area_Id: justificante.area_Id,
-          //     };
-          //   });
-          //   this.justificantes = listJustificantes;
-          //   this.isPersonal = true;
-          // }
           this.isPersonal = true;
         }
         this.justificantes = listJustificantes;
@@ -329,6 +282,9 @@ export const useJustificanteStore = defineStore("justificante", {
             this.justificante.responsable_Area = data.responsable_Area;
             this.justificante.puesto_Responsable_Area_Id =
               data.puesto_Responsable_Area_Id;
+            this.justificante.puesto_Responsable_Area =
+              data.puesto_Responsable_Area;
+            this.justificante.puesto_Solicitante = data.puesto_Solicitante;
             this.justificante.solicitante = data.solicitante;
             this.justificante.solicitante_Id = data.solicitante_Id;
             this.justificante.capturista_Id = data.capturista_Id;
@@ -342,6 +298,20 @@ export const useJustificanteStore = defineStore("justificante", {
             this.justificante.fecha_Aprobacion_Rechazo =
               data.fecha_Aprobacion_Rechazo;
             this.justificante.fecha_Creacion = data.fecha_Creacion;
+            this.justificante.recursos_Humanos_Id = data.recursos_Humanos_Id;
+            this.justificante.recursos_Humanos = data.recursos_Humanos;
+            this.justificante.puesto_Recursos_Humanos_Id =
+              data.puesto_Recursos_Humanos_Id;
+            this.justificante.puesto_Recursos_Humanos =
+              data.puesto_Recursos_Humanos;
+            this.justificante.puesto_Responsable_Administracion_Id =
+              data.puesto_Responsable_Administracion_Id;
+            this.justificante.puesto_Responsable_Administracion =
+              data.puesto_Responsable_Administracion;
+            this.justificante.responsable_Admistracion_Id =
+              data.responsable_Admistracion_Id;
+            this.justificante.responsable_Administracion =
+              data.responsable_Administracion;
 
             return { success, data };
           }
@@ -378,15 +348,6 @@ export const useJustificanteStore = defineStore("justificante", {
 
           let listAreas = [{ value: data.area_Id, label: data.area }];
 
-          let respPer = await api.get(`/Empleados/ByArea/${area}`);
-          let data2 = respPer.data.data;
-          let listPersonal = data2.map((personal) => {
-            return {
-              value: personal.id,
-              label: `${data2.nombres} ${data2.apellido_Paterno} ${data2.apellido_Materno}`,
-            };
-          });
-          this.listEmpleados = listPersonal;
           this.isSuperAdmi = false;
           this.isAdmi = true;
           this.personal = false;
@@ -547,7 +508,6 @@ export const useJustificanteStore = defineStore("justificante", {
           `/Detalle_Justificantes/ByJustificantes/${id}`
         );
         let { data } = resp.data;
-
         this.listaIncidencias = data.map((incidencia) => {
           return {
             id: incidencia.id,
@@ -594,7 +554,6 @@ export const useJustificanteStore = defineStore("justificante", {
     //-----------------------------------------------------------
 
     async createDetalleJustificantes(id, detalle) {
-      console.log("detalle", detalle);
       try {
         const resp = await api.post(`/Detalle_Justificantes/${id}`, detalle);
         if (resp.status == 200) {
@@ -694,19 +653,15 @@ export const useJustificanteStore = defineStore("justificante", {
         this.empleados = null;
         let resp = await api.get(`/Empleados/ByArea/${idNuevo}`);
         let { data } = resp.data;
-        this.listEmpleados = data.map((personal) => {
+        let list = data.map((personal) => {
           return {
             value: personal.id,
-            label:
-              personal.nombres +
-              " " +
-              personal.apellido_Paterno +
-              " " +
-              personal.apellido_Materno,
+            label: `${personal.nombres} ${personal.apellido_Paterno} ${personal.apellido_Materno}`,
             puesto_Id: personal.puesto_Id,
             area_Id: personal.area_Id,
           };
         });
+        this.listEmpleados = list;
       } catch (error) {
         return {
           success: false,
@@ -758,8 +713,6 @@ export const useJustificanteStore = defineStore("justificante", {
 
     //-----------------------------------------------------------
 
-    //-----------------------------------------------------------
-
     async loadDiasRestantes(id) {
       try {
         this.dias_restantes.dias_Economicos = null;
@@ -793,8 +746,9 @@ export const useJustificanteStore = defineStore("justificante", {
       const resp = await api.get("Asignaciones_Vacaciones/ObtenTodos");
       let { success, data } = resp.data;
       if (success) {
-        this.configuracion.dias_Economicos = data.dias_Economicos;
+        this.configuracion.dias_Economicos = data[0].dias_Economicos;
         this.configuracion.periodo_Vacacional = data[1].periodo_Vacacional;
+        this.configuracion.dias_Segundo_Periodo = data[1].dias_Segundo_Periodo;
       }
     },
   },

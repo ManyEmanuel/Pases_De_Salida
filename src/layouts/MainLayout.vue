@@ -158,6 +158,19 @@
                 >
               </q-item-section>
             </q-item>
+            <q-item
+              v-if="menuPasesList.some((element) => element == 'PS-GEN-JUS')"
+              :to="{ name: 'registro_general_justificantes' }"
+            >
+              <q-item-section avatar>
+                <q-icon name="list_alt" color="purple-ieen" />
+              </q-item-section>
+              <q-item-section>
+                <q-item-label class="text-purple-ieen label-title text-bold"
+                  >Registro general</q-item-label
+                >
+              </q-item-section>
+            </q-item>
           </q-expansion-item>
           <q-item
             v-if="menuPasesList.some((element) => element == 'PS-MISCHECADAS')"
@@ -358,6 +371,9 @@ export default defineComponent({
             break;
           case "PS-CHECADAS":
             menuPasesList.value.push("PS-CHECADAS");
+            break;
+          case "PS-GEN-JUS":
+            menuPasesList.value.push("PS-GEN-JUS");
             break;
         }
       });

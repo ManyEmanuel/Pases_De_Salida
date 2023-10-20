@@ -169,7 +169,7 @@
                 class="text-body2 q-pt-md"
                 v-show="tipo == 'Vacaciones' || tipo == 'Permiso día económico'"
               >
-                Días disponibles
+                Días disponibles:
                 {{ restanDias }}
               </div>
             </div>
@@ -245,7 +245,7 @@
 import { storeToRefs } from "pinia";
 import { useQuasar, date } from "quasar";
 import { useJustificanteStore } from "src/stores/justificantes_store";
-import { onBeforeMount, onMounted, ref, watch } from "vue";
+import { onBeforeMount, ref, watch } from "vue";
 import TablaConceptos from "./TablaConceptos.vue";
 
 //-----------------------------------------------------------
@@ -287,6 +287,7 @@ const area_Id = ref(null);
 const motivo = ref(null);
 const filtrarFecha = ref("");
 const restanDias = ref(null);
+
 //-----------------------------------------------------------
 
 onBeforeMount(() => {
@@ -297,7 +298,6 @@ onBeforeMount(() => {
 //-----------------------------------------------------------
 
 watch(justificante.value, (val) => {
-  console.log("val", val);
   if (
     isEditar.value == true ||
     isAdmi.value == true ||
@@ -332,6 +332,8 @@ watch(detalle.value, async (val) => {
   }
 });
 
+//-----------------------------------------------------------
+
 const diasRestantes = () => {
   if (tipo.value == "Permiso día económico") {
     restanDias.value = dias_restantes.value.dias_Economicos;
@@ -349,10 +351,10 @@ const diasRestantes = () => {
 };
 
 const cargarArea = async (val) => {
-  console.log("entro", val);
   if (area_Id.value == null) {
     let areaFiltrado = areas.value.find((x) => x.value == `${val.area_Id}`);
     area_Id.value = areaFiltrado;
+    //justificanteStore.loadPersonalArea(val.area_Id);
   }
 };
 
@@ -375,14 +377,14 @@ watch(modal, (val) => {
   //   area_Id.value = null;
   //   personalAutoriza.value = null;
   // }
-  // tipoJustificante.value = [
-  //   "Omisión de entrada",
-  //   "Omisión de salida",
-  //   "Comisión oficial",
-  //   "Permuta por día laborado",
-  //   "Permiso día económico",
-  //   "Vacaciones",
-  // ];
+  tipoJustificante.value = [
+    "Omisión de entrada",
+    "Omisión de salida",
+    "Comisión oficial",
+    "Permuta por día laborado",
+    "Permiso día económico",
+    "Vacaciones",
+  ];
 });
 
 watch(empleado_Id, async (val) => {
@@ -532,22 +534,32 @@ const actualizarModal = (valor) => {
 };
 
 const onItemClick = async (val) => {
-  tipo.value = val;
-  await justificanteStore.loadAsignacionesVacaciones();
-
-  days.value = null;
-  if (tipo.value == "Permiso día económico") {
-    restanDias.value = dias_restantes.value.dias_Economicos;
-  } else if (
-    tipo.value == "Vacaciones" &&
-    configuracion.value.periodo_Vacacional == 1
-  ) {
-    restanDias.value = dias_restantes.value.primer_Periodo;
-  } else if (
-    tipo.value == "Vacaciones" &&
-    configuracion.value.periodo_Vacacional == 2
-  ) {
-    restanDias.value = dias_restantes.value.segundo_Periodo;
+  if (empleado_Id.value == null) {
+    $q.dialog({
+      title: "Atención",
+      message: "Seleccione un solicitante",
+      icon: "Warning",
+      persistent: true,
+      transitionShow: "scale",
+      transitionHide: "scale",
+    });
+  } else {
+    tipo.value = val;
+    await justificanteStore.loadAsignacionesVacaciones();
+    days.value = null;
+    if (tipo.value == "Permiso día económico") {
+      restanDias.value = dias_restantes.value.dias_Economicos;
+    } else if (
+      tipo.value == "Vacaciones" &&
+      configuracion.value.periodo_Vacacional == 1
+    ) {
+      restanDias.value = dias_restantes.value.primer_Periodo;
+    } else if (
+      tipo.value == "Vacaciones" &&
+      configuracion.value.periodo_Vacacional == 2
+    ) {
+      restanDias.value = dias_restantes.value.segundo_Periodo;
+    }
   }
 };
 
@@ -651,10 +663,6 @@ const agregarIncidencia = async () => {
             tipo.value,
             periodo
           );
-          // await justificanteStore.createDetalleJustificantes(
-          //   justificante.value.id,
-          //   detalle.value
-          // );
         } else {
           const resultado = days.value.join(", ");
           detalle.value.dias_Incidencias = resultado;
@@ -670,10 +678,6 @@ const agregarIncidencia = async () => {
             tipo.value,
             0
           );
-          // await justificanteStore.createDetalleJustificantes(
-          //   justificante.value.id,
-          //   detalle.value
-          // );
         }
 
         limpiarCampos();

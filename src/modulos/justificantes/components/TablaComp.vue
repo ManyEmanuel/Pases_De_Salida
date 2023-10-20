@@ -16,7 +16,7 @@
             dense
             debounce="300"
             v-model="filter"
-            placeholder="Buscar.."
+            placeholder="Buscar..."
           >
             <template v-slot:append>
               <q-icon name="search" />
@@ -38,6 +38,7 @@
                   <q-tooltip>Ver justificante</q-tooltip>
                 </q-btn>
                 <q-btn
+                  :disable="activar_pdf"
                   v-show="modulo.leer && props.row.estatus == 'Aprobado'"
                   flat
                   round
@@ -58,11 +59,7 @@
                   <q-tooltip>Editar justificante</q-tooltip>
                 </q-btn>
                 <q-btn
-                  v-if="
-                    modulo.actualizar &&
-                    props.row.estatus == 'Pendiente' &&
-                    !jefeArea
-                  "
+                  v-if="modulo.actualizar && props.row.estatus == 'Pendiente'"
                   flat
                   round
                   color="purple-ieen"
@@ -92,16 +89,17 @@ import ValeJustificante from "src/helpers/ValeJustificante";
 
 const $q = useQuasar();
 const justificanteStore = useJustificanteStore();
-const { justificantes, isAdmi, isPersonal, jefeArea, byUsuario } =
-  storeToRefs(justificanteStore);
+const { justificantes } = storeToRefs(justificanteStore);
 const authStore = useAuthStore();
 const { modulo } = storeToRefs(authStore);
+const activar_pdf = ref(false);
 
 //-----------------------------------------------------------
 
 onBeforeMount(() => {
   justificanteStore.loadJustificantes();
 });
+
 //-----------------------------------------------------------
 
 const columns = [
@@ -148,7 +146,6 @@ const columns = [
     field: "estatus",
     sortable: false,
   },
-
   {
     name: "fecha_Creacion",
     align: "center",
@@ -221,44 +218,6 @@ const cancelar = async (id) => {
   });
 };
 
-const rechazar = async (id) => {
-  $q.dialog({
-    title: "Rechazar justificante",
-    message: "Al aceptar, se rechazará el justificante",
-    icon: "Warning",
-    persistent: true,
-    transitionShow: "scale",
-    transitionHide: "scale",
-    ok: {
-      color: "positive",
-      label: "Si, Aceptar",
-    },
-    cancel: {
-      color: "negative",
-      label: "No cancelar",
-    },
-  }).onOk(async () => {
-    $q.loading.show();
-    const resp = await justificanteStore.rechazarJustificante(id);
-    if (resp.success) {
-      $q.loading.hide();
-      $q.notify({
-        position: "top-right",
-        type: "positive",
-        message: resp.data,
-      });
-      justificanteStore.loadJustificantes();
-    } else {
-      $q.loading.hide();
-      $q.notify({
-        position: "top-right",
-        type: "negative",
-        message: resp.data,
-      });
-    }
-  });
-};
-
 const editar = async (id) => {
   $q.loading.show();
   await justificanteStore.loadJustificante(id);
@@ -284,49 +243,18 @@ const imprimir = async (id) => {
   $q.loading.show();
   resp = await justificanteStore.loadJustificante(id);
   await justificanteStore.loadDetalleJustificantes(id);
+
   if (resp.success === true) {
     ValeJustificante();
+    activar_pdf.value = true;
+    setTimeout(() => {
+      activar_pdf.value = false;
+    }, 5000);
   }
   $q.loading.hide();
 };
 
-const aprobar = async (id) => {
-  $q.dialog({
-    title: "Afectar justificante",
-    message: "Al aceptar, se afectará el justificante",
-    icon: "Warning",
-    persistent: true,
-    transitionShow: "scale",
-    transitionHide: "scale",
-    ok: {
-      color: "positive",
-      label: "Si, Aceptar",
-    },
-    cancel: {
-      color: "negative",
-      label: "No cancelar",
-    },
-  }).onOk(async () => {
-    $q.loading.show();
-    const resp = await justificanteStore.aprobarJustificante(id);
-    if (resp.success) {
-      $q.loading.hide();
-      $q.notify({
-        position: "top-right",
-        type: "positive",
-        message: resp.data,
-      });
-      justificanteStore.loadJustificantes();
-    } else {
-      $q.loading.hide();
-      $q.notify({
-        position: "top-right",
-        type: "negative",
-        message: resp.data,
-      });
-    }
-  });
-};
+//-----------------------------------------------------------
 </script>
 
 <style></style>

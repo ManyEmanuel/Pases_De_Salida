@@ -49,7 +49,7 @@
                   <q-tooltip>Rechazar justificante</q-tooltip>
                 </q-btn>
                 <q-btn
-                  v-if="modulo.eliminar"
+                  v-if="modulo.leer"
                   flat
                   round
                   color="purple-ieen"
@@ -77,6 +77,8 @@ import { onBeforeMount, ref } from "vue";
 import { useAuthStore } from "../../../stores/auth_store";
 import { useSolicitudJustificanteStore } from "../../../stores/solicitudes_Justificantes_store";
 
+//-----------------------------------------------------------
+
 const $q = useQuasar();
 const solicitudJustificanteStore = useSolicitudJustificanteStore();
 const justificanteStore = useJustificanteStore();
@@ -84,9 +86,14 @@ const authStore = useAuthStore();
 const { modulo } = storeToRefs(authStore);
 const { solicitudes } = storeToRefs(solicitudJustificanteStore);
 
+//-----------------------------------------------------------
+
 onBeforeMount(() => {
   solicitudJustificanteStore.loadSolicitudesJustificantes();
 });
+
+//-----------------------------------------------------------
+
 const columns = [
   {
     name: "folio",
@@ -109,7 +116,6 @@ const columns = [
     field: "responsable_Area",
     sortable: false,
   },
-
   {
     name: "capturista",
     align: "center",
@@ -162,6 +168,8 @@ const pagination = ref({
 });
 
 const filter = ref("");
+
+//-----------------------------------------------------------
 
 const visualizar = async (id) => {
   justificanteStore.loadJustificante(id);

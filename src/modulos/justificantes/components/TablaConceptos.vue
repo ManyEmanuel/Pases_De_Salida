@@ -118,6 +118,8 @@ const pagination = ref({
 
 const filter = ref("");
 
+//-----------------------------------------------------------
+
 const cargarColumnas = async () => {
   if (isVisualizar.value == true) {
     columnasVisibles = ["tipo_Justificantes", "dias_Incidencias", "motivo"];
@@ -130,8 +132,6 @@ const cargarColumnas = async () => {
     ];
   }
 };
-
-//-----------------------------------------------------------
 
 const eliminar = async (id) => {
   $q.dialog({
