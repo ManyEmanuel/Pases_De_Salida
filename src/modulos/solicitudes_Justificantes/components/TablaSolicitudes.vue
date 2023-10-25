@@ -174,8 +174,8 @@ const filter = ref("");
 const visualizar = async (id) => {
   justificanteStore.loadJustificante(id);
   justificanteStore.loadDetalleJustificantes(id);
-
   justificanteStore.actualizarModal(true);
+  justificanteStore.updateVisualizar(true);
 };
 
 const aceptar = async (id) => {

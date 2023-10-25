@@ -187,12 +187,12 @@ const ValeJustificante = async () => {
       null,
       "center"
     );
-    doc.text("Vo. Bo, Jefe/a inmediato/a", 165, 240, null, null, "center");
+    doc.text("Autoriza", 165, 240, null, null, "center");
     //--------------------------------------------------------------------------//
-    doc.line(10, 260, 90, 260);
+    doc.line(70, 260, 145, 260);
     doc.text(
       `${justificante.value.recursos_Humanos}`,
-      50,
+      108,
       259,
       null,
       null,
@@ -200,41 +200,41 @@ const ValeJustificante = async () => {
     );
     doc.text(
       `${justificante.value.puesto_Recursos_Humanos}`,
-      58,
+      108,
       265,
       null,
       null,
       "center"
     );
-    doc.text("Vo. Bo, Recursos humanos", 50, 270, null, null, "center");
+    doc.text("Vo. Bo, Recursos humanos", 108, 270, null, null, "center");
     //--------------------------------------------------------------------------//
-    doc.line(125, 260, 205, 260);
-    doc.text(
-      `${justificante.value.responsable_Administracion}`,
+    // doc.line(125, 260, 205, 260);
+    // doc.text(
+    //   `${justificante.value.responsable_Administracion}`,
 
-      165,
-      259,
-      null,
-      null,
-      "center"
-    );
-    doc.text(
-      `${justificante.value.puesto_Responsable_Administracion}`,
+    //   165,
+    //   259,
+    //   null,
+    //   null,
+    //   "center"
+    // );
+    // doc.text(
+    //   `${justificante.value.puesto_Responsable_Administracion}`,
 
-      165,
-      265,
-      null,
-      null,
-      "center"
-    );
-    doc.text(
-      "Vo. Bo, Dirección de Administración",
-      165,
-      270,
-      null,
-      null,
-      "center"
-    );
+    //   165,
+    //   265,
+    //   null,
+    //   null,
+    //   "center"
+    // );
+    // doc.text(
+    //   "Vo. Bo, Dirección de Administración",
+    //   165,
+    //   270,
+    //   null,
+    //   null,
+    //   "center"
+    // );
     //--------------------------------------------------------------------------//
     //Codigo numeracion de paginas
     var footer = function () {

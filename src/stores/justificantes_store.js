@@ -16,6 +16,7 @@ export const useJustificanteStore = defineStore("justificante", {
     areas: [],
     listaIncidencias: [],
     justificantes: [],
+    listReporte: [],
     byUsuario: null,
     detalle: {
       id: null,
@@ -73,11 +74,19 @@ export const useJustificanteStore = defineStore("justificante", {
       segundo_Periodo: null,
       dias_Economicos: null,
     },
-    configuracion: {
-      dias_Economicos: null,
-      periodo_Vacacional: null,
-      dias_Segundo_Periodo: null,
-    },
+    // configuracion: {
+    //   dias_Economicos: null,
+    //   periodo_Vacacional: null,
+    //   dias_Segundo_Periodo: null,
+    //   dias_Primer_Periodo: null,
+    //   tipo_Primer_Periodo: null,
+    //   año: null,
+    //   fechas_Primer_Periodo: null,
+    //   tipo_Segundo_Periodo: null,
+    //   fechas_Segundo_Periodo: null,
+    //   fecha_Creacion: null,
+    // },
+    configuracion: [],
   }),
   actions: {
     actualizarModal(valor) {
@@ -97,20 +106,21 @@ export const useJustificanteStore = defineStore("justificante", {
     },
 
     initJustificante() {
-      this.justificante.id = null;
-      this.justificante.solicitante = null;
-      this.justificante.solicitante_Id = null;
-      this.justificante.area = null;
-      this.justificante.area_Id = null;
-      this.justificante.capturista = null;
-      this.justificante.capturista_Id = null;
-      this.justificante.estatus = null;
-      this.justificante.folio = null;
-      this.justificante.fecha_Aprobacion_Rechazo = null;
-      this.justificante.fecha_Creacion = null;
-      this.justificante.puesto_Solicitante_Id = null;
-      this.justificante.puesto_Solicitante = null;
-      this.isPersonal = false;
+      // this.justificante.id = null;
+      // this.justificante.solicitante = null;
+      // this.justificante.solicitante_Id = null;
+      // this.justificante.area = null;
+      // this.justificante.area_Id = null;
+      // this.justificante.capturista = null;
+      // this.justificante.capturista_Id = null;
+      // this.justificante.estatus = null;
+      // this.justificante.folio = null;
+      // this.justificante.fecha_Aprobacion_Rechazo = null;
+      // this.justificante.fecha_Creacion = null;
+      // this.justificante.puesto_Solicitante_Id = null;
+      // this.justificante.puesto_Solicitante = null;
+      // this.isPersonal = false;
+      this.listaIncidencias = [];
     },
     //-----------------------------------------------------------
     async loadJustificantes() {
@@ -219,7 +229,6 @@ export const useJustificanteStore = defineStore("justificante", {
         const resp = await api.post("/Justificantes", justificante);
         if (resp.status == 200) {
           const { success, data, idJustificante } = resp.data;
-
           if (success === true) {
             return { success, data, idJustificante };
           } else {
@@ -448,7 +457,7 @@ export const useJustificanteStore = defineStore("justificante", {
 
     async aprobarJustificante(id) {
       try {
-        const resp = await api.get(`/Justificantes/Aprobar/${id}`);
+        const resp = await api.post(`/Justificantes/Aprobar/${id}`, 0);
         if (resp.status == 200) {
           const { success, data } = resp.data;
           if (success === true) {
@@ -743,12 +752,64 @@ export const useJustificanteStore = defineStore("justificante", {
     //-----------------------------------------------------------
 
     async loadAsignacionesVacaciones() {
-      const resp = await api.get("Asignaciones_Vacaciones/ObtenTodos");
-      let { success, data } = resp.data;
-      if (success) {
-        this.configuracion.dias_Economicos = data[0].dias_Economicos;
-        this.configuracion.periodo_Vacacional = data[1].periodo_Vacacional;
-        this.configuracion.dias_Segundo_Periodo = data[1].dias_Segundo_Periodo;
+      try {
+        const resp = await api.get("/Asignaciones_Vacaciones/ObtenTodos");
+        let { data } = resp.data;
+        let listconfiguracion = data.map((config) => {
+          return {
+            periodo_Vacacional: config.periodo_Vacacional,
+            año: config.año,
+            dias_Primer_Periodo: config.dias_Primer_Periodo,
+            tipo_Primer_Periodo: config.tipo_Primer_Periodo,
+            fechas_Primer_Periodo: config.fechas_Primer_Periodo,
+            dias_Segundo_Periodo: config.dias_Segundo_Periodo,
+            tipo_Segundo_Periodo: config.tipo_Segundo_Periodo,
+            fechas_Segundo_Periodo: config.fechas_Segundo_Periodo,
+            dias_Economicos: config.dias_Economicos,
+            fecha_Creacion: config.fecha_Creacion,
+          };
+        });
+        this.configuracion = listconfiguracion.filter((x) => x.año == 2023);
+      } catch (error) {
+        return {
+          success: false,
+          data: "Ocurrió un error, inténtelo de nuevo. Si el error persiste, contacte a soporte",
+        };
+      }
+    },
+
+    //-----------------------------------------------------------------------
+    //Reporte
+
+    async reporteJustificantes(date) {
+      try {
+        const resp = await api.get(
+          `/Justificantes/Justificantes_Solicitados_ByArea?Fecha_Inicio=${date.from}&Fecha_Fin=${date.to}`
+        );
+        let { data, success } = resp.data;
+
+        let listReporte = data.map((reporte) => {
+          return {
+            id: reporte.id,
+            empleado_Id: reporte.empleado_Id,
+            empleado: reporte.empleado,
+            vacaciones_P1: reporte.vacaciones_P1,
+            vacaciones_P2: reporte.vacaciones_P2,
+            permiso_Economico: reporte.permiso_Economico,
+            omision_Entrada: reporte.omision_Entrada,
+            omision_Salida: reporte.omision_Salida,
+            comision_Oficial: reporte.comision_Oficial,
+            permuta_Laboral: reporte.permuta_Laboral,
+            otros: reporte.otros,
+          };
+        });
+        this.listReporte = listReporte;
+        return { success };
+      } catch (error) {
+        return {
+          success: false,
+          data: "Ocurrió un error, inténtelo de nuevo. Si el error persiste, contacte a soporte",
+        };
       }
     },
   },

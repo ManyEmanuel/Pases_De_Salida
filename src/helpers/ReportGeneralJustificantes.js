@@ -2,21 +2,23 @@ import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
 import { storeToRefs } from "pinia";
 import { useJustificanteStore } from "src/stores/justificantes_store";
+import { api } from "src/boot/axios";
 
-const ReporteGeneralJustificantes = async () => {
+const ReporteGeneralJustificantes = async (date) => {
   try {
     //--------------------------------------------------------------------------//
     const justificanteStore = useJustificanteStore();
-    const { configuracion } = storeToRefs(justificanteStore);
+    const { configuracion, listReporte } = storeToRefs(justificanteStore);
+    const resp = await api.get("/Areas/AreaByUsuario");
+    const { data } = resp.data;
     let img = new Image();
     img.src = require("../assets/IEEN300.png");
     const doc = new jsPDF({ orientation: "portrait", format: "letter" });
     doc.addImage(img, "png", 10, 5, 35, 21);
     doc.setFontSize(10);
     doc.setFont("helvetica", "bold");
-    let area = "UNIDAD TÉCNICA DE INFORMÁTICA Y ESTADÍSTICA";
     doc.text(
-      "INSTITUTO ESTATAL ELECTORAL DE NAYARIT \n \n" + area + "",
+      `INSTITUTO ESTATAL ELECTORAL DE NAYARIT \n \n ${data.area.toUpperCase()}`,
       110,
       10,
       null,
@@ -25,43 +27,21 @@ const ReporteGeneralJustificantes = async () => {
     );
     doc.setFont("helvetica", "normal");
     doc.text("REPORTE GENERAL DE INCIDENCIAS", 110, 25, null, null, "center");
-    doc.text("04/07/2023 hasta 05/07/2023", 110, 35, null, null, "center");
+    doc.text(`${date.from} hasta ${date.to}`, 110, 35, null, null, "center");
 
     //--------------------------------------------------------------------------//
 
     var header = [
       [
-        { content: "Area" },
         { content: "Personal" },
         { content: "Omisión de entrada" },
         { content: "Omisión de salida" },
         { content: "Comisión oficial" },
         { content: "Permuta por día laborado" },
+        { content: "Otros" },
         { content: "Permiso por día económico" },
-        { content: "Vacaciones" },
-      ],
-    ];
-
-    var rows = [
-      [
-        "areaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-        "personal",
-        "1",
-        "1",
-        "1",
-        "1",
-        `1/${configuracion.value.dias_Economicos}`,
-        `1/${configuracion.value.dias_Segundo_Periodo}`,
-      ],
-      [
-        "areaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-        "personal",
-        "1",
-        "1",
-        "1",
-        "1",
-        `1/${configuracion.value.dias_Economicos}`,
-        `1/${configuracion.value.dias_Segundo_Periodo}`,
+        { content: "Vacaciones primer periodo" },
+        { content: "Vacaciones segundo periodo" },
       ],
     ];
 
@@ -84,15 +64,29 @@ const ReporteGeneralJustificantes = async () => {
       startY: 45,
       margin: { left: 10, right: 10 },
       head: header,
-      body: [...rows],
+      body: listReporte.value.map((item) => [
+        item.empleado,
+        item.omision_Entrada,
+        item.omision_Salida,
+        item.comision_Oficial,
+        item.permuta_Laboral,
+        item.otros,
+        `${configuracion.value[0].dias_Economicos - item.permiso_Economico}/${
+          configuracion.value[0].dias_Economicos
+        }`,
+        item.vacaciones_P1,
+        `${configuracion.value[0].dias_Segundo_Periodo - item.vacaciones_P2}/${
+          configuracion.value[0].dias_Segundo_Periodo
+        }`,
+      ]),
       bodyStyles: { fontSize: 10, textColor: [0, 0, 0] },
       tableLineColor: [0, 0, 0],
     });
+
     //--------------------------------------------------------------------------//
     //Codigo numeración de paginas
     var footer = function () {
       var pageCount = doc.internal.getNumberOfPages();
-      console.log("pageCount", pageCount);
       for (var i = 0; i < pageCount; i++) {
         doc.setPage(i + 1);
         doc.text(

@@ -249,7 +249,8 @@ const imprimir = async (id) => {
     activar_pdf.value = true;
     setTimeout(() => {
       activar_pdf.value = false;
-    }, 5000);
+      justificanteStore.initJustificante();
+    }, 2000);
   }
   $q.loading.hide();
 };

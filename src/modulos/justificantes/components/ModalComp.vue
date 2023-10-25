@@ -174,6 +174,9 @@
               </div>
             </div>
           </div>
+          <div v-if="tipo == 'Otros'" class="text-caption text-red">
+            Especificar concepto en el motivo.
+          </div>
           <div class="row" v-if="tipo == 'Vacaciones' && !isVisualizar">
             <div class="text-bold q-pt-xs text-body2">Periodo vacacional</div>
             <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
@@ -181,9 +184,9 @@
                 v-model="periodoVacacional"
                 checked-icon="task_alt"
                 unchecked-icon="panorama_fish_eye"
-                val="Primero"
+                val="2"
                 :label="
-                  configuracion.periodo_Vacacional == 2
+                  periodoVacacional == '2'
                     ? 'Segundo periodo'
                     : 'Primer periodo'
                 "
@@ -274,13 +277,14 @@ const tipoJustificante = ref([
   "Omisión de salida",
   "Comisión oficial",
   "Permuta por día laborado",
+  "Otros",
   "Permiso día económico",
   "Vacaciones",
 ]);
 const days = ref([]);
 const cambioDays = ref(false);
 const tipo = ref(null);
-const periodoVacacional = ref("Primero");
+const periodoVacacional = ref("2");
 const empleado_Id = ref(null);
 const personalAutoriza = ref(null);
 const area_Id = ref(null);
@@ -337,15 +341,7 @@ watch(detalle.value, async (val) => {
 const diasRestantes = () => {
   if (tipo.value == "Permiso día económico") {
     restanDias.value = dias_restantes.value.dias_Economicos;
-  } else if (
-    tipo.value == "Vacaciones" &&
-    configuracion.value.periodo_Vacacional == 1
-  ) {
-    restanDias.value = dias_restantes.value.primer_Periodo;
-  } else if (
-    tipo.value == "Vacaciones" &&
-    configuracion.value.periodo_Vacacional == 2
-  ) {
+  } else if (tipo.value == "Vacaciones") {
     restanDias.value = dias_restantes.value.segundo_Periodo;
   }
 };
@@ -373,15 +369,12 @@ watch(modal, (val) => {
     justificanteStore.loadInformacionJustificante();
     //cargarArea(justificante.value);
   }
-  // if (isSuperAdmi.value == true) {
-  //   area_Id.value = null;
-  //   personalAutoriza.value = null;
-  // }
   tipoJustificante.value = [
     "Omisión de entrada",
     "Omisión de salida",
     "Comisión oficial",
     "Permuta por día laborado",
+    "Otros",
     "Permiso día económico",
     "Vacaciones",
   ];
@@ -400,21 +393,20 @@ const empleado = async (val) => {
   await justificanteStore.loadResponsabeArea(val.value);
   await justificanteStore.loadDiasRestantes(val.value);
   await justificanteStore.loadAsignacionesVacaciones();
-  if (dias_restantes.value.dias_Economicos == 0) {
-    tipoJustificante.value.splice(4, 1);
-  } else if (
-    configuracion.value.periodo_Vacacional == 1 &&
-    dias_restantes.value.primer_Periodo == 0
+  if (
+    dias_restantes.value.dias_Economicos == 0 &&
+    dias_restantes.value.segundo_Periodo != 0
   ) {
     tipoJustificante.value = [
       "Omisión de entrada",
       "Omisión de salida",
       "Comisión oficial",
       "Permuta por día laborado",
-      "Permiso día económico",
+      "Otros",
+      "Vacaciones",
     ];
   } else if (
-    configuracion.value.periodo_Vacacional == 2 &&
+    dias_restantes.value.dias_Economicos == 0 &&
     dias_restantes.value.segundo_Periodo == 0
   ) {
     tipoJustificante.value = [
@@ -422,7 +414,27 @@ const empleado = async (val) => {
       "Omisión de salida",
       "Comisión oficial",
       "Permuta por día laborado",
+      "Otros",
+    ];
+  } else if (dias_restantes.value.primer_Periodo != 0) {
+    tipoJustificante.value = [
+      "Omisión de entrada",
+      "Omisión de salida",
+      "Comisión oficial",
+      "Permuta por día laborado",
+      "Otros",
       "Permiso día económico",
+      "Vacaciones",
+    ];
+  } else if (dias_restantes.value.segundo_Periodo != 0) {
+    tipoJustificante.value = [
+      "Omisión de entrada",
+      "Omisión de salida",
+      "Comisión oficial",
+      "Permuta por día laborado",
+      "Otros",
+      "Permiso día económico",
+      "Vacaciones",
     ];
   } else {
     tipoJustificante.value = [
@@ -430,6 +442,7 @@ const empleado = async (val) => {
       "Omisión de salida",
       "Comisión oficial",
       "Permuta por día laborado",
+      "Otros",
       "Permiso día económico",
       "Vacaciones",
     ];
@@ -445,17 +458,11 @@ watch(days, (val) => {
       restanDias.value = dias_restantes.value.dias_Economicos - val.length;
     }
   } else {
-    if (
-      tipo.value == "Vacaciones" &&
-      configuracion.value.periodo_Vacacional == 1
-    ) {
+    if (tipo.value == "Vacaciones" && periodoVacacional.value == 1) {
       restanDias.value = dias_restantes.value.primer_Periodo;
     } else if (tipo.value == "Permiso día económico") {
       restanDias.value = dias_restantes.value.dias_Economicos;
-    } else if (
-      tipo.value == "Vacaciones" &&
-      configuracion.value.periodo_Vacacional == 2
-    ) {
+    } else if (tipo.value == "Vacaciones" && periodoVacacional.value == 2) {
       restanDias.value = dias_restantes.value.segundo_Periodo;
     }
   }
@@ -549,15 +556,7 @@ const onItemClick = async (val) => {
     days.value = null;
     if (tipo.value == "Permiso día económico") {
       restanDias.value = dias_restantes.value.dias_Economicos;
-    } else if (
-      tipo.value == "Vacaciones" &&
-      configuracion.value.periodo_Vacacional == 1
-    ) {
-      restanDias.value = dias_restantes.value.primer_Periodo;
-    } else if (
-      tipo.value == "Vacaciones" &&
-      configuracion.value.periodo_Vacacional == 2
-    ) {
+    } else if (tipo.value == "Vacaciones") {
       restanDias.value = dias_restantes.value.segundo_Periodo;
     }
   }
@@ -601,9 +600,9 @@ const agregarIncidencia = async () => {
             detalle.value.dias_Incidencias = detalle.value.dias_Incidencias;
           }
 
-          if (configuracion.value.periodo_Vacacional == 1) {
+          if (periodoVacacional.value == 1) {
             periodo = 1;
-          } else if (configuracion.value.periodo_Vacacional == 2) {
+          } else if (periodoVacacional.value == 2) {
             periodo = 2;
           }
           detalle.value.tipo_Justificantes = tipo.value;
@@ -644,9 +643,9 @@ const agregarIncidencia = async () => {
       } else {
         if (tipo.value == "Vacaciones") {
           let periodo;
-          if (configuracion.value.periodo_Vacacional == 1) {
+          if (periodoVacacional.value == 1) {
             periodo = 1;
-          } else if (configuracion.value.periodo_Vacacional == 2) {
+          } else if (periodoVacacional.value == 2) {
             periodo = 2;
           }
           const resultado = days.value.join(", ");
@@ -655,8 +654,8 @@ const agregarIncidencia = async () => {
           detalle.value.motivo = motivo.value;
           detalle.value.periodo_Vacacional = periodo;
           detalle.value.dias_Economicos = 0;
-          detalle.value.primer_Periodo = 0;
-          detalle.value.segundo_Periodo = 0;
+          // detalle.value.primer_Periodo = 0;
+          // detalle.value.segundo_Periodo = 0;
           await justificanteStore.addIncidencia(
             resultado,
             motivo.value,
