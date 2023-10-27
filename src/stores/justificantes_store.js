@@ -11,13 +11,14 @@ export const useJustificanteStore = defineStore("justificante", {
     isAdmi: false,
     isSuperAdmi: false,
     jefeArea: false,
+    administracion: false,
     listaConceptos: [],
     listEmpleados: [],
     areas: [],
     listaIncidencias: [],
     justificantes: [],
     listReporte: [],
-    byUsuario: null,
+    listFiltroReporte: [],
     detalle: {
       id: null,
       dias_Incidencias: null,
@@ -123,6 +124,15 @@ export const useJustificanteStore = defineStore("justificante", {
       this.listaIncidencias = [];
     },
     //-----------------------------------------------------------
+    async isAdministracion() {
+      let area = parseInt(localStorage.getItem("area"));
+      if (area == 6) {
+        this.administracion = true;
+      } else {
+        this.administracion = false;
+      }
+    },
+
     async loadJustificantes() {
       try {
         let tipoEmp = localStorage.getItem("tipoEmp").toString();
@@ -653,7 +663,7 @@ export const useJustificanteStore = defineStore("justificante", {
 
     //-----------------------------------------------------------
 
-    async loadPersonalArea(id) {
+    async loadPersonalArea(id, especial) {
       try {
         let area = parseInt(localStorage.getItem("area"));
         let idNuevo;
@@ -670,6 +680,12 @@ export const useJustificanteStore = defineStore("justificante", {
             area_Id: personal.area_Id,
           };
         });
+        if (especial == true) {
+          list.splice(0, 0, {
+            value: 0,
+            label: "Todos",
+          });
+        }
         this.listEmpleados = list;
       } catch (error) {
         return {
@@ -781,6 +797,29 @@ export const useJustificanteStore = defineStore("justificante", {
     //-----------------------------------------------------------------------
     //Reporte
 
+    async loadListAreas() {
+      try {
+        let respArea = await api.get("/Areas/GetLista");
+        let { data } = respArea.data;
+        let listArea = data.map((areas) => {
+          return {
+            value: areas.value,
+            label: areas.label,
+          };
+        });
+        listArea.splice(0, 0, {
+          value: 0,
+          label: "Todos",
+        });
+        this.areas = listArea;
+      } catch (error) {
+        return {
+          success: false,
+          data: "Ocurrió un error, inténtelo de nuevo. Si el error persiste, contacte a soporte",
+        };
+      }
+    },
+
     async reporteJustificantes(date) {
       try {
         const resp = await api.get(
@@ -801,6 +840,7 @@ export const useJustificanteStore = defineStore("justificante", {
             comision_Oficial: reporte.comision_Oficial,
             permuta_Laboral: reporte.permuta_Laboral,
             otros: reporte.otros,
+            area_Id: reporte.area_Id,
           };
         });
         this.listReporte = listReporte;

@@ -1,6 +1,6 @@
 <template>
   <div class="row">
-    <div class="text-h6">{{ date.from }} - {{ date.to }}</div>
+    <div class="text-h6">Seleccione un rango de fechas: {{ nombreDate }}</div>
     <div class="col">
       <div class="text-right q-pa-md items-start q-gutter-md">
         <q-btn
@@ -12,7 +12,14 @@
         >
           <q-tooltip>Filtrar por rango de fechas</q-tooltip>
           <q-popup-proxy cover transition-show="scale" transition-hide="scale">
-            <q-date color="purple" v-model="date" range /> </q-popup-proxy
+            <q-date
+              :options="optionsCalendar"
+              color="purple"
+              v-model="date"
+              range
+              ><div class="row items-center justify-end">
+                <q-btn v-close-popup label="Cerrar" color="black" flat /></div
+            ></q-date> </q-popup-proxy
         ></q-btn>
         <q-btn
           round
@@ -29,13 +36,37 @@
   <div class="row">
     <div class="col">
       <q-table
-        :rows="listReporte"
+        :rows="listFiltroReporte"
         :columns="columns"
         :filter="filter"
         :pagination="pagination"
         rows-per-page-label="Filas por pagina"
         no-data-label="No hay registros"
       >
+        <template v-slot:top-left>
+          <div class="row">
+            <q-select
+              v-show="administracion == true"
+              class="q-pr-xs"
+              v-model="area_Id"
+              :options="areas"
+              label="Selecciona un catalogo"
+              hint="Seleccione un estatus de inventarios a mostrar"
+              style="width: 260px"
+            >
+            </q-select>
+
+            <q-select
+              v-show="administracion == true"
+              v-model="empleado_Id"
+              :options="listEmpleados"
+              label="Selecciona un estatus"
+              hint="Seleccione un catalogo de inventarios a mostrar"
+              style="width: 260px"
+            >
+            </q-select>
+          </div>
+        </template>
         <template v-slot:top-right>
           <q-input
             borderless
@@ -79,24 +110,64 @@
 import { storeToRefs } from "pinia";
 import { useQuasar } from "quasar";
 import { useJustificanteStore } from "src/stores/justificantes_store";
-import { onBeforeMount, ref, watch } from "vue";
+import { onBeforeMount, onMounted, ref, watch, watchEffect } from "vue";
 import ReporteGeneralJustificantes from "../../../helpers/ReportGeneralJustificantes";
 
 //-----------------------------------------------------------
 
 const $q = useQuasar();
 const justificanteStore = useJustificanteStore();
-const { listReporte, configuracion } = storeToRefs(justificanteStore);
+const {
+  listFiltroReporte,
+  listReporte,
+  configuracion,
+  administracion,
+  areas,
+  listEmpleados,
+} = storeToRefs(justificanteStore);
 const date = ref({});
-
+const nombreDate = ref("");
+const area_Id = ref(null);
+const empleado_Id = ref(null);
+//-----------------------------------------------------------
+//Get fecha actual
+//-----------------------------------------------------------
+//Get fecha actual
+const newDate = new Date();
+const year = newDate.getFullYear();
+const month = String(newDate.getMonth() + 1).padStart(2, "0");
+const day = String(newDate.getDate()).padStart(2, "0");
+const dateActual = ref(`${year}/${month}/${day}`);
 //-----------------------------------------------------------
 onBeforeMount(() => {
   justificanteStore.loadAsignacionesVacaciones();
+  justificanteStore.loadListAreas();
+  justificanteStore.isAdministracion();
   listReporte.value = [];
+  area_Id.value = { value: 0, label: "Todos" };
+  empleado_Id.value = { value: 0, label: "Todos" };
 });
 
 watch(date, (val) => {
-  cargarTabla(val);
+  if (val == null) {
+    $q.dialog({
+      title: "Atención",
+      message: "Seleccione un rango de fechas",
+      icon: "Warning",
+      persistent: true,
+      transitionShow: "scale",
+      transitionHide: "scale",
+    });
+  } else {
+    cargarTabla(val);
+    nombreDate.value = `${val.from} hasta ${val.to}`;
+  }
+});
+
+watch(area_Id, (val) => {
+  if (val != null) {
+    justificanteStore.loadPersonalArea(val.value, true);
+  }
 });
 
 const columns = [
@@ -172,6 +243,38 @@ const pagination = ref({
   descending: false,
 });
 const filter = ref("");
+
+const optionsCalendar = (date) => {
+  return date <= dateActual.value;
+};
+
+const filtrar = (listReporte, filtro) => {
+  listFiltroReporte.value = listReporte.filter((item) => {
+    let cumple = true;
+    if (filtro.area !== undefined) {
+      if (filtro.area == 0) {
+        cumple = cumple && item.area_Id === item.area_Id;
+      } else {
+        cumple = cumple && item.area_Id == filtro.area;
+      }
+    }
+    if (filtro.empleado !== undefined) {
+      if (filtro.empleado == 0) {
+        cumple = cumple && item.empleado_Id === item.empleado_Id;
+      } else {
+        cumple = cumple && item.empleado_Id === filtro.empleado;
+      }
+    }
+    return cumple;
+  });
+};
+
+watchEffect(() => {
+  const filtro = {};
+  if (area_Id.value != null) filtro.area = area_Id.value.value;
+  if (empleado_Id.value != null) filtro.empleado = empleado_Id.value.value;
+  filtrar(listReporte.value, filtro);
+});
 
 const cargarTabla = async (date) => {
   let resp = null;

@@ -10,10 +10,10 @@ import axios from "axios";
 // for each client)
 
 const api = axios.create({
-  baseURL: "http://ieen.ieenayarit.org:9170/api",
+  baseURL: "http://sistema.ieenayarit.org:9170/api",
 });
 // const api = axios.create({
-//   baseURL: "http://ieen.ieenayarit.org:9270/api",
+//   baseURL: "http://sistema.ieenayarit.org:9270/api",
 // });
 api.interceptors.request.use((config) => {
   config.headers = {
@@ -28,7 +28,7 @@ api.interceptors.response.use(
     if (error.response.status == 401) {
       alert("Su sesión ha expirado, sera redireccionado al logín");
       localStorage.clear();
-      window.location = "http://ieen.ieenayarit.org:9271?return=false";
+      window.location = "http://sistema.ieenayarit.org:9271?return=false";
     }
     return Promise.reject();
   }

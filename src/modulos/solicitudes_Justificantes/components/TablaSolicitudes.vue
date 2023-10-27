@@ -90,6 +90,8 @@ const { solicitudes } = storeToRefs(solicitudJustificanteStore);
 
 onBeforeMount(() => {
   solicitudJustificanteStore.loadSolicitudesJustificantes();
+  console.log("onbefore");
+  console.log("soli", solicitudes);
 });
 
 //-----------------------------------------------------------

@@ -8,7 +8,8 @@ const ReporteGeneralJustificantes = async (date) => {
   try {
     //--------------------------------------------------------------------------//
     const justificanteStore = useJustificanteStore();
-    const { configuracion, listReporte } = storeToRefs(justificanteStore);
+    const { configuracion, listReporte, listFiltroReporte } =
+      storeToRefs(justificanteStore);
     const resp = await api.get("/Areas/AreaByUsuario");
     const { data } = resp.data;
     let img = new Image();
@@ -64,7 +65,7 @@ const ReporteGeneralJustificantes = async (date) => {
       startY: 45,
       margin: { left: 10, right: 10 },
       head: header,
-      body: listReporte.value.map((item) => [
+      body: listFiltroReporte.value.map((item) => [
         item.empleado,
         item.omision_Entrada,
         item.omision_Salida,

@@ -39,6 +39,7 @@ export const useSolicitudJustificanteStore = defineStore(
         try {
           let resp = await api.get("/Justificantes/Pendientes");
           let { data } = resp.data;
+          console.log("dataaa", data);
           let listPendientesArea = data.map((justificante) => {
             return {
               id: justificante.id,

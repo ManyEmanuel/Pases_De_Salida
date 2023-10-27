@@ -117,7 +117,7 @@
               v-if="!isVisualizar"
               class="col-lg-6 col-md-6 col-sm-12 col-xs-12 q-pt-xs"
             >
-              <q-input label="Fecha" v-model="days">
+              <q-input label="Fecha" v-model="days" :disable="tipo == null">
                 <template v-slot:append>
                   <q-icon name="event" class="cursor-pointer">
                     <q-popup-proxy
@@ -146,7 +146,6 @@
                       ></q-date>
                       <q-date
                         v-else
-                        :disable="tipo == null"
                         color="purple"
                         v-model="days"
                         multiple
@@ -316,7 +315,7 @@ watch(area_Id, (val) => {
   if (area_Id.value != null) {
     empleado_Id.value = null;
     personalAutoriza.value = null;
-    justificanteStore.loadPersonalArea(val.value);
+    justificanteStore.loadPersonalArea(val.value, false);
   }
 });
 
