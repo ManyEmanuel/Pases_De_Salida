@@ -165,7 +165,11 @@ export const useJustificanteStore = defineStore("justificante", {
               fecha_Aprobacion_Rechazo: justificante.fecha_Aprobacion_Rechazo,
               capturista: justificante.capturista,
               puesto_Capturista: justificante.puesto_Capturista,
-              area: justificante.area,
+              area:
+                justificante.area.length >= 30
+                  ? justificante.area.slice(0, 30) + "..."
+                  : justificante.area,
+              area_Completa: justificante.area,
               area_Id: justificante.area_Id,
             };
           });
@@ -191,7 +195,11 @@ export const useJustificanteStore = defineStore("justificante", {
               fecha_Aprobacion_Rechazo: justificante.fecha_Aprobacion_Rechazo,
               capturista: justificante.capturista,
               puesto_Capturista: justificante.puesto_Capturista,
-              area: justificante.area,
+              area:
+                justificante.area.length >= 30
+                  ? justificante.area.slice(0, 30) + "..."
+                  : justificante.area,
+              area_Completa: justificante.area,
               area_Id: justificante.area_Id,
             };
           });
@@ -218,7 +226,11 @@ export const useJustificanteStore = defineStore("justificante", {
               fecha_Aprobacion_Rechazo: justificante.fecha_Aprobacion_Rechazo,
               capturista: justificante.capturista,
               puesto_Capturista: justificante.puesto_Capturista,
-              area: justificante.area,
+              area:
+                justificante.area.length >= 30
+                  ? justificante.area.slice(0, 30) + "..."
+                  : justificante.area,
+              area_Completa: justificante.area,
               area_Id: justificante.area_Id,
             };
           });
@@ -532,19 +544,13 @@ export const useJustificanteStore = defineStore("justificante", {
           return {
             id: incidencia.id,
             tipo_Justificantes: incidencia.tipo_Justificantes,
-            dias_Incidencias:
-              incidencia.dias_Incidencias.length >= 30
-                ? incidencia.dias_Incidencias.slice(0, 30) + "..."
-                : incidencia.dias_Incidencias,
+            dias_Incidencias: incidencia.dias_Incidencias,
             dias_Incidencias_Completo: incidencia.dias_Incidencias,
             periodo_Vacacional: incidencia.periodo_Vacacional,
             primer_Periodo: incidencia.primer_Periodo,
             segundo_Periodo: incidencia.segundo_Periodo,
             dias_Economicos: incidencia.dias_Economicos,
-            motivo:
-              incidencia.motivo.length >= 30
-                ? incidencia.motivo.slice(0, 30) + "..."
-                : incidencia.motivo,
+            motivo: incidencia.motivo,
             motivo_Completo: incidencia.motivo,
           };
         });
@@ -571,7 +577,6 @@ export const useJustificanteStore = defineStore("justificante", {
             this.detalle.motivo = data.motivo;
             this.detalle.periodo_Vacacional = data.periodo_Vacacional;
           }
-          console.log(this.detalle);
         }
       } catch (error) {
         return {

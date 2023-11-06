@@ -328,7 +328,9 @@ watch(detalle.value, async (val) => {
     } else if (val.tipo_Justificantes == "Vacaciones") {
       var diasArray = val.dias_Incidencias.split(", ");
       days.value = diasArray;
-    } else days.value = val.dias_Incidencias;
+    } else {
+      days.value = val.dias_Incidencias;
+    }
 
     await justificanteStore.loadDiasRestantes(empleado_Id.value.value);
     diasRestantes();
@@ -661,6 +663,12 @@ const agregarIncidencia = async () => {
             tipo.value,
             periodo
           );
+          listaIncidencias.value.forEach(async (element) => {
+            await justificanteStore.createDetalleJustificantes(
+              justificante.value.id,
+              element
+            );
+          });
         } else {
           const resultado = days.value.join(", ");
           detalle.value.dias_Incidencias = resultado;
@@ -676,6 +684,12 @@ const agregarIncidencia = async () => {
             tipo.value,
             0
           );
+          listaIncidencias.value.forEach(async (element) => {
+            await justificanteStore.createDetalleJustificantes(
+              justificante.value.id,
+              element
+            );
+          });
         }
 
         limpiarCampos();

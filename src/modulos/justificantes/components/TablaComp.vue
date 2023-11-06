@@ -2,6 +2,7 @@
   <div class="row">
     <div class="col">
       <q-table
+        :visible-columns="visible_columns"
         :rows="justificantes"
         :columns="columns"
         :filter="filter"
@@ -68,6 +69,15 @@
                 >
                   <q-tooltip>Cancelar justificante</q-tooltip>
                 </q-btn>
+              </div>
+              <div v-else-if="col.name == 'area'">
+                <label>{{ col.value }}</label>
+                <q-tooltip
+                  :offset="[10, 10]"
+                  v-if="col.value.length != props.row['area_Completa'].length"
+                >
+                  {{ props.row["area_Completa"] }}
+                </q-tooltip>
               </div>
               <label v-else>{{ col.value }}</label>
             </q-td>
@@ -147,12 +157,20 @@ const columns = [
     sortable: false,
   },
   {
+    name: "area_Completa",
+    align: "center",
+    label: "Área",
+    field: "area_Completa",
+    sortable: false,
+  },
+  {
     name: "estatus",
     align: "center",
     label: "Estatus",
     field: "estatus",
     sortable: false,
   },
+
   {
     name: "fecha_Creacion",
     align: "center",
@@ -178,6 +196,17 @@ const pagination = ref({
 
 const filter = ref("");
 
+const visible_columns = [
+  "justificante_Id",
+  "folio",
+  "solicitante",
+  "responsable_Area",
+  "capturista",
+  "area",
+  "estatus",
+  "fecha_Creacion",
+  "fecha_Aprobacion_Rechazo",
+];
 //-----------------------------------------------------------
 
 const cancelar = async (id) => {

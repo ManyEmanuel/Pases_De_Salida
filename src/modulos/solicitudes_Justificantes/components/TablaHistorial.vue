@@ -2,6 +2,7 @@
   <div class="row">
     <div class="col">
       <q-table
+        :visible-columns="visible_columns"
         :rows="historial"
         :columns="columns"
         :filter="filter"
@@ -49,7 +50,15 @@
                   <q-tooltip>Imprimir justificante</q-tooltip>
                 </q-btn>
               </div>
-
+              <div v-else-if="col.name == 'area'">
+                <label>{{ col.value }}</label>
+                <q-tooltip
+                  :offset="[10, 10]"
+                  v-if="col.value.length != props.row['area_Completa'].length"
+                >
+                  {{ props.row["area_Completa"] }}
+                </q-tooltip>
+              </div>
               <label v-else>{{ col.value }}</label>
             </q-td>
           </q-tr>
@@ -93,6 +102,13 @@ const columns = [
     sortable: false,
   },
   {
+    name: "estatus",
+    align: "center",
+    label: "Estatus",
+    field: "estatus",
+    sortable: false,
+  },
+  {
     name: "solicitante",
     align: "center",
     label: "Solicitante",
@@ -121,13 +137,6 @@ const columns = [
     sortable: false,
   },
   {
-    name: "estatus",
-    align: "center",
-    label: "Estatus",
-    field: "estatus",
-    sortable: false,
-  },
-  {
     name: "fecha_Creacion",
     align: "center",
     label: "Fecha de creación",
@@ -148,6 +157,18 @@ const columns = [
     field: "id",
     sortable: false,
   },
+];
+
+const visible_columns = [
+  "folio",
+  "estatus",
+  "solicitante",
+  "responsable_Area",
+  "capturista",
+  "area",
+  "fecha_Creacion",
+  "fecha_Aprobacion_Rechazo",
+  "id",
 ];
 
 const pagination = ref({

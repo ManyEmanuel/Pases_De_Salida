@@ -39,7 +39,6 @@ export const useSolicitudJustificanteStore = defineStore(
         try {
           let resp = await api.get("/Justificantes/Pendientes");
           let { data } = resp.data;
-          console.log("dataaa", data);
           let listPendientesArea = data.map((justificante) => {
             return {
               id: justificante.id,
@@ -58,7 +57,11 @@ export const useSolicitudJustificanteStore = defineStore(
               fecha_Aprobacion_Rechazo: justificante.fecha_Aprobacion_Rechazo,
               capturista: justificante.capturista,
               puesto_Capturista: justificante.puesto_Capturista,
-              area: justificante.area,
+              area:
+                justificante.area.length >= 30
+                  ? justificante.area.slice(0, 30) + "..."
+                  : justificante.area,
+              area_Completa: justificante.area,
               area_Id: justificante.area_Id,
             };
           });
@@ -98,7 +101,11 @@ export const useSolicitudJustificanteStore = defineStore(
               fecha_Aprobacion_Rechazo: justificante.fecha_Aprobacion_Rechazo,
               capturista: justificante.capturista,
               puesto_Capturista: justificante.puesto_Capturista,
-              area: justificante.area,
+              area:
+                justificante.area.length >= 30
+                  ? justificante.area.slice(0, 30) + "..."
+                  : justificante.area,
+              area_Completa: justificante.area,
               area_Id: justificante.area_Id,
             };
           });

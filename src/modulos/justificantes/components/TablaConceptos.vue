@@ -48,7 +48,11 @@
                   <q-tooltip>Eliminar incidencia</q-tooltip>
                 </q-btn>
               </div>
-              <div v-else-if="col.name == 'dias_Incidencias'">
+              <!-- <div
+                v-else-if="
+                  (isEditar || isVisualizar) && col.name == 'dias_Incidencias'
+                "
+              >
                 <label>{{ col.value }}</label>
                 <q-tooltip
                   :offset="[10, 10]"
@@ -60,7 +64,9 @@
                   {{ props.row["dias_Incidencias_Completo"] }}
                 </q-tooltip>
               </div>
-              <div v-else-if="col.name == 'motivo'">
+              <div
+                v-else-if="(isEditar || isVisualizar) && col.name == 'motivo'"
+              >
                 <label>{{ col.value }}</label>
                 <q-tooltip
                   :offset="[10, 10]"
@@ -68,7 +74,7 @@
                 >
                   {{ props.row["motivo_Completo"] }}
                 </q-tooltip>
-              </div>
+              </div> -->
               <label v-else>{{ col.value }}</label>
             </q-td>
           </q-tr>

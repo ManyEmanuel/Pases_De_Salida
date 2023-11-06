@@ -2,6 +2,7 @@
   <div class="row">
     <div class="col">
       <q-table
+        :visible-columns="visible_columns"
         :rows="solicitudes"
         :columns="columns"
         :filter="filter"
@@ -59,7 +60,15 @@
                   <q-tooltip>Ver justificante</q-tooltip>
                 </q-btn>
               </div>
-
+              <div v-else-if="col.name == 'area'">
+                <label>{{ col.value }}</label>
+                <q-tooltip
+                  :offset="[10, 10]"
+                  v-if="col.value.length != props.row['area_Completa'].length"
+                >
+                  {{ props.row["area_Completa"] }}
+                </q-tooltip>
+              </div>
               <label v-else>{{ col.value }}</label>
             </q-td>
           </q-tr>
@@ -90,8 +99,6 @@ const { solicitudes } = storeToRefs(solicitudJustificanteStore);
 
 onBeforeMount(() => {
   solicitudJustificanteStore.loadSolicitudesJustificantes();
-  console.log("onbefore");
-  console.log("soli", solicitudes);
 });
 
 //-----------------------------------------------------------
@@ -102,6 +109,13 @@ const columns = [
     align: "center",
     label: "Folio",
     field: "folio",
+    sortable: false,
+  },
+  {
+    name: "estatus",
+    align: "center",
+    label: "Estatus",
+    field: "estatus",
     sortable: false,
   },
   {
@@ -133,10 +147,10 @@ const columns = [
     sortable: false,
   },
   {
-    name: "estatus",
+    name: "area_Completa",
     align: "center",
-    label: "Estatus",
-    field: "estatus",
+    label: "Área",
+    field: "area_Completa",
     sortable: false,
   },
   {
@@ -160,6 +174,18 @@ const columns = [
     field: "id",
     sortable: false,
   },
+];
+
+const visible_columns = [
+  "folio",
+  "estatus",
+  "solicitante",
+  "responsable_Area",
+  "capturista",
+  "area",
+  "fecha_Creacion",
+  "fecha_Aprobacion_Rechazo",
+  "id",
 ];
 
 const pagination = ref({
