@@ -104,6 +104,13 @@ onBeforeMount(() => {
 
 const columns = [
   {
+    name: "justificante_Id",
+    align: "center",
+    label: "Acciones",
+    field: "justificante_Id",
+    sortable: false,
+  },
+  {
     name: "folio",
     align: "center",
     label: "Folio",
@@ -158,13 +165,6 @@ const columns = [
     align: "center",
     label: "Fecha de aprobación o rechazo",
     field: "fecha_Aprobacion_Rechazo",
-    sortable: false,
-  },
-  {
-    name: "justificante_Id",
-    align: "center",
-    label: "Acciones",
-    field: "justificante_Id",
     sortable: false,
   },
 ];

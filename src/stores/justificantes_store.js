@@ -22,6 +22,7 @@ export const useJustificanteStore = defineStore("justificante", {
     detalle: {
       id: null,
       dias_Incidencias: null,
+      dias_Indicencias_Completos: null,
       tipo_Justificantes: null,
       motivo: null,
       periodo_Vacacional: null,
@@ -531,12 +532,20 @@ export const useJustificanteStore = defineStore("justificante", {
           return {
             id: incidencia.id,
             tipo_Justificantes: incidencia.tipo_Justificantes,
-            dias_Incidencias: incidencia.dias_Incidencias,
+            dias_Incidencias:
+              incidencia.dias_Incidencias.length >= 30
+                ? incidencia.dias_Incidencias.slice(0, 30) + "..."
+                : incidencia.dias_Incidencias,
+            dias_Incidencias_Completo: incidencia.dias_Incidencias,
             periodo_Vacacional: incidencia.periodo_Vacacional,
             primer_Periodo: incidencia.primer_Periodo,
             segundo_Periodo: incidencia.segundo_Periodo,
             dias_Economicos: incidencia.dias_Economicos,
-            motivo: incidencia.motivo,
+            motivo:
+              incidencia.motivo.length >= 30
+                ? incidencia.motivo.slice(0, 30) + "..."
+                : incidencia.motivo,
+            motivo_Completo: incidencia.motivo,
           };
         });
       } catch (error) {
@@ -557,10 +566,12 @@ export const useJustificanteStore = defineStore("justificante", {
           if (success == true) {
             this.detalle.id = data.id;
             this.detalle.dias_Incidencias = data.dias_Incidencias;
+            this.detalle.dias_Indicencias_Completos = data.dias_Incidencias;
             this.detalle.tipo_Justificantes = data.tipo_Justificantes;
             this.detalle.motivo = data.motivo;
             this.detalle.periodo_Vacacional = data.periodo_Vacacional;
           }
+          console.log(this.detalle);
         }
       } catch (error) {
         return {
@@ -769,6 +780,8 @@ export const useJustificanteStore = defineStore("justificante", {
 
     async loadAsignacionesVacaciones() {
       try {
+        const dateActual = new Date();
+        const year = dateActual.getFullYear();
         const resp = await api.get("/Asignaciones_Vacaciones/ObtenTodos");
         let { data } = resp.data;
         let listconfiguracion = data.map((config) => {
@@ -785,7 +798,7 @@ export const useJustificanteStore = defineStore("justificante", {
             fecha_Creacion: config.fecha_Creacion,
           };
         });
-        this.configuracion = listconfiguracion.filter((x) => x.año == 2023);
+        this.configuracion = listconfiguracion.filter((x) => x.año == year);
       } catch (error) {
         return {
           success: false,

@@ -328,7 +328,7 @@ watch(detalle.value, async (val) => {
     } else if (val.tipo_Justificantes == "Vacaciones") {
       var diasArray = val.dias_Incidencias.split(", ");
       days.value = diasArray;
-    }
+    } else days.value = val.dias_Incidencias;
 
     await justificanteStore.loadDiasRestantes(empleado_Id.value.value);
     diasRestantes();
@@ -366,7 +366,7 @@ const cargarSolicitante = async (val) => {
 watch(modal, (val) => {
   if (val == true) {
     justificanteStore.loadInformacionJustificante();
-    //cargarArea(justificante.value);
+    cargarArea(justificante.value);
   }
   tipoJustificante.value = [
     "Omisión de entrada",
