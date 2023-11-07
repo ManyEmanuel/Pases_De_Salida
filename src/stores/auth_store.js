@@ -24,7 +24,6 @@ export const useAuthStore = defineStore("auth", {
                 const emp = await api.get("/ResponsablesAreas");
                 let datosEmp = emp.data.data;
                 let numEmp = datosEmp.find((x) => x.empleado_Id == data.id);
-                console.log("Este es el num de empleado", numEmp);
                 localStorage.setItem("area", numEmp.area_Id);
               } else {
                 localStorage.setItem("area", data.area_Id);
@@ -101,7 +100,6 @@ export const useAuthStore = defineStore("auth", {
                   url: sistema.url,
                 };
               });
-              console.log(sistemasArray);
               this.sistemas = sistemasArray;
 
               const appsArray = data.map((app) => {
@@ -168,7 +166,6 @@ export const useAuthStore = defineStore("auth", {
                 };
               });
               this.modulos = modulosArray;
-              console.log(modulosArray);
             }
           } else {
             return { success, data };

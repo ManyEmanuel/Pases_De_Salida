@@ -57,7 +57,11 @@ export const useSolicitudPaseStore = defineStore("solicitudPase", {
             area_Id: pases.area_Id,
             estatus: pases.estatus,
             folio: pases.folio,
-            asunto: pases.asunto,
+            asunto:
+              pases.asunto.length >= 30
+                ? pases.asunto.slice(0, 30) + "..."
+                : pases.asunto,
+            asunto_Completo: pases.asunto,
             fechaSolicitud:
               fechaFinal[2] + "-" + fechaFinal[1] + "-" + fechaFinal[0],
             responsable_Area: pases.responsable_Area,
@@ -86,7 +90,11 @@ export const useSolicitudPaseStore = defineStore("solicitudPase", {
               area_Id: todos.area_Id,
               estatus: todos.estatus,
               folio: todos.folio,
-              asunto: todos.asunto,
+              asunto:
+                pases.asunto.length >= 30
+                  ? pases.asunto.slice(0, 30) + "..."
+                  : pases.asunto,
+              asunto_Completo: pases.asunto,
               fechaSolicitud:
                 fechaFinal[2] + "-" + fechaFinal[1] + "-" + fechaFinal[0],
               responsable_Area: todos.responsable_Area,
@@ -94,7 +102,6 @@ export const useSolicitudPaseStore = defineStore("solicitudPase", {
               capturista: todos.capturista,
             };
           });
-          console.log("Lista de pendientes", listPendientesTodos);
           let listFiltro = listPendientesTodos.filter(
             (x) =>
               x.area_Id != parseInt(localStorage.getItem("area")) &&
@@ -102,7 +109,6 @@ export const useSolicitudPaseStore = defineStore("solicitudPase", {
               x.responsable_Area_Id ==
                 parseInt(localStorage.getItem("empleado"))
           );
-          console.log("Esto es el listado filtro", listFiltro);
           listPendientes = listPendientesArea.concat(listFiltro);
         } else {
           listPendientes = listPendientesArea;
@@ -142,7 +148,11 @@ export const useSolicitudPaseStore = defineStore("solicitudPase", {
             area_Id: pases.area_Id,
             estatus: pases.estatus,
             folio: pases.folio,
-            asunto: pases.asunto,
+            asunto:
+              pases.asunto.length >= 30
+                ? pases.asunto.slice(0, 30) + "..."
+                : pases.asunto,
+            asunto_Completo: pases.asunto,
             fechaSolicitud:
               fechaFinal[2] + "-" + fechaFinal[1] + "-" + fechaFinal[0],
             responsable_Area: pases.responsable_Area,
@@ -171,7 +181,11 @@ export const useSolicitudPaseStore = defineStore("solicitudPase", {
               area_Id: todos.area_Id,
               estatus: todos.estatus,
               folio: todos.folio,
-              asunto: todos.asunto,
+              asunto:
+                pases.asunto.length >= 30
+                  ? pases.asunto.slice(0, 30) + "..."
+                  : pases.asunto,
+              asunto_Completo: pases.asunto,
               fechaSolicitud:
                 fechaFinal[2] + "-" + fechaFinal[1] + "-" + fechaFinal[0],
               responsable_Area: todos.responsable_Area,
@@ -186,7 +200,6 @@ export const useSolicitudPaseStore = defineStore("solicitudPase", {
               x.responsable_Area_Id ==
                 parseInt(localStorage.getItem("empleado"))
           );
-          console.log("Esto es el listado filtro", listFiltro);
           listHistorial = listHistorialArea.concat(listFiltro);
         } else {
           listHistorial = listHistorialArea;

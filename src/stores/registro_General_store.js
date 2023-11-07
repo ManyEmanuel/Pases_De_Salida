@@ -55,7 +55,11 @@ export const useRegistroGeneralStore = defineStore("registroGeneral", {
             area: pases.area,
             estatus: pases.estatus,
             folio: pases.folio,
-            asunto: pases.asunto,
+            asunto:
+              pases.asunto.length >= 30
+                ? pases.asunto.slice(0, 30) + "..."
+                : pases.asunto,
+            asunto_Completo: pases.asunto,
             responsable_Area: pases.responsable_Area,
             capturista: pases.capturista,
             area: pases.area,
@@ -262,7 +266,6 @@ export const useRegistroGeneralStore = defineStore("registroGeneral", {
             let filtro = listaPorFecha.filter(
               (x) => x.area == areasTrue[i].value
             );
-            console.log("Esto es filtro", filtro);
             if (filtro.length > 0) {
               if (i == 0) {
                 listaPorArea = filtro;
@@ -280,7 +283,6 @@ export const useRegistroGeneralStore = defineStore("registroGeneral", {
             let filtro = listaPorArea.filter(
               (x) => x.tipo_Pase == tipoPaseTrue[i].value
             );
-            console.log("Esto es filtro", filtro);
             if (filtro.length > 0) {
               if (i == 0) {
                 listaPorTipo = filtro;
@@ -298,7 +300,6 @@ export const useRegistroGeneralStore = defineStore("registroGeneral", {
             let filtro = listaPorTipo.filter(
               (x) => x.tipo_Asunto == asuntoPaseTrue[i].value
             );
-            console.log("Esto es filtro", filtro);
             if (filtro.length > 0) {
               if (i == 0) {
                 listaPorAsunto = filtro;
@@ -315,7 +316,6 @@ export const useRegistroGeneralStore = defineStore("registroGeneral", {
             let filtro = listaPorAsunto.filter(
               (x) => x.estatus == estatusPaseTrue[i].value
             );
-            console.log("Esto es filtro", filtro);
             if (filtro.length > 0) {
               if (i == 0) {
                 listaPorEstatus = filtro;

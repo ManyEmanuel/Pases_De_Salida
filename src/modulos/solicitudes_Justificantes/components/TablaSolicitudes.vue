@@ -2,11 +2,10 @@
   <div class="row">
     <div class="col">
       <q-table
-        :visible-columns="visisble_columns"
+        :visible-columns="visible_columns"
         :rows="solicitudes"
         :columns="columns"
         :filter="filter"
-        :loading="loading"
         :pagination="pagination"
         row-key="id"
         rows-per-page-label="Filas por pagina"
@@ -38,7 +37,7 @@
                   icon="check_circle"
                   @click="aceptar(col.value)"
                 >
-                  <q-tooltip>Aceptar pase</q-tooltip>
+                  <q-tooltip>Aceptar justificante</q-tooltip>
                 </q-btn>
                 <q-btn
                   v-if="modulo.eliminar"
@@ -48,26 +47,26 @@
                   icon="cancel"
                   @click="rechazar(col.value)"
                 >
-                  <q-tooltip>Rechazar pase</q-tooltip>
+                  <q-tooltip>Rechazar justificante</q-tooltip>
                 </q-btn>
                 <q-btn
-                  v-if="modulo.eliminar"
+                  v-if="modulo.leer"
                   flat
                   round
                   color="purple-ieen"
                   icon="search"
                   @click="visualizar(col.value)"
                 >
-                  <q-tooltip>Ver pase</q-tooltip>
+                  <q-tooltip>Ver justificante</q-tooltip>
                 </q-btn>
               </div>
-              <div v-else-if="col.name == 'asunto'">
+              <div v-else-if="col.name == 'area'">
                 <label>{{ col.value }}</label>
                 <q-tooltip
                   :offset="[10, 10]"
-                  v-if="col.value.length != props.row['asunto_Completo'].length"
+                  v-if="col.value.length != props.row['area_Completa'].length"
                 >
-                  {{ props.row["asunto_Completo"] }}
+                  {{ props.row["area_Completa"] }}
                 </q-tooltip>
               </div>
               <label v-else>{{ col.value }}</label>
@@ -78,127 +77,139 @@
     </div>
   </div>
 </template>
+
 <script setup>
 import { storeToRefs } from "pinia";
 import { useQuasar } from "quasar";
+import { useJustificanteStore } from "src/stores/justificantes_store";
 import { onBeforeMount, ref } from "vue";
 import { useAuthStore } from "../../../stores/auth_store";
-import { useSolicitudPaseStore } from "../../../stores/solicitudes_Pase_store";
-import { useRegistroPaseStore } from "src/stores/registro_Pase_store";
+import { useSolicitudJustificanteStore } from "../../../stores/solicitudes_Justificantes_store";
+
+//-----------------------------------------------------------
 
 const $q = useQuasar();
-const solicitudStore = useSolicitudPaseStore();
-const pasesStore = useRegistroPaseStore();
+const solicitudJustificanteStore = useSolicitudJustificanteStore();
+const justificanteStore = useJustificanteStore();
 const authStore = useAuthStore();
 const { modulo } = storeToRefs(authStore);
-const { solicitudes } = storeToRefs(solicitudStore);
+const { solicitudes } = storeToRefs(solicitudJustificanteStore);
+
+//-----------------------------------------------------------
 
 onBeforeMount(() => {
-  solicitudStore.loadSolicitudes();
+  solicitudJustificanteStore.loadSolicitudesJustificantes();
 });
+
+//-----------------------------------------------------------
 
 const columns = [
   {
     name: "folio",
     align: "center",
-    label: "Folio del pase",
+    label: "Folio",
     field: "folio",
-    sortable: true,
-  },
-  {
-    name: "fechaSolicitud",
-    align: "center",
-    label: "Fecha del pase",
-    field: "fechaSolicitud",
-    sortable: true,
+    sortable: false,
   },
   {
     name: "estatus",
     align: "center",
-    label: "Estatus del pase",
+    label: "Estatus",
     field: "estatus",
-    sortable: true,
-  },
-  {
-    name: "tipo_Pase",
-    align: "center",
-    label: "Tipo de pase",
-    field: "tipo_Pase",
-    sortable: true,
-  },
-  {
-    name: "tipo_Asunto",
-    align: "center",
-    label: "Asunto del pase",
-    field: "tipo_Asunto",
-    sortable: true,
-  },
-  {
-    name: "asunto",
-    align: "center",
-    label: "Motivo de pase",
-    field: "asunto",
-    sortable: true,
-  },
-  {
-    name: "asunto_Completo",
-    align: "center",
-    label: "Motivo de pase",
-    field: "asunto_Completo",
-    sortable: true,
+    sortable: false,
   },
   {
     name: "solicitante",
     align: "center",
     label: "Solicitante",
     field: "solicitante",
-    sortable: true,
+    sortable: false,
+  },
+  {
+    name: "responsable_Area",
+    align: "center",
+    label: "Responsable área",
+    field: "responsable_Area",
+    sortable: false,
   },
   {
     name: "capturista",
     align: "center",
-    label: "Quien tramita",
+    label: "Capturista",
     field: "capturista",
-    sortable: true,
+    sortable: false,
+  },
+  {
+    name: "area",
+    align: "center",
+    label: "Área",
+    field: "area",
+    sortable: false,
+  },
+  {
+    name: "area_Completa",
+    align: "center",
+    label: "Área",
+    field: "area_Completa",
+    sortable: false,
+  },
+  {
+    name: "fecha_Creacion",
+    align: "center",
+    label: "Fecha de creación",
+    field: "fecha_Creacion",
+    sortable: false,
+  },
+  {
+    name: "fecha_Aprobacion_Rechazo",
+    align: "center",
+    label: "Fecha de aprobación o rechazo",
+    field: "fecha_Aprobacion_Rechazo",
+    sortable: false,
   },
   {
     name: "id",
     align: "center",
-    label: "Opciones",
+    label: "Acciones",
     field: "id",
     sortable: false,
   },
 ];
 
-const visisble_columns = [
+const visible_columns = [
   "folio",
-  "fechaSolicitud",
   "estatus",
-  "tipo_Pase",
-  "tipo_Asunto",
-  "asunto",
   "solicitante",
+  "responsable_Area",
   "capturista",
+  "area",
+  "fecha_Creacion",
+  "fecha_Aprobacion_Rechazo",
   "id",
 ];
 
 const pagination = ref({
-  //********** */
   page: 1,
   rowsPerPage: 25,
   sortBy: "name",
   descending: false,
 });
 
+const filter = ref("");
+
+//-----------------------------------------------------------
+
 const visualizar = async (id) => {
-  pasesStore.loadPaseConsulta(id);
-  pasesStore.actualizarConsulta(true);
+  justificanteStore.loadJustificante(id);
+  justificanteStore.loadDetalleJustificantes(id);
+  justificanteStore.actualizarModal(true);
+  justificanteStore.updateVisualizar(true);
 };
 
 const aceptar = async (id) => {
   $q.dialog({
-    title: "Aceptar pase",
-    message: "¿Está seguro de aceptar el pase?",
+    title: "Aceptar justificante",
+    message: "¿Está seguro de aceptar el justificante?",
     icon: "Warning",
     persistent: true,
     transitionShow: "scale",
@@ -213,14 +224,14 @@ const aceptar = async (id) => {
     },
   }).onOk(async () => {
     $q.loading.show();
-    const resp = await solicitudStore.aceptarSolicitud(id);
+    const resp = await solicitudJustificanteStore.aprobarJustificante(id);
     if (resp.success == true) {
       $q.loading.hide();
       $q.notify({
         type: "positive",
         message: resp.data,
       });
-      solicitudStore.loadSolicitudes();
+      solicitudJustificanteStore.loadSolicitudesJustificantes();
     } else {
       $q.loading.hide();
       $q.notify({
@@ -233,8 +244,8 @@ const aceptar = async (id) => {
 
 const rechazar = async (id) => {
   $q.dialog({
-    title: "Rechazar pase",
-    message: "¿Está seguro de rechazar el pase?",
+    title: "Rechazar justificante",
+    message: "¿Está seguro de rechazar el justificante?",
     icon: "Warning",
     persistent: true,
     transitionShow: "scale",
@@ -249,14 +260,14 @@ const rechazar = async (id) => {
     },
   }).onOk(async () => {
     $q.loading.show();
-    const resp = await solicitudStore.rechazarSolicitud(id);
+    const resp = await solicitudJustificanteStore.rechazarJustificante(id);
     if (resp.success == true) {
       $q.loading.hide();
       $q.notify({
         type: "positive",
         message: resp.data,
       });
-      solicitudStore.loadSolicitudes();
+      solicitudJustificanteStore.loadSolicitudesJustificantes();
     } else {
       $q.loading.hide();
       $q.notify({
@@ -267,3 +278,5 @@ const rechazar = async (id) => {
   });
 };
 </script>
+
+<style></style>

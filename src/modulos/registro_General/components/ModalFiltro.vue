@@ -205,7 +205,6 @@ const opcionEstatusPase = ref([
 ]);
 
 watch(areasTodos, (val) => {
-  console.log("Esto es val", val, "Esto es lista", listAreas.value.length);
   if (val == true) {
     textoAreaTodos.value = "Deshabilitar todos";
     for (let i = 0; i < listAreas.value.length; i++) {
@@ -261,7 +260,6 @@ const busquedaFiltro = async () => {
                 0
               );
             }
-            console.log("Esto es resp", resp);
             actualizarModal(false);
           } else {
             $q.notify({

@@ -11,10 +11,16 @@
     "test": "echo \"No test specified\" && exit 0"
   },
   "dependencies": {
+    "@fullcalendar/daygrid": "^6.1.9",
+    "@fullcalendar/interaction": "^6.1.9",
+    "@fullcalendar/timegrid": "^6.1.9",
+    "@fullcalendar/vue3": "^6.1.9",
     "@microsoft/signalr": "^7.0.4",
     "@quasar/extras": "^1.0.0",
     "axios": "^1.2.1",
     "core-js": "^3.6.5",
+    "date-fns": "^2.30.0",
+    "fullcalendar": "^6.1.9",
     "jspdf": "^2.5.1",
     "jspdf-autotable": "^3.5.28",
     "moment": "^2.29.4",

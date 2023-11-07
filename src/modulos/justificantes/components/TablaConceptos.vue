@@ -48,6 +48,33 @@
                   <q-tooltip>Eliminar incidencia</q-tooltip>
                 </q-btn>
               </div>
+              <!-- <div
+                v-else-if="
+                  (isEditar || isVisualizar) && col.name == 'dias_Incidencias'
+                "
+              >
+                <label>{{ col.value }}</label>
+                <q-tooltip
+                  :offset="[10, 10]"
+                  v-if="
+                    col.value.length !=
+                    props.row['dias_Incidencias_Completo'].length
+                  "
+                >
+                  {{ props.row["dias_Incidencias_Completo"] }}
+                </q-tooltip>
+              </div>
+              <div
+                v-else-if="(isEditar || isVisualizar) && col.name == 'motivo'"
+              >
+                <label>{{ col.value }}</label>
+                <q-tooltip
+                  :offset="[10, 10]"
+                  v-if="col.value.length != props.row['motivo_Completo'].length"
+                >
+                  {{ props.row["motivo_Completo"] }}
+                </q-tooltip>
+              </div> -->
               <label v-else>{{ col.value }}</label>
             </q-td>
           </q-tr>
@@ -95,10 +122,24 @@ const columns = [
     sortable: true,
   },
   {
+    name: "dias_Incidencias_Completo",
+    align: "center",
+    label: "Fecha",
+    field: "dias_Incidencias_Completo",
+    sortable: true,
+  },
+  {
     name: "motivo",
     align: "center",
     label: "Motivo",
     field: "motivo",
+    sortable: true,
+  },
+  {
+    name: "motivo_Completo",
+    align: "center",
+    label: "Motivo",
+    field: "motivo_Completo",
     sortable: true,
   },
   {
@@ -110,7 +151,6 @@ const columns = [
   },
 ];
 const pagination = ref({
-  //********** */
   page: 1,
   rowsPerPage: 25,
   sortBy: "name",
@@ -118,6 +158,8 @@ const pagination = ref({
 });
 
 const filter = ref("");
+
+//-----------------------------------------------------------
 
 const cargarColumnas = async () => {
   if (isVisualizar.value == true) {
@@ -131,8 +173,6 @@ const cargarColumnas = async () => {
     ];
   }
 };
-
-//-----------------------------------------------------------
 
 const eliminar = async (id) => {
   $q.dialog({
@@ -160,8 +200,6 @@ const eliminar = async (id) => {
         type: "positive",
         message: resp.data,
       });
-      if (isEditar.value == true)
-        justificanteStore.loadDetalleJustificantes(id);
     } else {
       $q.loading.hide();
       $q.notify({

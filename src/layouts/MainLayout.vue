@@ -80,55 +80,121 @@
         "
       >
         <q-list padding class="margin top">
+          <q-expansion-item
+            expand-separator
+            icon="menu_book"
+            label="Pases de salida"
+            class="text-purple-ieen label-title text-bold"
+          >
+            <q-item
+              v-if="menuPasesList.some((element) => element == 'PS-REG-PAS')"
+              :to="{ name: 'registro_Pases' }"
+            >
+              <q-item-section avatar>
+                <q-icon name="person" color="purple-ieen" />
+              </q-item-section>
+              <q-item-section>
+                <q-item-label class="text-purple-ieen label-title text-bold"
+                  >Mis solicitudes</q-item-label
+                >
+              </q-item-section>
+            </q-item>
+            <q-item
+              v-if="menuPasesList.some((element) => element == 'PS-SOL-PAS')"
+              :to="{ name: 'solicitudes_Pases' }"
+            >
+              <q-item-section avatar>
+                <q-icon name="groups" color="purple-ieen" />
+              </q-item-section>
+              <q-item-section>
+                <q-item-label class="text-purple-ieen label-title text-bold"
+                  >Solicitudes del área</q-item-label
+                >
+              </q-item-section>
+            </q-item>
+            <q-item
+              v-if="menuPasesList.some((element) => element == 'PS-REG-GEN')"
+              :to="{ name: 'registro_General' }"
+            >
+              <q-item-section avatar>
+                <q-icon name="list_alt" color="purple-ieen" />
+              </q-item-section>
+              <q-item-section>
+                <q-item-label class="text-purple-ieen label-title text-bold"
+                  >Registro general</q-item-label
+                >
+              </q-item-section>
+            </q-item>
+          </q-expansion-item>
+          <q-expansion-item
+            expand-separator
+            icon="library_books"
+            label="Justificantes"
+            class="text-purple-ieen label-title text-bold"
+          >
+            <q-item
+              v-if="menuPasesList.some((element) => element == 'PS-REG-JUS')"
+              :to="{ name: 'registro_Justificante' }"
+            >
+              <q-item-section avatar>
+                <q-icon name="person" color="purple-ieen" />
+              </q-item-section>
+              <q-item-section>
+                <q-item-label class="text-purple-ieen label-title text-bold"
+                  >Mis solicitudes</q-item-label
+                >
+              </q-item-section>
+            </q-item>
+            <q-item
+              v-if="menuPasesList.some((element) => element == 'PS-MIS-JUS')"
+              :to="{ name: 'solicitudes_Justificantes' }"
+            >
+              <q-item-section avatar>
+                <q-icon name="groups" color="purple-ieen" />
+              </q-item-section>
+              <q-item-section>
+                <q-item-label class="text-purple-ieen label-title text-bold"
+                  >Solicitudes del área</q-item-label
+                >
+              </q-item-section>
+            </q-item>
+            <q-item
+              v-if="menuPasesList.some((element) => element == 'PS-GEN-JUS')"
+              :to="{ name: 'registro_general_justificantes' }"
+            >
+              <q-item-section avatar>
+                <q-icon name="list_alt" color="purple-ieen" />
+              </q-item-section>
+              <q-item-section>
+                <q-item-label class="text-purple-ieen label-title text-bold"
+                  >Registro general</q-item-label
+                >
+              </q-item-section>
+            </q-item>
+          </q-expansion-item>
           <q-item
-            v-if="menuPasesList.some((element) => element == 'PS-REG-PAS')"
-            :to="{ name: 'registro_Pases' }"
+            v-if="menuPasesList.some((element) => element == 'PS-MISCHECADAS')"
+            :to="{ name: 'misChecadas' }"
           >
             <q-item-section avatar>
-              <q-icon name="person" color="purple-ieen" />
+              <q-icon name="calendar_month" color="purple-ieen" />
             </q-item-section>
             <q-item-section>
               <q-item-label class="text-purple-ieen label-title text-bold"
-                >Mis solicitudes</q-item-label
+                >Mis checadas</q-item-label
               >
             </q-item-section>
           </q-item>
           <q-item
-            v-if="menuPasesList.some((element) => element == 'PS-SOL-PAS')"
-            :to="{ name: 'solicitudes_Pases' }"
+            v-if="menuPasesList.some((element) => element == 'PS-CHECADAS')"
+            :to="{ name: 'checadas' }"
           >
             <q-item-section avatar>
-              <q-icon name="groups" color="purple-ieen" />
+              <q-icon name="calendar_month" color="purple-ieen" />
             </q-item-section>
             <q-item-section>
               <q-item-label class="text-purple-ieen label-title text-bold"
-                >Solicitudes del área</q-item-label
-              >
-            </q-item-section>
-          </q-item>
-          <q-item
-            v-if="menuPasesList.some((element) => element == 'PS-REG-GEN')"
-            :to="{ name: 'registro_General' }"
-          >
-            <q-item-section avatar>
-              <q-icon name="list_alt" color="purple-ieen" />
-            </q-item-section>
-            <q-item-section>
-              <q-item-label class="text-purple-ieen label-title text-bold"
-                >Registro general</q-item-label
-              >
-            </q-item-section>
-          </q-item>
-          <q-item
-            v-if="menuPasesList.some((element) => element == 'PS-REG-JUS')"
-            :to="{ name: 'registro_Justificante' }"
-          >
-            <q-item-section avatar>
-              <q-icon name="summarize" color="purple-ieen" />
-            </q-item-section>
-            <q-item-section>
-              <q-item-label class="text-purple-ieen label-title text-bold"
-                >Registro justificante</q-item-label
+                >Checadas</q-item-label
               >
             </q-item-section>
           </q-item>
@@ -297,6 +363,19 @@ export default defineComponent({
             break;
           case "PS-REG-JUS":
             menuPasesList.value.push("PS-REG-JUS");
+            break;
+
+          case "PS-MIS-JUS":
+            menuPasesList.value.push("PS-MIS-JUS");
+            break;
+          case "PS-MISCHECADAS":
+            menuPasesList.value.push("PS-MISCHECADAS");
+            break;
+          case "PS-CHECADAS":
+            menuPasesList.value.push("PS-CHECADAS");
+            break;
+          case "PS-GEN-JUS":
+            menuPasesList.value.push("PS-GEN-JUS");
             break;
         }
       });
