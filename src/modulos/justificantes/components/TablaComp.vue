@@ -2,6 +2,7 @@
   <div class="row">
     <div class="col">
       <q-table
+        :visible-columns="visible_columns"
         :rows="justificantes"
         :columns="columns"
         :filter="filter"
@@ -16,7 +17,7 @@
             dense
             debounce="300"
             v-model="filter"
-            placeholder="Buscar.."
+            placeholder="Buscar..."
           >
             <template v-slot:append>
               <q-icon name="search" />
@@ -38,6 +39,7 @@
                   <q-tooltip>Ver justificante</q-tooltip>
                 </q-btn>
                 <q-btn
+                  :disable="activar_pdf"
                   v-show="modulo.leer && props.row.estatus == 'Aprobado'"
                   flat
                   round
@@ -58,11 +60,7 @@
                   <q-tooltip>Editar justificante</q-tooltip>
                 </q-btn>
                 <q-btn
-                  v-if="
-                    modulo.actualizar &&
-                    props.row.estatus == 'Pendiente' &&
-                    !jefeArea
-                  "
+                  v-if="modulo.actualizar && props.row.estatus == 'Pendiente'"
                   flat
                   round
                   color="purple-ieen"
@@ -71,6 +69,15 @@
                 >
                   <q-tooltip>Cancelar justificante</q-tooltip>
                 </q-btn>
+              </div>
+              <div v-else-if="col.name == 'area'">
+                <label>{{ col.value }}</label>
+                <q-tooltip
+                  :offset="[10, 10]"
+                  v-if="col.value.length != props.row['area_Completa'].length"
+                >
+                  {{ props.row["area_Completa"] }}
+                </q-tooltip>
               </div>
               <label v-else>{{ col.value }}</label>
             </q-td>
@@ -92,19 +99,27 @@ import ValeJustificante from "src/helpers/ValeJustificante";
 
 const $q = useQuasar();
 const justificanteStore = useJustificanteStore();
-const { justificantes, isAdmi, isPersonal, jefeArea, byUsuario } =
-  storeToRefs(justificanteStore);
+const { justificantes } = storeToRefs(justificanteStore);
 const authStore = useAuthStore();
 const { modulo } = storeToRefs(authStore);
+const activar_pdf = ref(false);
 
 //-----------------------------------------------------------
 
 onBeforeMount(() => {
   justificanteStore.loadJustificantes();
 });
+
 //-----------------------------------------------------------
 
 const columns = [
+  {
+    name: "justificante_Id",
+    align: "center",
+    label: "Acciones",
+    field: "justificante_Id",
+    sortable: false,
+  },
   {
     name: "folio",
     align: "center",
@@ -142,6 +157,13 @@ const columns = [
     sortable: false,
   },
   {
+    name: "area_Completa",
+    align: "center",
+    label: "Área",
+    field: "area_Completa",
+    sortable: false,
+  },
+  {
     name: "estatus",
     align: "center",
     label: "Estatus",
@@ -163,13 +185,6 @@ const columns = [
     field: "fecha_Aprobacion_Rechazo",
     sortable: false,
   },
-  {
-    name: "justificante_Id",
-    align: "center",
-    label: "Acciones",
-    field: "justificante_Id",
-    sortable: false,
-  },
 ];
 
 const pagination = ref({
@@ -181,6 +196,17 @@ const pagination = ref({
 
 const filter = ref("");
 
+const visible_columns = [
+  "justificante_Id",
+  "folio",
+  "solicitante",
+  "responsable_Area",
+  "capturista",
+  "area",
+  "estatus",
+  "fecha_Creacion",
+  "fecha_Aprobacion_Rechazo",
+];
 //-----------------------------------------------------------
 
 const cancelar = async (id) => {
@@ -202,44 +228,6 @@ const cancelar = async (id) => {
   }).onOk(async () => {
     $q.loading.show();
     const resp = await justificanteStore.cancelarJustificante(id);
-    if (resp.success) {
-      $q.loading.hide();
-      $q.notify({
-        position: "top-right",
-        type: "positive",
-        message: resp.data,
-      });
-      justificanteStore.loadJustificantes();
-    } else {
-      $q.loading.hide();
-      $q.notify({
-        position: "top-right",
-        type: "negative",
-        message: resp.data,
-      });
-    }
-  });
-};
-
-const rechazar = async (id) => {
-  $q.dialog({
-    title: "Rechazar justificante",
-    message: "Al aceptar, se rechazará el justificante",
-    icon: "Warning",
-    persistent: true,
-    transitionShow: "scale",
-    transitionHide: "scale",
-    ok: {
-      color: "positive",
-      label: "Si, Aceptar",
-    },
-    cancel: {
-      color: "negative",
-      label: "No cancelar",
-    },
-  }).onOk(async () => {
-    $q.loading.show();
-    const resp = await justificanteStore.rechazarJustificante(id);
     if (resp.success) {
       $q.loading.hide();
       $q.notify({
@@ -284,49 +272,19 @@ const imprimir = async (id) => {
   $q.loading.show();
   resp = await justificanteStore.loadJustificante(id);
   await justificanteStore.loadDetalleJustificantes(id);
+
   if (resp.success === true) {
     ValeJustificante();
+    activar_pdf.value = true;
+    setTimeout(() => {
+      activar_pdf.value = false;
+      justificanteStore.initJustificante();
+    }, 2000);
   }
   $q.loading.hide();
 };
 
-const aprobar = async (id) => {
-  $q.dialog({
-    title: "Afectar justificante",
-    message: "Al aceptar, se afectará el justificante",
-    icon: "Warning",
-    persistent: true,
-    transitionShow: "scale",
-    transitionHide: "scale",
-    ok: {
-      color: "positive",
-      label: "Si, Aceptar",
-    },
-    cancel: {
-      color: "negative",
-      label: "No cancelar",
-    },
-  }).onOk(async () => {
-    $q.loading.show();
-    const resp = await justificanteStore.aprobarJustificante(id);
-    if (resp.success) {
-      $q.loading.hide();
-      $q.notify({
-        position: "top-right",
-        type: "positive",
-        message: resp.data,
-      });
-      justificanteStore.loadJustificantes();
-    } else {
-      $q.loading.hide();
-      $q.notify({
-        position: "top-right",
-        type: "negative",
-        message: resp.data,
-      });
-    }
-  });
-};
+//-----------------------------------------------------------
 </script>
 
 <style></style>

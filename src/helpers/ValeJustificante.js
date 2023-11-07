@@ -8,30 +8,24 @@ const ValeJustificante = async () => {
   try {
     const justificanteStore = useJustificanteStore();
     const { justificante, listaIncidencias } = storeToRefs(justificanteStore);
-
     const resp = await api.get(`/Empleados/GetResponsableByArea/${6}`);
     let { success, data } = resp.data;
-
     if (success) {
       justificante.value.responsable_Administracion = `${data.nombres}  ${data.apellido_Paterno} ${data.apellido_Materno}`;
     }
     //--------------------------------------------------------------------------//
     const dateActual = new Date();
     const year = dateActual.getFullYear();
-    const month = String(dateActual.getMonth() + 1).padStart(2, "0");
     const monthNameLong = dateActual.toLocaleString("es-ES", { month: "long" });
     const day = String(dateActual.getDate()).padStart(2, "0");
     let img = new Image();
-
     img.src = require("../assets/IEEN300.png");
-    let totalPagesExp = "{total_pages_count_string}";
     const doc = new jsPDF({ orientation: "portrait", format: "letter" });
     doc.addImage(img, "png", 10, 5, 35, 21);
     doc.setFontSize(10);
     doc.setFont("helvetica", "bold");
-    let area = "UNIDAD TÉCNICA DE INFORMÁTICA Y ESTADÍSTICA";
     doc.text(
-      "INSTITUTO ESTATAL ELECTORAL DEL ESTADO DE NAYARIT \n \n" + area + "",
+      `INSTITUTO ESTATAL ELECTORAL DE NAYARIT \n \n ${justificante.value.area.toUpperCase()}`,
       110,
       10,
       null,
@@ -48,13 +42,18 @@ const ValeJustificante = async () => {
       "center"
     );
 
+    doc.setFont("helvetica", "bold");
+    doc.text(`Folio:`, 170, 35, null, null, "right");
+    doc.setFont("helvetica", "normal");
+    doc.text(`${justificante.value.folio}.`, 205, 35, null, null, "right");
     //--------------------------------------------------------------------------//
     doc.text(
       `Tepic, Nayarit a ${day} de ${monthNameLong} de ${year}.`,
-      135,
+      205,
       40,
       null,
-      null
+      null,
+      "right"
     );
     //--------------------------------------------------------------------------//
     doc.setFont("helvetica", "bold");
@@ -71,7 +70,7 @@ const ValeJustificante = async () => {
     doc.setTextColor(255, 255, 255);
     doc.setFont("helvetica", "bold");
     doc.setFontSize(10);
-    doc.text("Datos del Trabajdor", 105, 70, null, null, "center");
+    doc.text("Datos del Personal", 105, 70, null, null, "center");
     //--------------------------------------------------------------------------//
     doc.setTextColor(0, 0, 0);
     doc.setFont("helvetica", "normal");
@@ -151,43 +150,91 @@ const ValeJustificante = async () => {
 
     //--------------------------------------------------------------------------//
     doc.setFont("helvetica", "normal");
+    doc.setDrawColor(0, 0, 0);
     doc.text(
       `${justificante.value.solicitante}`,
       50,
-      239,
+      229,
       null,
       null,
       "center"
     );
-    doc.line(10, 240, 90, 240);
-    doc.text("Nombre y Firma", 50, 245, null, null, "center");
-    doc.text("Solicitante", 50, 250, null, null, "center");
+    doc.line(10, 230, 90, 230);
+    doc.text(
+      `${justificante.value.puesto_Solicitante}`,
+      50,
+      235,
+      null,
+      null,
+      "center"
+    );
+    doc.text("Solicitante", 50, 240, null, null, "center");
     //--------------------------------------------------------------------------//
-    doc.line(125, 240, 205, 240);
+    doc.line(125, 230, 205, 230);
     doc.text(
       `${justificante.value.responsable_Area}`,
       165,
-      239,
+      229,
       null,
       null,
       "center"
     );
-    doc.text("Nombre y Firma", 165, 245, null, null, "center");
-    doc.text("Vo. Bo, Jefe/a inmediato/a", 165, 250, null, null, "center");
-    //--------------------------------------------------------------------------//
-    doc.line(60, 260, 150, 260);
     doc.text(
-      `${justificante.value.responsable_Administracion}`,
-      105,
+      `${justificante.value.puesto_Responsable_Area}`,
+      165,
+      235,
+      null,
+      null,
+      "center"
+    );
+    doc.text("Autoriza", 165, 240, null, null, "center");
+    //--------------------------------------------------------------------------//
+    doc.line(70, 260, 145, 260);
+    doc.text(
+      `${justificante.value.recursos_Humanos}`,
+      108,
       259,
       null,
       null,
       "center"
     );
-    doc.text("Nombre y Firma", 105, 265, null, null, "center");
-    doc.text("Dirección de Administración", 105, 270, null, null, "center");
+    doc.text(
+      `${justificante.value.puesto_Recursos_Humanos}`,
+      108,
+      265,
+      null,
+      null,
+      "center"
+    );
+    doc.text("Vo. Bo, Recursos humanos", 108, 270, null, null, "center");
     //--------------------------------------------------------------------------//
+    // doc.line(125, 260, 205, 260);
+    // doc.text(
+    //   `${justificante.value.responsable_Administracion}`,
 
+    //   165,
+    //   259,
+    //   null,
+    //   null,
+    //   "center"
+    // );
+    // doc.text(
+    //   `${justificante.value.puesto_Responsable_Administracion}`,
+
+    //   165,
+    //   265,
+    //   null,
+    //   null,
+    //   "center"
+    // );
+    // doc.text(
+    //   "Vo. Bo, Dirección de Administración",
+    //   165,
+    //   270,
+    //   null,
+    //   null,
+    //   "center"
+    // );
     //--------------------------------------------------------------------------//
     //Codigo numeracion de paginas
     var footer = function () {

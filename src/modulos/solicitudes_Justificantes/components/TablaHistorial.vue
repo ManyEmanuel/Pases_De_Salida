@@ -2,6 +2,7 @@
   <div class="row">
     <div class="col">
       <q-table
+        :visible-columns="visible_columns"
         :rows="historial"
         :columns="columns"
         :filter="filter"
@@ -27,15 +28,9 @@
         <template v-slot:body="props">
           <q-tr :props="props">
             <q-td v-for="col in props.cols" :key="col.name" :props="props">
-              <div
-                v-if="
-                  col.name === 'id' &&
-                  (props.row.estatus == 'Rechazado' ||
-                    props.row.estatus == 'Cancelado')
-                "
-              >
+              <div v-if="col.name === 'id'">
                 <q-btn
-                  v-if="modulo.eliminar"
+                  v-if="modulo.leer && props.row.estatus != 'Pendiente'"
                   flat
                   round
                   color="purple-ieen"
@@ -44,12 +39,8 @@
                 >
                   <q-tooltip>Ver justificante</q-tooltip>
                 </q-btn>
-              </div>
-              <div
-                v-else-if="col.name === 'id' && props.row.estatus == 'Aprobado'"
-              >
                 <q-btn
-                  v-if="modulo.actualizar"
+                  v-if="modulo.leer && props.row.estatus == 'Aprobado'"
                   flat
                   round
                   color="purple-ieen"
@@ -58,16 +49,15 @@
                 >
                   <q-tooltip>Imprimir justificante</q-tooltip>
                 </q-btn>
-                <q-btn
-                  v-if="modulo.eliminar"
-                  flat
-                  round
-                  color="purple-ieen"
-                  icon="search"
-                  @click="visualizar(col.value)"
+              </div>
+              <div v-else-if="col.name == 'area'">
+                <label>{{ col.value }}</label>
+                <q-tooltip
+                  :offset="[10, 10]"
+                  v-if="col.value.length != props.row['area_Completa'].length"
                 >
-                  <q-tooltip>Ver justificante</q-tooltip>
-                </q-btn>
+                  {{ props.row["area_Completa"] }}
+                </q-tooltip>
               </div>
               <label v-else>{{ col.value }}</label>
             </q-td>
@@ -86,6 +76,8 @@ import { onBeforeMount, ref } from "vue";
 import { useAuthStore } from "../../../stores/auth_store";
 import ValeJustificante from "src/helpers/ValeJustificante";
 
+//-----------------------------------------------------------
+
 const $q = useQuasar();
 const authStore = useAuthStore();
 const solicitudJustificanteStore = useSolicitudJustificanteStore();
@@ -93,9 +85,13 @@ const justificanteStore = useJustificanteStore();
 const { modulo } = storeToRefs(authStore);
 const { historial } = storeToRefs(solicitudJustificanteStore);
 
+//-----------------------------------------------------------
+
 onBeforeMount(() => {
   solicitudJustificanteStore.loadHistorialJustificante();
 });
+
+//-----------------------------------------------------------
 
 const columns = [
   {
@@ -103,6 +99,13 @@ const columns = [
     align: "center",
     label: "Folio",
     field: "folio",
+    sortable: false,
+  },
+  {
+    name: "estatus",
+    align: "center",
+    label: "Estatus",
+    field: "estatus",
     sortable: false,
   },
   {
@@ -119,7 +122,6 @@ const columns = [
     field: "responsable_Area",
     sortable: false,
   },
-
   {
     name: "capturista",
     align: "center",
@@ -132,13 +134,6 @@ const columns = [
     align: "center",
     label: "Área",
     field: "area",
-    sortable: false,
-  },
-  {
-    name: "estatus",
-    align: "center",
-    label: "Estatus",
-    field: "estatus",
     sortable: false,
   },
   {
@@ -163,6 +158,19 @@ const columns = [
     sortable: false,
   },
 ];
+
+const visible_columns = [
+  "folio",
+  "estatus",
+  "solicitante",
+  "responsable_Area",
+  "capturista",
+  "area",
+  "fecha_Creacion",
+  "fecha_Aprobacion_Rechazo",
+  "id",
+];
+
 const pagination = ref({
   page: 1,
   rowsPerPage: 25,
@@ -172,13 +180,7 @@ const pagination = ref({
 
 const filter = ref("");
 
-// const editar = async (id) => {
-//   $q.loading.show();
-//   await pasesStore.loadPase(id);
-//   pasesStore.updateEditar(true);
-//   pasesStore.actualizarModal(true);
-//   $q.loading.hide();
-// };
+//-----------------------------------------------------------
 
 const visualizar = async (id) => {
   justificanteStore.loadJustificante(id);

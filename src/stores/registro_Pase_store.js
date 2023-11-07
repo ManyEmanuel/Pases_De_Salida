@@ -233,7 +233,11 @@ export const useRegistroPaseStore = defineStore("registroPase", {
               area: pases.area,
               estatus: pases.estatus,
               folio: pases.folio,
-              asunto: pases.asunto,
+              asunto:
+                pases.asunto.length >= 30
+                  ? pases.asunto.slice(0, 30) + "..."
+                  : pases.asunto,
+              asunto_Completo: pases.asunto,
               fechaSolicitud:
                 fechaFinal[2] + "-" + fechaFinal[1] + "-" + fechaFinal[0],
               responsable_Area: pases.responsable_Area,
@@ -259,7 +263,11 @@ export const useRegistroPaseStore = defineStore("registroPase", {
               area: pases.area,
               estatus: pases.estatus,
               folio: pases.folio,
-              asunto: pases.asunto,
+              asunto:
+                pases.asunto.length >= 30
+                  ? pases.asunto.slice(0, 30) + "..."
+                  : pases.asunto,
+              asunto_Completo: pases.asunto,
               fechaSolicitud:
                 fechaFinal[2] + "-" + fechaFinal[1] + "-" + fechaFinal[0],
               responsable_Area: pases.responsable_Area,
@@ -285,7 +293,11 @@ export const useRegistroPaseStore = defineStore("registroPase", {
               area: pases.area,
               estatus: pases.estatus,
               folio: pases.folio,
-              asunto: pases.asunto,
+              asunto:
+                pases.asunto.length >= 30
+                  ? pases.asunto.slice(0, 30) + "..."
+                  : pases.asunto,
+              asunto_Completo: pases.asunto,
               fechaSolicitud:
                 fechaFinal[2] + "-" + fechaFinal[1] + "-" + fechaFinal[0],
               responsable_Area: pases.responsable_Area,

@@ -14,7 +14,6 @@ export const useNotificacionStore = defineStore("Notificaciones", {
         const resp = await api.get("/NotificacionesPases");
         if (resp.status == 200) {
           const { success, data } = resp.data;
-          console.log("Estas son las notificaciones", data);
           if (success == true) {
             if (data) {
               const notificaciones_array = data.notificaciones.map(

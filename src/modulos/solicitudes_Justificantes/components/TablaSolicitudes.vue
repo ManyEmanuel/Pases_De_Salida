@@ -2,6 +2,7 @@
   <div class="row">
     <div class="col">
       <q-table
+        :visible-columns="visible_columns"
         :rows="solicitudes"
         :columns="columns"
         :filter="filter"
@@ -49,7 +50,7 @@
                   <q-tooltip>Rechazar justificante</q-tooltip>
                 </q-btn>
                 <q-btn
-                  v-if="modulo.eliminar"
+                  v-if="modulo.leer"
                   flat
                   round
                   color="purple-ieen"
@@ -59,7 +60,15 @@
                   <q-tooltip>Ver justificante</q-tooltip>
                 </q-btn>
               </div>
-
+              <div v-else-if="col.name == 'area'">
+                <label>{{ col.value }}</label>
+                <q-tooltip
+                  :offset="[10, 10]"
+                  v-if="col.value.length != props.row['area_Completa'].length"
+                >
+                  {{ props.row["area_Completa"] }}
+                </q-tooltip>
+              </div>
               <label v-else>{{ col.value }}</label>
             </q-td>
           </q-tr>
@@ -77,6 +86,8 @@ import { onBeforeMount, ref } from "vue";
 import { useAuthStore } from "../../../stores/auth_store";
 import { useSolicitudJustificanteStore } from "../../../stores/solicitudes_Justificantes_store";
 
+//-----------------------------------------------------------
+
 const $q = useQuasar();
 const solicitudJustificanteStore = useSolicitudJustificanteStore();
 const justificanteStore = useJustificanteStore();
@@ -84,15 +95,27 @@ const authStore = useAuthStore();
 const { modulo } = storeToRefs(authStore);
 const { solicitudes } = storeToRefs(solicitudJustificanteStore);
 
+//-----------------------------------------------------------
+
 onBeforeMount(() => {
   solicitudJustificanteStore.loadSolicitudesJustificantes();
 });
+
+//-----------------------------------------------------------
+
 const columns = [
   {
     name: "folio",
     align: "center",
     label: "Folio",
     field: "folio",
+    sortable: false,
+  },
+  {
+    name: "estatus",
+    align: "center",
+    label: "Estatus",
+    field: "estatus",
     sortable: false,
   },
   {
@@ -109,7 +132,6 @@ const columns = [
     field: "responsable_Area",
     sortable: false,
   },
-
   {
     name: "capturista",
     align: "center",
@@ -125,10 +147,10 @@ const columns = [
     sortable: false,
   },
   {
-    name: "estatus",
+    name: "area_Completa",
     align: "center",
-    label: "Estatus",
-    field: "estatus",
+    label: "Área",
+    field: "area_Completa",
     sortable: false,
   },
   {
@@ -154,6 +176,18 @@ const columns = [
   },
 ];
 
+const visible_columns = [
+  "folio",
+  "estatus",
+  "solicitante",
+  "responsable_Area",
+  "capturista",
+  "area",
+  "fecha_Creacion",
+  "fecha_Aprobacion_Rechazo",
+  "id",
+];
+
 const pagination = ref({
   page: 1,
   rowsPerPage: 25,
@@ -163,11 +197,13 @@ const pagination = ref({
 
 const filter = ref("");
 
+//-----------------------------------------------------------
+
 const visualizar = async (id) => {
   justificanteStore.loadJustificante(id);
   justificanteStore.loadDetalleJustificantes(id);
-
   justificanteStore.actualizarModal(true);
+  justificanteStore.updateVisualizar(true);
 };
 
 const aceptar = async (id) => {

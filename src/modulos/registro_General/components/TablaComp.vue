@@ -2,6 +2,7 @@
   <div class="row">
     <div class="col">
       <q-table
+        :visible-columns="visisble_columns"
         :rows="pasesGeneral"
         :columns="columns"
         :filter="filter"
@@ -37,6 +38,16 @@
                   <q-tooltip>Ver pase</q-tooltip>
                 </q-btn>
               </div>
+              <div v-else-if="col.name == 'asunto'">
+                <label>{{ col.value }}</label>
+                <q-tooltip
+                  :offset="[10, 10]"
+                  v-if="col.value.length != props.row['asunto_Completo'].length"
+                >
+                  {{ props.row["asunto_Completo"] }}
+                </q-tooltip>
+              </div>
+
               <label v-else>{{ col.value }}</label>
             </q-td>
           </q-tr>
@@ -109,6 +120,13 @@ const columns = [
     sortable: true,
   },
   {
+    name: "asunto_Completo",
+    align: "center",
+    label: "Motivo de pase",
+    field: "asunto_Completo",
+    sortable: true,
+  },
+  {
     name: "solicitante",
     align: "center",
     label: "Solicitante",
@@ -130,6 +148,18 @@ const columns = [
     field: "id",
     sortable: false,
   },
+];
+
+const visisble_columns = [
+  "folio",
+  "fechaSolicitud",
+  "estatus",
+  "tipo_Pase",
+  "tipo_Asunto",
+  "asunto",
+  "solicitante",
+  "capturista",
+  "id",
 ];
 
 const pagination = ref({

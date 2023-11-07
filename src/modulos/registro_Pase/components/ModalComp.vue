@@ -496,7 +496,6 @@ const cargarEmpleado = async (val) => {
 const cargarVehiculo = async (val) => {
   if (vehiculo_Id.value == null) {
     if (val.vehiculo_Id != null) {
-      console.log("Si entro al vehiculo");
       verVehiculo.value = true;
       let vehiculoFiltrado = vehiculos.value.find(
         (x) => x.value == `${val.vehiculo_Id}`

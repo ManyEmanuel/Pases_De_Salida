@@ -5,11 +5,12 @@ import axios from "axios";
 // due to creating a Singleton instance here;
 // If any client changes this (global) instance, it might be a
 // good idea to move this instance creation inside of the
+
 // "export default () => {}" function below (which runs individually
 // for each client)
 
 const api = axios.create({
-  baseURL: "http://sistema.ieenayarit.org:9270/api",
+  baseURL: "http://sistema.ieenayarit.org:9170/api",
 });
 // const api = axios.create({
 //   baseURL: "http://sistema.ieenayarit.org:9270/api",
@@ -20,7 +21,6 @@ api.interceptors.request.use((config) => {
   };
   return config;
 });
-
 
 api.interceptors.response.use(
   (response) => response,
@@ -33,7 +33,6 @@ api.interceptors.response.use(
     return Promise.reject();
   }
 );
-
 
 export default boot(({ app }) => {
   // for use inside Vue files (Options API) through this.$axios and this.$api
