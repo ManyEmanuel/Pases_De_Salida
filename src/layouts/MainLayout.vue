@@ -282,7 +282,7 @@ export default defineComponent({
     });
 
     const connection = new HubConnectionBuilder()
-      .withUrl("http://ieen.ieenayarit.org:9270/hubPases", {
+      .withUrl("http://sistema.ieenayarit.org:9270/hubPases", {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("key")}`,
         },
@@ -317,10 +317,10 @@ export default defineComponent({
         if (action.label == "Cerrar sesión") {
           localStorage.clear();
           //window.location = "http://sistema.ieenayarit.org:9271?return=false";
-          window.location = "http://ieen.ieenayarit.org:9271?return=false";
+          window.location = "http://sistema.ieenayarit.org:9271?return=false";
         } else if (action.label == "Ir a universo") {
           //window.location = "http://sistema.ieenayarit.org:9271?return=true";
-          window.location = "http://ieen.ieenayarit.org:9271?return=true";
+          window.location = "http://sistema.ieenayarit.org:9271?return=true";
         } else {
           window.location =
             action.url +

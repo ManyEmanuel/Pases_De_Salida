@@ -71,15 +71,6 @@
                   <q-tooltip>Ver pase</q-tooltip>
                 </q-btn>
               </div>
-              <div v-else-if="col.name == 'asunto'">
-                <label>{{ col.value }}</label>
-                <q-tooltip
-                  :offset="[10, 10]"
-                  v-if="col.value.length != props.row['asunto_Completo'].length"
-                >
-                  {{ props.row["asunto_Completo"] }}
-                </q-tooltip>
-              </div>
 
               <label v-else>{{ col.value }}</label>
             </q-td>
