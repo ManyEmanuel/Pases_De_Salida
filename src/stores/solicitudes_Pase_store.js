@@ -57,11 +57,7 @@ export const useSolicitudPaseStore = defineStore("solicitudPase", {
             area_Id: pases.area_Id,
             estatus: pases.estatus,
             folio: pases.folio,
-            asunto:
-              pases.asunto.length >= 30
-                ? pases.asunto.slice(0, 30) + "..."
-                : pases.asunto,
-            asunto_Completo: pases.asunto,
+            asunto: pases.asunto,
             fechaSolicitud:
               fechaFinal[2] + "-" + fechaFinal[1] + "-" + fechaFinal[0],
             responsable_Area: pases.responsable_Area,
@@ -72,6 +68,7 @@ export const useSolicitudPaseStore = defineStore("solicitudPase", {
         if (localStorage.getItem("tipoEmp").toString() == "JefeArea") {
           let respTodos = await api.get("/PasesSalida/ObtenTodos");
           let listTodos = respTodos.data.data;
+          console.log("Esto es todos", listTodos);
           let listPendientesTodos = listTodos.map((todos) => {
             let fechaPase = null;
             if (todos.tipo_Pase == "Entrada") {
@@ -90,11 +87,7 @@ export const useSolicitudPaseStore = defineStore("solicitudPase", {
               area_Id: todos.area_Id,
               estatus: todos.estatus,
               folio: todos.folio,
-              asunto:
-                pases.asunto.length >= 30
-                  ? pases.asunto.slice(0, 30) + "..."
-                  : pases.asunto,
-              asunto_Completo: pases.asunto,
+              asunto: todos.asunto,
               fechaSolicitud:
                 fechaFinal[2] + "-" + fechaFinal[1] + "-" + fechaFinal[0],
               responsable_Area: todos.responsable_Area,
@@ -148,11 +141,7 @@ export const useSolicitudPaseStore = defineStore("solicitudPase", {
             area_Id: pases.area_Id,
             estatus: pases.estatus,
             folio: pases.folio,
-            asunto:
-              pases.asunto.length >= 30
-                ? pases.asunto.slice(0, 30) + "..."
-                : pases.asunto,
-            asunto_Completo: pases.asunto,
+            asunto: pases.asunto,
             fechaSolicitud:
               fechaFinal[2] + "-" + fechaFinal[1] + "-" + fechaFinal[0],
             responsable_Area: pases.responsable_Area,
@@ -181,11 +170,7 @@ export const useSolicitudPaseStore = defineStore("solicitudPase", {
               area_Id: todos.area_Id,
               estatus: todos.estatus,
               folio: todos.folio,
-              asunto:
-                pases.asunto.length >= 30
-                  ? pases.asunto.slice(0, 30) + "..."
-                  : pases.asunto,
-              asunto_Completo: pases.asunto,
+              asunto: todos.asunto,
               fechaSolicitud:
                 fechaFinal[2] + "-" + fechaFinal[1] + "-" + fechaFinal[0],
               responsable_Area: todos.responsable_Area,
