@@ -55,11 +55,7 @@ export const useRegistroGeneralStore = defineStore("registroGeneral", {
             area: pases.area,
             estatus: pases.estatus,
             folio: pases.folio,
-            asunto:
-              pases.asunto.length >= 30
-                ? pases.asunto.slice(0, 30) + "..."
-                : pases.asunto,
-            asunto_Completo: pases.asunto,
+            asunto: pases.asunto,
             responsable_Area: pases.responsable_Area,
             capturista: pases.capturista,
             area: pases.area,
