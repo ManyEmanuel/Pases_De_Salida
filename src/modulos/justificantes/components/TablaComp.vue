@@ -253,6 +253,7 @@ const editar = async (id) => {
   await justificanteStore.loadDetalleJustificantes(id);
   justificanteStore.actualizarModal(true);
   justificanteStore.updateEditar(true);
+  justificanteStore.updateEditarDetalle(true);
   justificanteStore.updateVisualizar(false);
   $q.loading.hide();
 };

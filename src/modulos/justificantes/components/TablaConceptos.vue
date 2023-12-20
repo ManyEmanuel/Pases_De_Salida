@@ -28,7 +28,7 @@
           <q-tr :props="props">
             <q-td v-for="col in props.cols" :key="col.name" :props="props">
               <div v-if="col.name === 'id'">
-                <q-btn
+                <!-- <q-btn
                   v-if="isEditar"
                   flat
                   round
@@ -37,7 +37,7 @@
                   @click="editar(col.value)"
                 >
                   <q-tooltip>Editar incidencia</q-tooltip>
-                </q-btn>
+                </q-btn> -->
                 <q-btn
                   flat
                   round
