@@ -91,9 +91,9 @@
 
             <div
               v-if="!isVisualizar"
-              class="col-lg-6 col-md-6 col-sm-12 col-xs-12 q-pt-md"
+              class="col-lg-4 col-md-4 col-sm-4 col-xs-12"
             >
-              <q-btn-dropdown
+              <!-- <q-btn-dropdown
                 class="bg-purple-ieen-3 text-white"
                 :label="tipo == null ? 'Seleccione una opción' : tipo"
                 dropdown-icon="change_history"
@@ -111,11 +111,29 @@
                     </q-item-section>
                   </q-item>
                 </q-list>
-              </q-btn-dropdown>
+              </q-btn-dropdown> -->
+              <q-select
+                v-model="tipo"
+                :options="tipoJustificante"
+                label="Seleccione una opción"
+              />
             </div>
+
             <div
               v-if="!isVisualizar"
-              class="col-lg-6 col-md-6 col-sm-12 col-xs-12 q-pt-xs"
+              class="col-lg-4 col-md-4 col-sm-4 col-xs-12 q-pl-xs q-pr-xs"
+            >
+              <q-select
+                @click="elegirYear"
+                v-model="year"
+                :options="years"
+                label="Año"
+              />
+            </div>
+
+            <div
+              v-if="!isVisualizar"
+              class="col-lg-4 col-md-4 col-sm-4 col-xs-12"
             >
               <q-input label="Fecha" v-model="days" :disable="tipo == null">
                 <template v-slot:append>
@@ -278,6 +296,8 @@ const tipoJustificante = ref([
   "Permiso día económico",
   "Vacaciones",
 ]);
+const years = ref([2023, 2024]);
+const year = ref();
 const days = ref([]);
 const cambioDays = ref(false);
 const tipo = ref(null);
@@ -317,32 +337,32 @@ watch(area_Id, (val) => {
   }
 });
 
-watch(detalle.value, async (val) => {
-  if (val.id != null) {
-    cargarTipo(val);
-    motivo.value = val.motivo;
-    if (val.tipo_Justificantes == "Permiso día económico") {
-      days.value = val.dias_Incidencias;
-    } else if (val.tipo_Justificantes == "Vacaciones") {
-      var diasArray = val.dias_Incidencias.split(", ");
-      days.value = diasArray;
-    } else {
-      days.value = val.dias_Incidencias;
-    }
-    await justificanteStore.loadDiasRestantes(empleado_Id.value.value);
-    diasRestantes();
-  }
-});
+// watch(detalle.value, async (val) => {
+//   if (val.id != null) {
+//     cargarTipo(val);
+//     motivo.value = val.motivo;
+//     if (val.tipo_Justificantes == "Permiso día económico") {
+//       days.value = val.dias_Incidencias;
+//     } else if (val.tipo_Justificantes == "Vacaciones") {
+//       var diasArray = val.dias_Incidencias.split(", ");
+//       days.value = diasArray;
+//     } else {
+//       days.value = val.dias_Incidencias;
+//     }
+//     await justificanteStore.loadDiasRestantes(empleado_Id.value.value);
+//     diasRestantes();
+//   }
+// });
 
 //-----------------------------------------------------------
 
-const diasRestantes = () => {
-  if (tipo.value == "Permiso día económico") {
-    restanDias.value = dias_restantes.value.dias_Economicos;
-  } else if (tipo.value == "Vacaciones") {
-    restanDias.value = dias_restantes.value.segundo_Periodo;
-  }
-};
+// const diasRestantes = () => {
+//   if (tipo.value == "Permiso día económico") {
+//     restanDias.value = dias_restantes.value.dias_Economicos;
+//   } else if (tipo.value == "Vacaciones") {
+//     restanDias.value = dias_restantes.value.segundo_Periodo;
+//   }
+// };
 
 const cargarArea = async (val) => {
   if (area_Id.value == null) {
@@ -387,64 +407,70 @@ watch(empleado_Id, async (val) => {
   }
 });
 
+watch(year, async (val) => {
+  if (val != null) {
+    await justificanteStore.loadDiasRestantes(empleado_Id.value.value);
+
+    await justificanteStore.loadAsignacionesVacaciones(val);
+    days.value = null;
+    if (tipo.value == "Permiso día económico") {
+      restanDias.value = dias_restantes.value.dias_Economicos;
+    } else if (tipo.value == "Vacaciones") {
+      restanDias.value = dias_restantes.value.segundo_Periodo;
+      console.log("restanDiasrestanDias", restanDias.value);
+    }
+  }
+});
+
 const empleado = async (val) => {
   await justificanteStore.loadResponsabeArea(val.value);
   await justificanteStore.loadDiasRestantes(val.value);
-  await justificanteStore.loadAsignacionesVacaciones();
-  if (
-    dias_restantes.value.dias_Economicos == 0 &&
-    dias_restantes.value.segundo_Periodo != 0
-  ) {
-    tipoJustificante.value = [
-      "Omisión de entrada",
-      "Omisión de salida",
-      "Comisión oficial",
-      "Permuta por día laborado",
-      "Otros",
-      "Vacaciones",
-    ];
-  } else if (
-    dias_restantes.value.dias_Economicos == 0 &&
-    dias_restantes.value.segundo_Periodo == 0
-  ) {
-    tipoJustificante.value = [
-      "Omisión de entrada",
-      "Omisión de salida",
-      "Comisión oficial",
-      "Permuta por día laborado",
-      "Otros",
-    ];
-  } else if (dias_restantes.value.primer_Periodo != 0) {
-    tipoJustificante.value = [
-      "Omisión de entrada",
-      "Omisión de salida",
-      "Comisión oficial",
-      "Permuta por día laborado",
-      "Otros",
-      "Permiso día económico",
-      "Vacaciones",
-    ];
-  } else if (dias_restantes.value.segundo_Periodo != 0) {
-    tipoJustificante.value = [
-      "Omisión de entrada",
-      "Omisión de salida",
-      "Comisión oficial",
-      "Permuta por día laborado",
-      "Otros",
-      "Permiso día económico",
-      "Vacaciones",
-    ];
-  } else {
-    tipoJustificante.value = [
-      "Omisión de entrada",
-      "Omisión de salida",
-      "Comisión oficial",
-      "Permuta por día laborado",
-      "Otros",
-      "Permiso día económico",
-      "Vacaciones",
-    ];
-  }
+  // if (
+  //   dias_restantes.value.dias_Economicos == 0 &&
+  //   dias_restantes.value.segundo_Periodo != 0
+  // ) {
+  //   tipoJustificante.value = [
+  //     "Omisión de entrada",
+  //     "Omisión de salida",
+  //     "Comisión oficial",
+  //     "Permuta por día laborado",
+  //     "Otros",
+  //     "Vacaciones",
+  //   ];
+  // } else if (
+  //   dias_restantes.value.dias_Economicos == 0 &&
+  //   dias_restantes.value.segundo_Periodo == 0
+  // ) {
+  //   tipoJustificante.value = [
+  //     "Omisión de entrada",
+  //     "Omisión de salida",
+  //     "Comisión oficial",
+  //     "Permuta por día laborado",
+  //     "Otros",
+  //   ];
+  // } else if (
+  //   dias_restantes.value.segundo_Periodo == 0 &&
+  //   dias_restantes.value.dias_Economicos != 0
+  // ) {
+  //   tipoJustificante.value = [
+  //     "Omisión de entrada",
+  //     "Omisión de salida",
+  //     "Comisión oficial",
+  //     "Permuta por día laborado",
+  //     "Otros",
+  //     "Permiso día económico",
+  //   ];
+  // } else {
+  //   tipoJustificante.value = [
+  //     "Omisión de entrada",
+  //     "Omisión de salida",
+  //     "Comisión oficial",
+  //     "Permuta por día laborado",
+  //     "Otros",
+  //     "Permiso día económico",
+  //     "Vacaciones",
+  //   ];
+  // }
   limpiarCampos();
 };
 
@@ -551,12 +577,13 @@ const onItemClick = async (val) => {
     });
   } else {
     tipo.value = val;
-    await justificanteStore.loadAsignacionesVacaciones();
+    await justificanteStore.loadAsignacionesVacaciones(year.value);
     days.value = null;
     if (tipo.value == "Permiso día económico") {
       restanDias.value = dias_restantes.value.dias_Economicos;
     } else if (tipo.value == "Vacaciones") {
       restanDias.value = dias_restantes.value.segundo_Periodo;
+      console.log("restanDiasrestanDias", restanDias.value);
     }
   }
 };
