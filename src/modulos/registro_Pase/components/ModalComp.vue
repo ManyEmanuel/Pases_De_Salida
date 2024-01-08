@@ -355,9 +355,9 @@ const filtrarFecha = ref("");
 const opcionTipoPase = ref(["Entrada", "Intermedio", "Salida"]);
 const opcionAsuntoPase = ref(["Oficial", "Médico", "Personal"]);
 const area_Id = ref(null);
-const horasHabiles = [8, 9, 10, 11, 12, 13, 14, 15, 16];
+const horasHabiles = [7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18];
 const horasLlegada = [
-  8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23,
+  7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23,
 ];
 const empleado_Id = ref(null);
 const vehiculo_Id = ref(null);
@@ -410,7 +410,7 @@ const FiltroFecha = (fechha) => {
   let diaSemana = today.getDay();
   let diasContar = 3;
   if (diaSemana <= 3) {
-    diasContar = 5;
+    diasContar = 4;
   }
 
   filtrarFecha.value = date.formatDate(today, "YYYY/MM/DD");
