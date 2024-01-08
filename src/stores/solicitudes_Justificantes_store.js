@@ -82,7 +82,7 @@ export const useSolicitudJustificanteStore = defineStore(
         try {
           let resp = await api.get("/Justificantes/ByArea");
           let { data } = resp.data;
-          let listHistorial = null;
+
           let listHistorialArea = data.map((justificante) => {
             return {
               id: justificante.id,
