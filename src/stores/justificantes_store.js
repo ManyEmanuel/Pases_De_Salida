@@ -792,7 +792,6 @@ export const useJustificanteStore = defineStore("justificante", {
         //const year = dateActual.getFullYear();
         const resp = await api.get("/Asignaciones_Vacaciones/ObtenTodos");
         let { data } = resp.data;
-        console.log("data----", data);
         let listconfiguracion = data.map((config) => {
           return {
             periodo_Vacacional: config.periodo_Vacacional,
