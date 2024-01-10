@@ -711,14 +711,22 @@ export const useJustificanteStore = defineStore("justificante", {
       }
     },
 
-    async loadResponsabeArea(id) {
-      const resp = await api.get(`/ResponsablesAreas/ResposableByArea/${id}`);
-      let { data } = resp.data;
-      let filtro = data.find((x) => x.area_Id == id);
+    // async loadResponsabeArea(id) {
+    //   try {
+    //     const resp = await api.get(`/ResponsablesAreas/ResposableByArea/${id}`);
+    //     let { data } = resp.data;
+    //     console.log("responsable", data);
+    //     let filtro = data.find((x) => x.area_Id == id);
 
-      this.justificante.responsable_Area = filtro.empleado;
-      this.justificante.responsable_Area_Id = filtro.empleado_Id;
-    },
+    //     this.justificante.responsable_Area = filtro.empleado;
+    //     this.justificante.responsable_Area_Id = filtro.empleado_Id;
+    //   } catch (error) {
+    //     return {
+    //       success: false,
+    //       data: "Ocurrió un error, inténtelo de nuevo. Si el error persiste, contacte a soporte",
+    //     };
+    //   }
+    // },
 
     //-----------------------------------------------------------
 
@@ -742,27 +750,34 @@ export const useJustificanteStore = defineStore("justificante", {
 
     //-----------------------------------------------------------
 
-    async loadResponsabeArea(id) {
-      const resp = await api.get(`/Empleados/GetResponsableByEmpleado/${id}`);
-      let { success, data } = resp.data;
-      if (success) {
-        this.justificante.responsable_Area_Id = data.id;
-        this.justificante.responsable_Area = `${data.nombres} ${data.apellido_Paterno} ${data.apellido_Materno}`;
-        this.justificante.puesto_Responsable_Area_Id = data.puesto_Id;
+    async loadResponsabeAreaByEmpleado(id) {
+      try {
+        const resp = await api.get(`/Empleados/GetResponsableByEmpleado/${id}`);
+        let { success, data } = resp.data;
+        if (success) {
+          this.justificante.responsable_Area_Id = data.id;
+          this.justificante.responsable_Area = `${data.nombres} ${data.apellido_Paterno} ${data.apellido_Materno}`;
+          this.justificante.puesto_Responsable_Area_Id = data.puesto_Id;
+        }
+      } catch (error) {
+        return {
+          success: false,
+          data: "Ocurrió un error, inténtelo de nuevo. Si el error persiste, contacte a soporte",
+        };
       }
     },
 
     //-----------------------------------------------------------
 
-    async loadDiasRestantes(id) {
+    async loadDiasRestantes(id, año) {
       try {
         this.dias_restantes.dias_Economicos = null;
         this.dias_restantes.primer_Periodo = null;
         this.dias_restantes.segundo_Periodo = null;
-        console.log("id", id);
-        const resp = await api.get(`/Justificantes/Dias_Restantes/${id}`);
+        const resp = await api.get(
+          `/Justificantes/Dias_Restantes/${id}?A%C3%B1o=${año}`
+        );
         let { success, data } = resp.data;
-        console.log("data", data);
         if (success) {
           this.dias_restantes.dias_Economicos = data.dias_Economicos;
           this.dias_restantes.primer_Periodo =
@@ -773,8 +788,6 @@ export const useJustificanteStore = defineStore("justificante", {
             data.segundo_Periodo == undefined
               ? data.dias_Segundo_Periodo
               : data.segundo_Periodo;
-
-          console.log("dias_restantes", this.dias_restantes);
         }
       } catch (error) {
         return {
