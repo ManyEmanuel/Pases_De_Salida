@@ -392,15 +392,6 @@ watch(modal, (val) => {
     justificanteStore.loadInformacionJustificante();
     cargarArea(justificante.value);
   }
-  // tipoJustificante.value = [
-  //   "Omisión de entrada",
-  //   "Omisión de salida",
-  //   "Comisión oficial",
-  //   "Permuta por día laborado",
-  //   "Otros",
-  //   "Permiso día económico",
-  //   "Vacaciones",
-  // ];
 });
 
 watch(empleado_Id, async (val) => {
@@ -443,68 +434,35 @@ const diasRestantes = async () => {
 const empleado = async (val) => {
   await justificanteStore.loadResponsabeAreaByEmpleado(val.value);
   await justificanteStore.loadDiasRestantes(val.value, year.value);
-  tipoJustificante.value.push(
-    "Omisión de entrada",
-    "Omisión de salida",
-    "Comisión oficial",
-    "Permuta por día laborado",
-    "Otros"
-  );
+  if (!tipoJustificante.value.includes("Omisión de entrada")) {
+    tipoJustificante.value.push("Omisión de entrada");
+  }
+  if (!tipoJustificante.value.includes("Omisión de salida")) {
+    tipoJustificante.value.push("Omisión de salida");
+  }
+  if (!tipoJustificante.value.includes("Comisión oficial")) {
+    tipoJustificante.value.push("Comisión oficial");
+  }
+  if (!tipoJustificante.value.includes("Permuta por día laborado")) {
+    tipoJustificante.value.push("Permuta por día laborado");
+  }
+  if (!tipoJustificante.value.includes("Otros")) {
+    tipoJustificante.value.push("Otros");
+  }
   if (dias_restantes.value.dias_Economicos != 0) {
-    tipoJustificante.value.push("Permiso día económico");
+    if (!tipoJustificante.value.includes("Permiso día económico")) {
+      tipoJustificante.value.push("Permiso día económico");
+    }
   }
   if (
     dias_restantes.value.primer_Periodo != 0 ||
     dias_restantes.value.segundo_Periodo != 0
   ) {
-    tipoJustificante.value.push("Vacaciones");
+    if (!tipoJustificante.value.includes("Vacaciones")) {
+      tipoJustificante.value.push("Vacaciones");
+    }
   }
-  // if (
-  //   dias_restantes.value.dias_Economicos == 0 &&
-  //   dias_restantes.value.segundo_Periodo != 0
-  // ) {
-  //   tipoJustificante.value = [
-  //     "Omisión de entrada",
-  //     "Omisión de salida",
-  //     "Comisión oficial",
-  //     "Permuta por día laborado",
-  //     "Otros",
-  //     "Vacaciones",
-  //   ];
-  // } else if (
-  //   dias_restantes.value.dias_Economicos == 0 &&
-  //   dias_restantes.value.segundo_Periodo == 0
-  // ) {
-  //   tipoJustificante.value = [
-  //     "Omisión de entrada",
-  //     "Omisión de salida",
-  //     "Comisión oficial",
-  //     "Permuta por día laborado",
-  //     "Otros",
-  //   ];
-  // } else if (
-  //   dias_restantes.value.segundo_Periodo == 0 &&
-  //   dias_restantes.value.dias_Economicos != 0
-  // ) {
-  //   tipoJustificante.value = [
-  //     "Omisión de entrada",
-  //     "Omisión de salida",
-  //     "Comisión oficial",
-  //     "Permuta por día laborado",
-  //     "Otros",
-  //     "Permiso día económico",
-  //   ];
-  // } else {
-  //   tipoJustificante.value = [
-  //     "Omisión de entrada",
-  //     "Omisión de salida",
-  //     "Comisión oficial",
-  //     "Permuta por día laborado",
-  //     "Otros",
-  //     "Permiso día económico",
-  //     "Vacaciones",
-  //   ];
-  // }
+
   limpiarCampos();
 };
 
