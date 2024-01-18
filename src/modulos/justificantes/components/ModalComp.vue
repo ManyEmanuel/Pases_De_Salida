@@ -586,6 +586,7 @@ const agregarIncidencia = async () => {
           detalle.value.segundo_Periodo = 0;
           detalle.value.dias_Economicos = 0;
           detalle.value.periodo_Vacacional = periodo;
+          detalle.value.año = year.value;
           resp = await justificanteStore.createDetalleJustificantes(
             justificante.value.id,
             detalle.value
@@ -608,6 +609,7 @@ const agregarIncidencia = async () => {
           detalle.value.segundo_Periodo = 0;
           detalle.value.dias_Economicos = 0;
           detalle.value.periodo_Vacacional = 0;
+          detalle.value.año = year.value;
           resp = await justificanteStore.createDetalleJustificantes(
             justificante.value.id,
             detalle.value
@@ -635,11 +637,13 @@ const agregarIncidencia = async () => {
           detalle.value.motivo = motivo.value;
           detalle.value.periodo_Vacacional = periodo;
           detalle.value.dias_Economicos = 0;
+          detalle.value.año = year.value;
           await justificanteStore.addIncidencia(
             resultado,
             motivo.value,
             tipo.value,
-            periodo
+            periodo,
+            year.value
           );
         } else {
           const resultado = days.value.join(", ");
@@ -650,11 +654,13 @@ const agregarIncidencia = async () => {
           detalle.value.primer_Periodo = 0;
           detalle.value.segundo_Periodo = 0;
           detalle.value.dias_Economicos = 0;
+          detalle.value.año = year.value;
           await justificanteStore.addIncidencia(
             resultado,
             motivo.value,
             tipo.value,
-            0
+            0,
+            year.value
           );
         }
         limpiarCampos();
@@ -688,7 +694,9 @@ const onSubmit = async () => {
     justificante.value.area_Id = area_Id.value.value;
     justificante.value.area = area_Id.value.label;
     justificante.value.solicitante_Id = empleado_Id.value.value;
-    justificante.value.puesto_Solicitante_Id = empleado_Id.value.puesto_Id;
+    if (isPersonal.value != true) {
+      justificante.value.puesto_Solicitante_Id = empleado_Id.value.puesto_Id;
+    }
     if (isEditar.value == true) {
     } else {
       resp = await justificanteStore.createJustificante(justificante.value);

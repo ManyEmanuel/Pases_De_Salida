@@ -29,6 +29,7 @@ export const useJustificanteStore = defineStore("justificante", {
       primer_Periodo: null,
       segundo_Periodo: null,
       dias_Economicos: null,
+      año: null,
     },
     justificante: {
       id: null,
@@ -508,7 +509,8 @@ export const useJustificanteStore = defineStore("justificante", {
       dias_Incidencias,
       motivo,
       tipo_Justificantes,
-      periodo_Vacacional
+      periodo_Vacacional,
+      año
     ) {
       var ultimoId =
         this.listaIncidencias.length > 0
@@ -525,6 +527,7 @@ export const useJustificanteStore = defineStore("justificante", {
           primer_Periodo: 0,
           segundo_Periodo: 0,
           dias_Economicos: 0,
+          año: año,
         });
       } catch (error) {
         return {
