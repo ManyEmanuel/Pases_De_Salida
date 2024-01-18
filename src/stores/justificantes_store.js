@@ -77,18 +77,6 @@ export const useJustificanteStore = defineStore("justificante", {
       segundo_Periodo: null,
       dias_Economicos: null,
     },
-    // configuracion: {
-    //   dias_Economicos: null,
-    //   periodo_Vacacional: null,
-    //   dias_Segundo_Periodo: null,
-    //   dias_Primer_Periodo: null,
-    //   tipo_Primer_Periodo: null,
-    //   año: null,
-    //   fechas_Primer_Periodo: null,
-    //   tipo_Segundo_Periodo: null,
-    //   fechas_Segundo_Periodo: null,
-    //   fecha_Creacion: null,
-    // },
     configuracion: [],
   }),
   actions: {
@@ -110,10 +98,10 @@ export const useJustificanteStore = defineStore("justificante", {
 
     initJustificante() {
       // this.justificante.id = null;
-      // this.justificante.solicitante = null;
-      // this.justificante.solicitante_Id = null;
-      // this.justificante.area = null;
-      // this.justificante.area_Id = null;
+      this.justificante.solicitante = null;
+      this.justificante.solicitante_Id = null;
+      //this.justificante.area = null;
+      //this.justificante.area_Id = null;
       // this.justificante.capturista = null;
       // this.justificante.capturista_Id = null;
       // this.justificante.estatus = null;
@@ -345,7 +333,6 @@ export const useJustificanteStore = defineStore("justificante", {
               data.responsable_Admistracion_Id;
             this.justificante.responsable_Administracion =
               data.responsable_Administracion;
-
             return { success, data };
           }
         }
@@ -733,7 +720,7 @@ export const useJustificanteStore = defineStore("justificante", {
 
     //-----------------------------------------------------------
 
-    async loadEmpleadosByUsuario() {
+    async loadCapturista() {
       try {
         const resp = await api.get("/Empleados/ByUsuario");
         let { success, data } = resp.data;

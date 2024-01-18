@@ -31,14 +31,14 @@
           <div class="row">
             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
               <q-input
-                v-if="isEditar || isPersonal || isVisualizar"
+                v-if="isPersonal || isVisualizar"
                 readonly
                 v-model="justificante.area"
                 label="Área"
               ></q-input>
               <q-select
                 v-else
-                :readonly="isAdmi"
+                :readonly="isAdmi || isEditar"
                 v-model="area_Id"
                 :options="areas"
                 label="Área del empleado"
@@ -56,10 +56,9 @@
               >
               </q-input>
             </div>
-
             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
               <q-input
-                v-if="isVisualizar || isEditar || isPersonal"
+                v-if="isVisualizar || isPersonal || isEditar"
                 readonly
                 v-model="justificante.solicitante"
                 label="Solicitante"
@@ -67,6 +66,7 @@
               </q-input>
               <q-select
                 v-else
+                :readonly="isEditar"
                 stack-label
                 v-model="empleado_Id"
                 :options="listEmpleados"
@@ -77,7 +77,6 @@
               >
               </q-select>
             </div>
-
             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
               <q-input
                 readonly
@@ -88,7 +87,6 @@
               <br />
               <div class="text-h6 q-pt-xs text-bold">Incidencia</div>
             </div>
-
             <div
               v-if="!isVisualizar"
               class="col-lg-4 col-md-4 col-sm-4 col-xs-12"
@@ -288,44 +286,22 @@ onBeforeMount(() => {
 
 const cargarData = async () => {
   await justificanteStore.loadInformacionJustificante();
-  await justificanteStore.loadEmpleadosByUsuario();
+  await justificanteStore.loadCapturista();
 };
 
 watch(justificante.value, (val) => {
-  if (
-    isEditar.value == true ||
-    isAdmi.value == true ||
-    isPersonal.value == true
-  ) {
+  if (isEditar == true) {
     cargarArea(val);
-    cargarSolicitante(val);
   }
 });
 
 watch(area_Id, (val) => {
-  if (area_Id.value != null) {
+  if (val != null) {
     empleado_Id.value = null;
     personalAutoriza.value = null;
     justificanteStore.loadPersonalArea(val.value, false);
   }
 });
-
-// watch(detalle.value, async (val) => {
-//   if (val.id != null) {
-//     cargarTipo(val);
-//     motivo.value = val.motivo;
-//     if (val.tipo_Justificantes == "Permiso día económico") {
-//       days.value = val.dias_Incidencias;
-//     } else if (val.tipo_Justificantes == "Vacaciones") {
-//       var diasArray = val.dias_Incidencias.split(", ");
-//       days.value = diasArray;
-//     } else {
-//       days.value = val.dias_Incidencias;
-//     }
-//     await justificanteStore.loadDiasRestantes(empleado_Id.value.value);
-//     diasRestantes();
-//   }
-// });
 
 //-----------------------------------------------------------
 
@@ -333,28 +309,20 @@ const cargarArea = async (val) => {
   if (area_Id.value == null) {
     let areaFiltrado = areas.value.find((x) => x.value == `${val.area_Id}`);
     area_Id.value = areaFiltrado;
-    //justificanteStore.loadPersonalArea(val.area_Id);
+    await justificanteStore.loadPersonalArea(val.value, false);
+    cargarSolicitante(val);
   }
 };
 
 const cargarSolicitante = async (val) => {
   if (empleado_Id.value == null) {
     let solicitanteFiltrado = listEmpleados.value.find(
-      (x) => x.label == `${val.solicitante}`
+      (x) => x.value == `${val.solicitante_Id}`
     );
     empleado_Id.value = solicitanteFiltrado;
     personalAutoriza.value = val.responsable_Area;
   }
 };
-
-// const cargarTipo = async (val) => {
-//   if (tipo.value == null) {
-//     let tipoFiltrado = tipoJustificante.value.find(
-//       (x) => x == `${val.tipo_Justificantes}`
-//     );
-//     tipo.value = tipoFiltrado;
-//   }
-// };
 
 watch(tipo, async (val) => {
   if (val != null) {
@@ -368,7 +336,6 @@ watch(tipo, async (val) => {
 });
 
 watch(periodoVacacional, (val) => {
-  //days.value = [];
   if (val != null) {
     diasRestantes();
     days.value = [];
@@ -376,7 +343,6 @@ watch(periodoVacacional, (val) => {
 });
 
 watch(year, async (val) => {
-  //restanDias.value = 0;
   days.value = [];
   if (val != null) {
     await justificanteStore.loadDiasRestantes(
@@ -394,7 +360,7 @@ watch(modal, (val) => {
   }
 });
 
-watch(empleado_Id, async (val) => {
+watch(empleado_Id, (val) => {
   if (empleado_Id.value != null) {
     empleado(val);
     if (isPersonal == false) {
@@ -527,7 +493,8 @@ const actualizarModal = (valor) => {
   justificanteStore.updateVisualizar(false);
   justificanteStore.updateEditar(false);
   justificanteStore.updateEditarDetalle(false);
-  justificanteStore.loadEmpleadosByUsuario();
+  justificanteStore.loadCapturista();
+  justificanteStore.initJustificante();
   limpiarCampos();
   justificante.value.solicitante = null;
   listaIncidencias.value = [];
