@@ -365,7 +365,6 @@ export const useJustificanteStore = defineStore("justificante", {
         } else if (perfil == 2) {
           let respArea = await api.get("/Areas/AreaByUsuario");
           let { data } = respArea.data;
-
           let listAreas = [{ value: data.area_Id, label: data.area }];
 
           this.isSuperAdmi = false;
@@ -381,7 +380,6 @@ export const useJustificanteStore = defineStore("justificante", {
           this.listEmpleados = [];
           let respArea = await api.get("/Areas/AreaByUsuario");
           let { data } = respArea.data;
-
           let listAreas = [{ value: data.area_Id, label: data.area }];
 
           let respPer = await api.get("/Empleados/ByUsuario");

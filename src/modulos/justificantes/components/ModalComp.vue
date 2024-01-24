@@ -293,6 +293,11 @@ watch(justificante.value, (val) => {
   if (isEditar == true) {
     cargarArea(val);
   }
+  if (val.solicitante_Id != null) {
+    if (isPersonal.value == true) {
+      justificanteStore.loadResponsabeAreaByEmpleado(val.solicitante_Id);
+    }
+  }
 });
 
 watch(area_Id, (val) => {
