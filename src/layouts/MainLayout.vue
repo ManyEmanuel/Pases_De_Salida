@@ -349,7 +349,6 @@ export default defineComponent({
       await authStore.loadPerfil();
       await authStore.loadDatosEmp();
       await authStore.loadRolEmp();
-      //console.log("Estos son los modulos", modulos.value);
       modulos.value.forEach((element) => {
         switch (element.siglas_Modulo) {
           case "PS-REG-PAS":

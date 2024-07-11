@@ -6,7 +6,7 @@
           <q-breadcrumbs>
             <q-breadcrumbs-el icon="home" to="/" />
             <q-breadcrumbs-el
-              label="Solicitudes de pase"
+              label="Solicitudes de justificantes"
               icon="library_books"
             />
           </q-breadcrumbs>
@@ -37,32 +37,17 @@
         </q-tab-panels>
       </q-card>
     </div>
-    <ModalConsulta />
+    <ModalComp />
   </q-page>
 </template>
 
 <script setup>
-import { useQuasar } from "quasar";
-import { useAuthStore } from "../../../stores/auth_store";
-import { onBeforeMount, ref } from "vue";
-import { storeToRefs } from "pinia";
+import { ref } from "vue";
 import TablaSolicitudes from "../components/TablaSolicitudes.vue";
 import TablaHistorial from "../components/TablaHistorial.vue";
-import ModalConsulta from "../../justificantes/components/ModalComp.vue";
+import ModalComp from "../components/ModalComp.vue";
 
-const $q = useQuasar();
-const authStore = useAuthStore();
-const { modulo } = storeToRefs(authStore);
+//-----------------------------------------------------------
+
 const tab = ref("solicitudes");
-const siglas = "PS-SOL-PAS";
-
-onBeforeMount(() => {
-  leerPermisos();
-});
-
-const leerPermisos = async () => {
-  $q.loading.show();
-  await authStore.loadModulo(siglas);
-  $q.loading.hide();
-};
 </script>

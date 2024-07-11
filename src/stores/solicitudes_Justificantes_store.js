@@ -5,6 +5,7 @@ export const useSolicitudJustificanteStore = defineStore(
   "solicitudJustifcante",
   {
     state: () => ({
+      modal: false,
       solicitudes: [],
       historial: [],
       solicitudJustificante: {
@@ -33,6 +34,10 @@ export const useSolicitudJustificanteStore = defineStore(
       },
     }),
     actions: {
+      actualizarModal(valor) {
+        this.modal = valor;
+      },
+
       //-----------------------------------------------------------------------
 
       async loadSolicitudesJustificantes() {

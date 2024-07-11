@@ -29,7 +29,7 @@ export const useJustificanteStore = defineStore("justificante", {
       primer_Periodo: null,
       segundo_Periodo: null,
       dias_Economicos: null,
-      año: null,
+      year: null,
     },
     justificante: {
       id: null,
@@ -68,7 +68,7 @@ export const useJustificanteStore = defineStore("justificante", {
           "_"
         ),
       monthsShort: "Ene_Feb_Mar_Abr_May_Jun_Jul_Ago_Sep_Oct_Nov_Dic".split("_"),
-      firstDayOfWeek: 1, // 0-6, 0 - Sunday, 1 Monday, ...
+      firstDayOfWeek: 1,
       format24h: true,
       pluralDay: "dias",
     },
@@ -113,6 +113,7 @@ export const useJustificanteStore = defineStore("justificante", {
       // this.isPersonal = false;
       this.listaIncidencias = [];
     },
+
     //-----------------------------------------------------------
     async isAdministracion() {
       let area = parseInt(localStorage.getItem("area"));
@@ -123,6 +124,7 @@ export const useJustificanteStore = defineStore("justificante", {
       }
     },
 
+    //-----------------------------------------------------------
     async loadJustificantes() {
       try {
         let tipoEmp = localStorage.getItem("tipoEmp").toString();
@@ -135,7 +137,6 @@ export const useJustificanteStore = defineStore("justificante", {
         if (perfil == 1) {
           resp = await api.get("/Justificantes/ObtenTodos");
           let { data } = resp.data;
-
           listJustificantes = data.map((justificante) => {
             return {
               justificante_Id: justificante.id,
@@ -225,7 +226,10 @@ export const useJustificanteStore = defineStore("justificante", {
           });
           this.isPersonal = true;
         }
-        this.justificantes = listJustificantes;
+
+        this.justificantes = listJustificantes.sort(
+          (a, b) => b.justificante_Id - a.justificante_Id
+        );
       } catch (error) {
         return {
           success: false,
@@ -235,16 +239,15 @@ export const useJustificanteStore = defineStore("justificante", {
     },
 
     //-----------------------------------------------------------
-
     async createJustificante(justificante) {
       try {
         const resp = await api.post("/Justificantes", justificante);
         if (resp.status == 200) {
-          const { success, data, idJustificante } = resp.data;
+          const { success, data, id } = resp.data;
           if (success === true) {
-            return { success, data, idJustificante };
+            return { success, data, id };
           } else {
-            return { success, data, idJustificante };
+            return { success, data, id };
           }
         } else {
           return {
@@ -261,7 +264,6 @@ export const useJustificanteStore = defineStore("justificante", {
     },
 
     //-----------------------------------------------------------
-
     async updateJustificante(justificante) {
       try {
         const resp = await api.put(
@@ -290,7 +292,6 @@ export const useJustificanteStore = defineStore("justificante", {
     },
 
     //-----------------------------------------------------------
-
     async loadJustificante(id) {
       try {
         let resp = null;
@@ -344,6 +345,7 @@ export const useJustificanteStore = defineStore("justificante", {
       }
     },
 
+    //-----------------------------------------------------------
     async loadInformacionJustificante() {
       try {
         let perfil = parseInt(localStorage.getItem("perfil"));
@@ -411,7 +413,6 @@ export const useJustificanteStore = defineStore("justificante", {
     },
 
     //-----------------------------------------------------------
-
     async cancelarJustificante(id) {
       try {
         const resp = await api.get(`/Justificantes/Cancelar/${id}`);
@@ -437,7 +438,6 @@ export const useJustificanteStore = defineStore("justificante", {
     },
 
     //-----------------------------------------------------------
-
     async rechazarJustificante(id) {
       try {
         const resp = await api.get(`/Justificantes/Rechazar/${id}`);
@@ -463,7 +463,6 @@ export const useJustificanteStore = defineStore("justificante", {
     },
 
     //-----------------------------------------------------------
-
     async aprobarJustificante(id) {
       try {
         const resp = await api.post(`/Justificantes/Aprobar/${id}`, 0);
@@ -489,13 +488,12 @@ export const useJustificanteStore = defineStore("justificante", {
     },
 
     //-----------------------------------------------------------
-
     async addIncidencia(
       dias_Incidencias,
       motivo,
       tipo_Justificantes,
       periodo_Vacacional,
-      año
+      year
     ) {
       var ultimoId =
         this.listaIncidencias.length > 0
@@ -512,7 +510,7 @@ export const useJustificanteStore = defineStore("justificante", {
           primer_Periodo: 0,
           segundo_Periodo: 0,
           dias_Economicos: 0,
-          año: año,
+          year: year,
         });
       } catch (error) {
         return {
@@ -521,6 +519,7 @@ export const useJustificanteStore = defineStore("justificante", {
         };
       }
     },
+
     //-----------------------------------------------------------
     async loadDetalleJustificantes(id) {
       try {
@@ -551,7 +550,6 @@ export const useJustificanteStore = defineStore("justificante", {
     },
 
     //-----------------------------------------------------------
-
     async loadDetalle(id) {
       try {
         let resp = await api.get(`/Detalle_Justificantes/${id}`);
@@ -575,7 +573,6 @@ export const useJustificanteStore = defineStore("justificante", {
     },
 
     //-----------------------------------------------------------
-
     async createDetalleJustificantes(id, detalle) {
       try {
         const resp = await api.post(`/Detalle_Justificantes/${id}`, detalle);
@@ -601,7 +598,6 @@ export const useJustificanteStore = defineStore("justificante", {
     },
 
     //-----------------------------------------------------------
-
     async eliminarDetalleJusitifcante(id) {
       try {
         let nIndex = this.listaIncidencias.find((x) => x.id == id);
@@ -636,7 +632,6 @@ export const useJustificanteStore = defineStore("justificante", {
     },
 
     //-----------------------------------------------------------
-
     async updateDetalle(detalle) {
       try {
         const resp = await api.put(
@@ -666,7 +661,6 @@ export const useJustificanteStore = defineStore("justificante", {
     },
 
     //-----------------------------------------------------------
-
     async loadPersonalArea(id, especial) {
       try {
         let area = parseInt(localStorage.getItem("area"));
@@ -699,25 +693,7 @@ export const useJustificanteStore = defineStore("justificante", {
       }
     },
 
-    // async loadResponsabeArea(id) {
-    //   try {
-    //     const resp = await api.get(`/ResponsablesAreas/ResposableByArea/${id}`);
-    //     let { data } = resp.data;
-    //     console.log("responsable", data);
-    //     let filtro = data.find((x) => x.area_Id == id);
-
-    //     this.justificante.responsable_Area = filtro.empleado;
-    //     this.justificante.responsable_Area_Id = filtro.empleado_Id;
-    //   } catch (error) {
-    //     return {
-    //       success: false,
-    //       data: "Ocurrió un error, inténtelo de nuevo. Si el error persiste, contacte a soporte",
-    //     };
-    //   }
-    // },
-
     //-----------------------------------------------------------
-
     async loadCapturista() {
       try {
         const resp = await api.get("/Empleados/ByUsuario");
@@ -737,7 +713,6 @@ export const useJustificanteStore = defineStore("justificante", {
     },
 
     //-----------------------------------------------------------
-
     async loadResponsabeAreaByEmpleado(id) {
       try {
         const resp = await api.get(`/Empleados/GetResponsableByEmpleado/${id}`);
@@ -756,7 +731,6 @@ export const useJustificanteStore = defineStore("justificante", {
     },
 
     //-----------------------------------------------------------
-
     async loadDiasRestantes(id, año) {
       try {
         this.dias_restantes.dias_Economicos = null;
@@ -786,11 +760,8 @@ export const useJustificanteStore = defineStore("justificante", {
     },
 
     //-----------------------------------------------------------
-
     async loadAsignacionesVacaciones(year) {
       try {
-        const dateActual = new Date();
-        //const year = dateActual.getFullYear();
         const resp = await api.get("/Asignaciones_Vacaciones/ObtenTodos");
         let { data } = resp.data;
         let listconfiguracion = data.map((config) => {
@@ -817,8 +788,6 @@ export const useJustificanteStore = defineStore("justificante", {
     },
 
     //-----------------------------------------------------------------------
-    //Reporte
-
     async loadListAreas() {
       try {
         let respArea = await api.get("/Areas/GetLista");
@@ -842,6 +811,7 @@ export const useJustificanteStore = defineStore("justificante", {
       }
     },
 
+    //-----------------------------------------------------------------------
     async reporteJustificantes(date) {
       try {
         const resp = await api.get(

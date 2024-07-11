@@ -37,10 +37,12 @@
 import { storeToRefs } from "pinia";
 import { useQuasar } from "quasar";
 import { useJustificanteStore } from "src/stores/justificantes_store";
-import { onBeforeMount, onMounted } from "vue";
+import { onBeforeMount } from "vue";
 import { useAuthStore } from "../../../stores/auth_store";
 import ModalCompVue from "../components/ModalComp.vue";
 import TablaComp from "../components/TablaComp.vue";
+
+//-----------------------------------------------------------
 
 const $q = useQuasar();
 const authStore = useAuthStore();
@@ -48,9 +50,13 @@ const { modulo } = storeToRefs(authStore);
 const siglas = "PS-REG-JUS";
 const justificanteStore = useJustificanteStore();
 
+//-----------------------------------------------------------
+
 onBeforeMount(() => {
   leerPermisos();
 });
+
+//-----------------------------------------------------------
 
 const leerPermisos = async () => {
   $q.loading.show();
@@ -64,5 +70,3 @@ const actualizarModal = (valor) => {
   $q.loading.hide();
 };
 </script>
-
-<style></style>

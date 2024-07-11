@@ -10,6 +10,7 @@
         row-key="id"
         rows-per-page-label="Filas por pagina"
         no-data-label="No hay registros"
+        class="my-sticky-last-column-table"
       >
         <template v-slot:top-right>
           <q-input
@@ -95,6 +96,7 @@ import { storeToRefs } from "pinia";
 import { useQuasar } from "quasar";
 import { useAuthStore } from "src/stores/auth_store";
 import ValeJustificante from "src/helpers/ValeJustificante";
+
 //-----------------------------------------------------------
 
 const $q = useQuasar();
@@ -107,107 +109,14 @@ const activar_pdf = ref(false);
 //-----------------------------------------------------------
 
 onBeforeMount(() => {
-  justificanteStore.loadJustificantes();
+  cargarData();
 });
 
 //-----------------------------------------------------------
 
-const columns = [
-  {
-    name: "justificante_Id",
-    align: "center",
-    label: "Acciones",
-    field: "justificante_Id",
-    sortable: false,
-  },
-  {
-    name: "folio",
-    align: "center",
-    label: "Folio",
-    field: "folio",
-    sortable: false,
-  },
-  {
-    name: "solicitante",
-    align: "center",
-    label: "Solicitante",
-    field: "solicitante",
-    sortable: false,
-  },
-  {
-    name: "responsable_Area",
-    align: "center",
-    label: "Responsable área",
-    field: "responsable_Area",
-    sortable: false,
-  },
-
-  {
-    name: "capturista",
-    align: "center",
-    label: "Capturista",
-    field: "capturista",
-    sortable: false,
-  },
-  {
-    name: "area",
-    align: "center",
-    label: "Área",
-    field: "area",
-    sortable: false,
-  },
-  {
-    name: "area_Completa",
-    align: "center",
-    label: "Área",
-    field: "area_Completa",
-    sortable: false,
-  },
-  {
-    name: "estatus",
-    align: "center",
-    label: "Estatus",
-    field: "estatus",
-    sortable: false,
-  },
-
-  {
-    name: "fecha_Creacion",
-    align: "center",
-    label: "Fecha de creación",
-    field: "fecha_Creacion",
-    sortable: false,
-  },
-  {
-    name: "fecha_Aprobacion_Rechazo",
-    align: "center",
-    label: "Fecha de aprobación o rechazo",
-    field: "fecha_Aprobacion_Rechazo",
-    sortable: false,
-  },
-];
-
-const pagination = ref({
-  page: 1,
-  rowsPerPage: 25,
-  sortBy: "name",
-  descending: false,
-});
-
-const filter = ref("");
-
-const visible_columns = [
-  "justificante_Id",
-  "folio",
-  "solicitante",
-  "responsable_Area",
-  "capturista",
-  "area",
-  "estatus",
-  "fecha_Creacion",
-  "fecha_Aprobacion_Rechazo",
-];
-//-----------------------------------------------------------
+const cargarData = async () => {
+  await justificanteStore.loadJustificantes();
+};
 
 const cancelar = async (id) => {
   $q.dialog({
@@ -218,11 +127,11 @@ const cancelar = async (id) => {
     transitionShow: "scale",
     transitionHide: "scale",
     ok: {
-      color: "positive",
+      color: "secondary",
       label: "Si, Aceptar",
     },
     cancel: {
-      color: "negative",
+      color: "red",
       label: "No cancelar",
     },
   }).onOk(async () => {
@@ -273,7 +182,6 @@ const imprimir = async (id) => {
   $q.loading.show();
   resp = await justificanteStore.loadJustificante(id);
   await justificanteStore.loadDetalleJustificantes(id);
-
   if (resp.success === true) {
     ValeJustificante();
     activar_pdf.value = true;
@@ -286,6 +194,114 @@ const imprimir = async (id) => {
 };
 
 //-----------------------------------------------------------
-</script>
 
-<style></style>
+const columns = [
+  {
+    name: "folio",
+    align: "center",
+    label: "Folio",
+    field: "folio",
+    sortable: false,
+  },
+  {
+    name: "solicitante",
+    align: "center",
+    label: "Solicitante",
+    field: "solicitante",
+    sortable: false,
+  },
+  {
+    name: "responsable_Area",
+    align: "center",
+    label: "Responsable área",
+    field: "responsable_Area",
+    sortable: false,
+  },
+
+  {
+    name: "capturista",
+    align: "center",
+    label: "Capturista",
+    field: "capturista",
+    sortable: false,
+  },
+  {
+    name: "area",
+    align: "center",
+    label: "Área",
+    field: "area",
+    sortable: false,
+  },
+  {
+    name: "area_Completa",
+    align: "center",
+    label: "Área",
+    field: "area_Completa",
+    sortable: false,
+  },
+  {
+    name: "estatus",
+    align: "center",
+    label: "Estatus",
+    field: "estatus",
+    sortable: false,
+  },
+  {
+    name: "fecha_Creacion",
+    align: "center",
+    label: "Fecha de creación",
+    field: "fecha_Creacion",
+    sortable: false,
+  },
+  {
+    name: "fecha_Aprobacion_Rechazo",
+    align: "center",
+    label: "Fecha de aprobación o rechazo",
+    field: "fecha_Aprobacion_Rechazo",
+    sortable: false,
+  },
+  {
+    name: "justificante_Id",
+    align: "center",
+    label: "Acciones",
+    field: "justificante_Id",
+    sortable: false,
+  },
+];
+
+const pagination = ref({
+  page: 1,
+  rowsPerPage: 25,
+  sortBy: "name",
+  descending: false,
+});
+
+const filter = ref("");
+
+const visible_columns = [
+  "justificante_Id",
+  "folio",
+  "solicitante",
+  "responsable_Area",
+  "capturista",
+  "area",
+  "estatus",
+  "fecha_Creacion",
+  "fecha_Aprobacion_Rechazo",
+];
+</script>
+<style lang="sass">
+.my-sticky-last-column-table
+  thead tr:last-child th:last-child
+    /* bg color is important for th; just specify one */
+    background-color: white
+
+  td:last-child
+    background-color: white
+
+  th:last-child,
+  td:last-child
+    position: sticky
+    right: 0
+    z-index: 1
+</style>

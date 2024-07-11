@@ -110,7 +110,7 @@
 import { storeToRefs } from "pinia";
 import { useQuasar } from "quasar";
 import { useJustificanteStore } from "src/stores/justificantes_store";
-import { onBeforeMount, onMounted, ref, watch, watchEffect } from "vue";
+import { onBeforeMount, ref, watch, watchEffect } from "vue";
 import ReporteGeneralJustificantes from "../../../helpers/ReportGeneralJustificantes";
 
 //-----------------------------------------------------------
@@ -131,16 +131,15 @@ const area_Id = ref(null);
 const empleado_Id = ref(null);
 //-----------------------------------------------------------
 //Get fecha actual
-//-----------------------------------------------------------
-//Get fecha actual
 const newDate = new Date();
 const year = newDate.getFullYear();
 const month = String(newDate.getMonth() + 1).padStart(2, "0");
 const day = String(newDate.getDate()).padStart(2, "0");
 const dateActual = ref(`${year}/${month}/${day}`);
+
 //-----------------------------------------------------------
 onBeforeMount(() => {
-  justificanteStore.loadAsignacionesVacaciones();
+  justificanteStore.loadAsignacionesVacaciones(year);
   justificanteStore.loadListAreas();
   justificanteStore.isAdministracion();
   listReporte.value = [];

@@ -2,6 +2,7 @@
   <div class="row">
     <div class="col">
       <q-table
+        class="my-sticky-last-column-table"
         :visible-columns="visible_columns"
         :rows="solicitudes"
         :columns="columns"
@@ -10,7 +11,6 @@
         row-key="id"
         rows-per-page-label="Filas por pagina"
         no-data-label="No hay registros"
-        class="tamanoCelda"
       >
         <template v-slot:top-right>
           <q-input
@@ -98,10 +98,14 @@ const { solicitudes } = storeToRefs(solicitudJustificanteStore);
 //-----------------------------------------------------------
 
 onBeforeMount(() => {
-  solicitudJustificanteStore.loadSolicitudesJustificantes();
+  cargarData();
 });
 
 //-----------------------------------------------------------
+
+const cargarData = async () => {
+  await solicitudJustificanteStore.loadSolicitudesJustificantes();
+};
 
 const columns = [
   {
@@ -200,10 +204,9 @@ const filter = ref("");
 //-----------------------------------------------------------
 
 const visualizar = async (id) => {
-  justificanteStore.loadJustificante(id);
-  justificanteStore.loadDetalleJustificantes(id);
-  justificanteStore.actualizarModal(true);
-  justificanteStore.updateVisualizar(true);
+  await justificanteStore.loadJustificante(id);
+  await justificanteStore.loadDetalleJustificantes(id);
+  solicitudJustificanteStore.actualizarModal(true);
 };
 
 const aceptar = async (id) => {
@@ -215,11 +218,11 @@ const aceptar = async (id) => {
     transitionShow: "scale",
     transitionHide: "scale",
     ok: {
-      color: "positive",
+      color: "secondary",
       label: "¡Sí!, aceptar",
     },
     cancel: {
-      color: "negative",
+      color: "red",
       label: "Cancelar",
     },
   }).onOk(async () => {
@@ -251,11 +254,11 @@ const rechazar = async (id) => {
     transitionShow: "scale",
     transitionHide: "scale",
     ok: {
-      color: "positive",
+      color: "secondary",
       label: "¡Sí!, rechazar",
     },
     cancel: {
-      color: "negative",
+      color: "red",
       label: "Cancelar",
     },
   }).onOk(async () => {
@@ -278,5 +281,18 @@ const rechazar = async (id) => {
   });
 };
 </script>
+<style lang="sass">
+.my-sticky-last-column-table
+  thead tr:last-child th:last-child
+    /* bg color is important for th; just specify one */
+    background-color: white
 
-<style></style>
+  td:last-child
+    background-color: white
+
+  th:last-child,
+  td:last-child
+    position: sticky
+    right: 0
+    z-index: 1
+</style>

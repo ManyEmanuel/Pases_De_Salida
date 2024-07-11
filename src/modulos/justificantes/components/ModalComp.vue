@@ -5,9 +5,9 @@
     transition-show="scale"
     transition-hide="scale"
   >
-    <q-card style="width: 800px; max-width: 80vw">
+    <q-card style="width: 900px; max-width: 90vw">
       <q-card-section class="row">
-        <div class="text-h6">
+        <div class="text-h5 text-purple-ieen text-bold absolute-center">
           {{
             isEditar
               ? "Editar justificante"
@@ -29,8 +29,9 @@
       <q-card-section>
         <q-form class="q-col-gutter-xs" @submit="onSubmit">
           <div class="row">
-            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 q-pb-sm">
               <q-input
+                filled
                 v-if="isPersonal || isVisualizar"
                 readonly
                 v-model="justificante.area"
@@ -38,6 +39,7 @@
               ></q-input>
               <q-select
                 v-else
+                filled
                 :readonly="isAdmi || isEditar"
                 v-model="area_Id"
                 :options="areas"
@@ -48,16 +50,18 @@
               >
               </q-select>
             </div>
-            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 q-pb-sm">
               <q-input
+                filled
                 readonly
                 v-model="justificante.capturista"
-                label="Empleado que realiza la captura de la solicitud"
+                label="Personal que realiza la captura de la solicitud"
               >
               </q-input>
             </div>
-            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 q-pb-sm">
               <q-input
+                filled
                 v-if="isVisualizar || isPersonal || isEditar"
                 readonly
                 v-model="justificante.solicitante"
@@ -66,6 +70,7 @@
               </q-input>
               <q-select
                 v-else
+                filled
                 :readonly="isEditar"
                 stack-label
                 v-model="empleado_Id"
@@ -79,6 +84,7 @@
             </div>
             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
               <q-input
+                filled
                 readonly
                 v-model="justificante.responsable_Area"
                 label="Personal que autoriza"
@@ -89,9 +95,10 @@
             </div>
             <div
               v-if="!isVisualizar"
-              class="col-lg-4 col-md-4 col-sm-4 col-xs-12"
+              class="col-lg-3 col-md-3 col-sm-3 col-xs-12 q-pr-xs"
             >
               <q-select
+                filled
                 v-model="tipo"
                 :options="tipoJustificante"
                 label="Seleccione una opción"
@@ -99,15 +106,31 @@
             </div>
             <div
               v-if="!isVisualizar && tipo == 'Vacaciones'"
-              class="col-lg-4 col-md-4 col-sm-4 col-xs-12 q-pl-xs q-pr-xs"
+              class="col-lg-3 col-md-3 col-sm-3 col-xs-12 q-pr-xs"
             >
-              <q-select v-model="year" :options="years" label="Año" />
+              <q-select filled v-model="year" :options="years" label="Año" />
+            </div>
+            <div
+              v-if="tipo == 'Vacaciones' && !isVisualizar"
+              class="col-lg-3 col-md-3 col-sm-3 col-xs-12 q-pr-xs"
+            >
+              <q-select
+                filled
+                v-model="periodoVacacional"
+                :options="periodos_Vacacionales"
+                label="Periodo vacacional"
+              />
             </div>
             <div
               v-if="!isVisualizar"
-              class="col-lg-4 col-md-4 col-sm-4 col-xs-12 q-pl-xs"
+              class="col-lg-3 col-md-3 col-sm-3 col-xs-12 q-pl-xs"
             >
-              <q-input label="Fecha" v-model="days" :disable="tipo == null">
+              <q-input
+                filled
+                label="Fecha"
+                v-model="days"
+                :disable="tipo == null || vacacionesFijo == true"
+              >
                 <template v-slot:append>
                   <q-icon name="event" class="cursor-pointer">
                     <q-popup-proxy
@@ -158,35 +181,21 @@
                 class="text-body2 q-pt-md"
                 v-show="tipo == 'Vacaciones' || tipo == 'Permiso día económico'"
               >
-                Días disponibles:
-                {{ restanDias }}
+                {{
+                  vacacionesFijo == false
+                    ? `Días disponibles: ${restanDias}`
+                    : `Periodo establecido`
+                }}
               </div>
             </div>
           </div>
           <div v-if="tipo == 'Otros'" class="text-caption text-red">
             Especificar concepto en el motivo.
           </div>
-          <div class="row" v-if="tipo == 'Vacaciones' && !isVisualizar">
-            <div class="text-bold q-pt-xs text-body2">Periodo vacacional</div>
-            <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
-              <q-radio
-                v-model="periodoVacacional"
-                checked-icon="task_alt"
-                unchecked-icon="panorama_fish_eye"
-                val="1"
-                label="Primer periodo"
-              />
-              <q-radio
-                v-model="periodoVacacional"
-                checked-icon="task_alt"
-                unchecked-icon="panorama_fish_eye"
-                val="2"
-                label="Segundo periodo"
-              />
-            </div>
-          </div>
+
           <div v-if="!isVisualizar" class="col-12">
             <q-input
+              filled
               v-model="motivo"
               label="Motivo: (Especificar en todos los casos)"
               type="textarea"
@@ -208,19 +217,19 @@
             </div>
           </div>
           <br />
-          <q-card-section>
-            <TablaConceptos />
-          </q-card-section>
+          <TablaConceptos />
           <q-space />
           <div class="col-12">
             <div class="text-right">
               <q-btn
-                label="Cancelar"
+                label="Cerrar"
                 type="reset"
                 color="red"
+                icon-right="close"
                 @click="actualizarModal(false)"
               />
               <q-btn
+                icon-right="save"
                 v-if="!isVisualizar && !isEditar"
                 :disable="listaIncidencias.value == ''"
                 label="Guardar"
@@ -261,20 +270,26 @@ const {
   isPersonal,
   isAdmi,
   dias_restantes,
+  configuracion,
 } = storeToRefs(justificanteStore);
 const tipoJustificante = ref([]);
 const years = ref([2023, 2024]);
 const year = ref(2024);
 const days = ref([]);
+const periodos_Vacacionales = ref([
+  { value: 1, label: "Primer periodo" },
+  { value: 2, label: "Segundo periodo" },
+]);
 const cambioDays = ref(false);
 const tipo = ref(null);
-const periodoVacacional = ref("1");
+const periodoVacacional = ref({ value: 1, label: "Primer periodo" });
 const empleado_Id = ref(null);
 const personalAutoriza = ref(null);
 const area_Id = ref(null);
 const motivo = ref(null);
 const filtrarFecha = ref("");
 const restanDias = ref(null);
+const vacacionesFijo = ref(false);
 
 //-----------------------------------------------------------
 
@@ -378,9 +393,9 @@ watch(days, (val) => {
   if (val != null) {
     if (tipo.value == "Vacaciones") {
       //resta los dias disponibles de vacaciones
-      if (periodoVacacional.value == 1) {
+      if (periodoVacacional.value.value == 1) {
         restanDias.value = dias_restantes.value.primer_Periodo - val.length;
-      } else if (periodoVacacional.value == 2) {
+      } else if (periodoVacacional.value.value == 2) {
         restanDias.value = dias_restantes.value.segundo_Periodo - val.length;
       }
     } else if (tipo.value == "Permiso día económico") {
@@ -391,13 +406,26 @@ watch(days, (val) => {
 });
 
 const diasRestantes = async () => {
+  await justificanteStore.loadAsignacionesVacaciones(year.value);
   if (tipo.value == "Permiso día económico") {
     restanDias.value = dias_restantes.value.dias_Economicos;
   } else if (tipo.value == "Vacaciones") {
-    if (periodoVacacional.value == 1) {
-      restanDias.value = dias_restantes.value.primer_Periodo;
-    } else if (periodoVacacional.value == 2) {
-      restanDias.value = dias_restantes.value.segundo_Periodo;
+    if (periodoVacacional.value.value == 1) {
+      if (configuracion.value[0].tipo_Primer_Periodo == "Fijo") {
+        vacacionesFijo.value = true;
+        days.value = configuracion.value[0].fechas_Primer_Periodo.split(",");
+      } else {
+        vacacionesFijo.value = false;
+        restanDias.value = dias_restantes.value.primer_Periodo;
+      }
+    } else if (periodoVacacional.value.value == 2) {
+      if (configuracion.value[0].tipo_Segundo_Periodo == "Fijo") {
+        vacacionesFijo.value = true;
+        days.value = configuracion.value[0].fechas_Segundo_Periodo.split(",");
+      } else {
+        vacacionesFijo.value = false;
+        restanDias.value = dias_restantes.value.segundo_Periodo;
+      }
     }
   }
 };
@@ -444,11 +472,11 @@ const validateDates = () => {
         days.value = days.value.slice(0, dias_restantes.value.dias_Economicos);
       }
     } else if (tipo.value == "Vacaciones") {
-      if (periodoVacacional.value == 1) {
+      if (periodoVacacional.value.value == 1) {
         if (days.value.length > dias_restantes.value.primer_Periodo) {
           days.value = days.value.slice(0, dias_restantes.value.primer_Periodo);
         }
-      } else if (periodoVacacional.value == 2) {
+      } else if (periodoVacacional.value.value == 2) {
         if (days.value.length > dias_restantes.value.segundo_Periodo) {
           days.value = days.value.slice(
             0,
@@ -522,10 +550,14 @@ const agregarIncidencia = async () => {
     });
   } else {
     if (
-      tipo.value == null ||
-      motivo.value == null ||
-      days.value == "" ||
-      empleado_Id.value == null
+      vacacionesFijo.value == true
+        ? tipo.value == null ||
+          motivo.value == null ||
+          empleado_Id.value == null
+        : tipo.value == null ||
+          motivo.value == null ||
+          empleado_Id.value == null ||
+          days.value == ""
     ) {
       $q.dialog({
         title: "Atención",
@@ -547,9 +579,9 @@ const agregarIncidencia = async () => {
             detalle.value.dias_Incidencias = detalle.value.dias_Incidencias;
           }
 
-          if (periodoVacacional.value == 1) {
+          if (periodoVacacional.value.value == 1) {
             periodo = 1;
-          } else if (periodoVacacional.value == 2) {
+          } else if (periodoVacacional.value.value == 2) {
             periodo = 2;
           }
           detalle.value.tipo_Justificantes = tipo.value;
@@ -558,15 +590,26 @@ const agregarIncidencia = async () => {
           detalle.value.segundo_Periodo = 0;
           detalle.value.dias_Economicos = 0;
           detalle.value.periodo_Vacacional = periodo;
-          detalle.value.año = year.value;
+          detalle.value.year = year.value;
           resp = await justificanteStore.createDetalleJustificantes(
             justificante.value.id,
             detalle.value
           );
-          if (resp.success) {
+          if (resp.success === true) {
+            $q.notify({
+              position: "top-right",
+              type: "positive",
+              message: "Se creo con exito",
+            });
             await justificanteStore.loadDetalleJustificantes(
               justificante.value.id
             );
+          } else {
+            $q.notify({
+              position: "top-right",
+              type: "negative",
+              message: resp.data,
+            });
           }
         } else {
           if (respObjeto == true) {
@@ -581,15 +624,26 @@ const agregarIncidencia = async () => {
           detalle.value.segundo_Periodo = 0;
           detalle.value.dias_Economicos = 0;
           detalle.value.periodo_Vacacional = 0;
-          detalle.value.año = year.value;
+          detalle.value.year = year.value;
           resp = await justificanteStore.createDetalleJustificantes(
             justificante.value.id,
             detalle.value
           );
-          if (resp.success) {
+          if (resp.success === true) {
+            $q.notify({
+              position: "top-right",
+              type: "positive",
+              message: "Se creo con exito",
+            });
             await justificanteStore.loadDetalleJustificantes(
               justificante.value.id
             );
+          } else {
+            $q.notify({
+              position: "top-right",
+              type: "negative",
+              message: resp.data,
+            });
           }
         }
 
@@ -598,9 +652,9 @@ const agregarIncidencia = async () => {
       } else {
         if (tipo.value == "Vacaciones") {
           let periodo;
-          if (periodoVacacional.value == 1) {
+          if (periodoVacacional.value.value == 1) {
             periodo = 1;
-          } else if (periodoVacacional.value == 2) {
+          } else if (periodoVacacional.value.value == 2) {
             periodo = 2;
           }
           const resultado = days.value.join(", ");
@@ -609,7 +663,7 @@ const agregarIncidencia = async () => {
           detalle.value.motivo = motivo.value;
           detalle.value.periodo_Vacacional = periodo;
           detalle.value.dias_Economicos = 0;
-          detalle.value.año = year.value;
+          detalle.value.year = year.value;
           await justificanteStore.addIncidencia(
             resultado,
             motivo.value,
@@ -626,7 +680,7 @@ const agregarIncidencia = async () => {
           detalle.value.primer_Periodo = 0;
           detalle.value.segundo_Periodo = 0;
           detalle.value.dias_Economicos = 0;
-          detalle.value.año = year.value;
+          detalle.value.year = year.value;
           await justificanteStore.addIncidencia(
             resultado,
             motivo.value,
@@ -674,10 +728,7 @@ const onSubmit = async () => {
       resp = await justificanteStore.createJustificante(justificante.value);
       if (resp.success == true) {
         listaIncidencias.value.forEach(async (element) => {
-          await justificanteStore.createDetalleJustificantes(
-            resp.idJustificante,
-            element
-          );
+          await justificanteStore.createDetalleJustificantes(resp.id, element);
         });
       }
     }
@@ -702,5 +753,3 @@ const onSubmit = async () => {
   $q.loading.hide();
 };
 </script>
-
-<style></style>
