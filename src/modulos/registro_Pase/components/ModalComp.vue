@@ -311,6 +311,8 @@
               counter
               maxlength="500"
               hint="Máximo 500 carácteres"
+              lazy-rules
+              :rules="[(val) => !!val || 'Especifique el asunto']"
             >
             </q-input>
           </div>
