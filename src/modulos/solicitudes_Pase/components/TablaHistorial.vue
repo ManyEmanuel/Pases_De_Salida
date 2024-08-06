@@ -11,7 +11,7 @@
         row-key="id"
         rows-per-page-label="Filas por pagina"
         no-data-label="No hay registros"
-        class="tamanoCelda"
+        class="my-sticky-last-column-table"
       >
         <template v-slot:top-right>
           <q-input
@@ -71,7 +71,21 @@
                   <q-tooltip>Ver pase</q-tooltip>
                 </q-btn>
               </div>
-
+              <div v-else-if="col.name == 'estatus'">
+                <q-badge
+                  :color="col.value == 'Aprobado' ? 'green' : 'red'"
+                  text-color="white"
+                  :label="col.value"
+                >
+                  <q-icon
+                    :name="col.value == 'Aprobado' ? 'done' : 'close'"
+                    color="white"
+                  />
+                </q-badge>
+              </div>
+              <label v-else-if="col.name == 'folio'" class="text-bold">{{
+                col.value
+              }}</label>
               <label v-else>{{ col.value }}</label>
             </q-td>
           </q-tr>
@@ -82,11 +96,13 @@
 </template>
 <script setup>
 import { storeToRefs } from "pinia";
-import { useQuasar } from "quasar";
+import { useQuasar, QSpinnerFacebook } from "quasar";
 import { onBeforeMount, ref } from "vue";
 import { useAuthStore } from "../../../stores/auth_store";
 import { useSolicitudPaseStore } from "../../../stores/solicitudes_Pase_store";
 import { useRegistroPaseStore } from "src/stores/registro_Pase_store";
+
+//-----------------------------------------------------------
 
 const $q = useQuasar();
 const solicitudStore = useSolicitudPaseStore();
@@ -95,9 +111,49 @@ const authStore = useAuthStore();
 const { modulo } = storeToRefs(authStore);
 const { historial } = storeToRefs(solicitudStore);
 
+//-----------------------------------------------------------
+
 onBeforeMount(() => {
-  solicitudStore.loadHistorial();
+  cargarData();
 });
+
+//-----------------------------------------------------------
+
+const cargarData = async () => {
+  await solicitudStore.loadHistorial();
+};
+
+const visualizar = async (id) => {
+  pasesStore.loadPaseConsulta(id);
+  pasesStore.actualizarConsulta(true);
+};
+
+const generarPase = async (id) => {
+  $q.loading.show({
+    spinner: QSpinnerFacebook,
+    spinnerColor: "purple-ieen",
+    spinnerSize: 140,
+    backgroundColor: "purple-3",
+    message: "Espere un momento, por favor...",
+    messageColor: "black",
+  });
+  let resp = await solicitudStore.crearPase(id);
+  let { success, msj } = resp;
+  if (success == true) {
+    $q.notify({
+      type: "positive",
+      message: msj,
+    });
+  } else {
+    $q.notify({
+      type: "negative",
+      message: msj,
+    });
+  }
+  $q.loading.hide();
+};
+
+//-----------------------------------------------------------
 
 const columns = [
   {
@@ -108,17 +164,17 @@ const columns = [
     sortable: true,
   },
   {
-    name: "fechaSolicitud",
-    align: "center",
-    label: "Fecha del pase",
-    field: "fechaSolicitud",
-    sortable: true,
-  },
-  {
     name: "estatus",
     align: "center",
     label: "Estatus del pase",
     field: "estatus",
+    sortable: true,
+  },
+  {
+    name: "fechaSolicitud",
+    align: "center",
+    label: "Fecha del pase",
+    field: "fechaSolicitud",
     sortable: true,
   },
   {
@@ -193,35 +249,19 @@ const pagination = ref({
 });
 
 const filter = ref("");
-
-const editar = async (id) => {
-  $q.loading.show();
-  await pasesStore.loadPase(id);
-  pasesStore.updateEditar(true);
-  pasesStore.actualizarModal(true);
-  $q.loading.hide();
-};
-
-const visualizar = async (id) => {
-  pasesStore.loadPaseConsulta(id);
-  pasesStore.actualizarConsulta(true);
-};
-
-const generarPase = async (id) => {
-  $q.loading.show();
-  let resp = await solicitudStore.crearPase(id);
-  let { success, msj } = resp;
-  if (success == true) {
-    $q.notify({
-      type: "positive",
-      message: msj,
-    });
-  } else {
-    $q.notify({
-      type: "negative",
-      message: msj,
-    });
-  }
-  $q.loading.hide();
-};
 </script>
+<style lang="sass">
+.my-sticky-last-column-table
+  thead tr:last-child th:last-child
+    /* bg color is important for th; just specify one */
+    background-color: white
+
+  td:last-child
+    background-color: white
+
+  th:last-child,
+  td:last-child
+    position: sticky
+    right: 0
+    z-index: 1
+</style>

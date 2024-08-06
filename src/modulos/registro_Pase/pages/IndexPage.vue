@@ -1,11 +1,15 @@
 <template>
-  <q-page padding>
-    <div class="row">
-      <div class="col">
+  <q-page>
+    <div class="row bg-grey-2">
+      <div class="col-9">
         <div class="q-pa-md q-gutter-sm">
+          <div class="text-gray-ieen-1 text-h6">Registro de pases</div>
           <q-breadcrumbs>
-            <q-breadcrumbs-el icon="home" to="/" />
-            <q-breadcrumbs-el label="Registro de pases" icon="library_books" />
+            <template v-slot:separator>
+              <q-icon size="1.5em" name="chevron_right" color="primary" />
+            </template>
+            <q-breadcrumbs-el icon="home" label="Inicio" to="/" />
+            <q-breadcrumbs-el class="text-grey-7" label="Registro de pases" />
           </q-breadcrumbs>
         </div>
       </div>
@@ -32,7 +36,7 @@
 </template>
 
 <script setup>
-import { useQuasar } from "quasar";
+import { useQuasar, QSpinnerFacebook } from "quasar";
 import { useRegistroPaseStore } from "src/stores/registro_Pase_store";
 //import { useInstitucionesStore } from "../../../stores/instituciones_store";
 import { useAuthStore } from "../../../stores/auth_store";
@@ -55,14 +59,27 @@ onBeforeMount(() => {
 });
 
 const leerPermisos = async () => {
-  $q.loading.show();
+  $q.loading.show({
+    spinner: QSpinnerFacebook,
+    spinnerColor: "purple-ieen",
+    spinnerSize: 140,
+    backgroundColor: "purple-3",
+    message: "Espere un momento, por favor...",
+    messageColor: "black",
+  });
   await authStore.loadModulo(siglas);
   $q.loading.hide();
 };
 
 const actualizarModal = (valor) => {
-  $q.loading.show();
-
+  $q.loading.show({
+    spinner: QSpinnerFacebook,
+    spinnerColor: "purple-ieen",
+    spinnerSize: 140,
+    backgroundColor: "purple-3",
+    message: "Espere un momento, por favor...",
+    messageColor: "black",
+  });
   //pasesStore.loadInformacionPase();
   pasesStore.actualizarModal(valor);
   pasesStore.loadInformacionPase();

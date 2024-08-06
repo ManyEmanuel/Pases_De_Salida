@@ -67,8 +67,6 @@ const currentMonthDays = computed(() => {
 });
 
 const obtenColor = (title) => {
-  console.log(title);
-
   if (title.includes("Entrada") || title.includes("Salida")) {
     return "green";
   }

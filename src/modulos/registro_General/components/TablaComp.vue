@@ -1,5 +1,5 @@
 <template>
-  <div class="row">
+  <div class="row q-pr-lg q-pl-lg">
     <div class="col">
       <q-table
         :visible-columns="visisble_columns"
@@ -10,6 +10,7 @@
         :pagination="pagination"
         rows-per-page-label="Filas por pagina"
         no-data-label="No hay registros"
+        class="my-sticky-last-column-table"
       >
         <template v-slot:top-right>
           <q-input
@@ -38,16 +39,30 @@
                   <q-tooltip>Ver pase</q-tooltip>
                 </q-btn>
               </div>
+              <div v-else-if="col.name == 'estatus'">
+                <q-badge
+                  :color="col.value == 'Aprobado' ? 'green' : 'red'"
+                  text-color="white"
+                  :label="col.value"
+                >
+                  <q-icon
+                    :name="col.value == 'Aprobado' ? 'done' : 'close'"
+                    color="white"
+                  />
+                </q-badge>
+              </div>
               <div v-else-if="col.name == 'asunto'">
                 <label>{{ col.value }}</label>
                 <q-tooltip
                   :offset="[10, 10]"
-                  v-if="col.value.length != props.row['asunto_Completo'].length"
+                  v-if="col.value.length != props.row.asunto_Completo.length"
                 >
-                  {{ props.row["asunto_Completo"] }}
+                  {{ props.row.asunto_Completo }}
                 </q-tooltip>
               </div>
-
+              <label v-else-if="col.name == 'folio'" class="text-bold">{{
+                col.value
+              }}</label>
               <label v-else>{{ col.value }}</label>
             </q-td>
           </q-tr>
@@ -72,8 +87,7 @@ const { modulo } = storeToRefs(authStore);
 const { pasesGeneral } = storeToRefs(generalStore);
 
 onBeforeMount(() => {
-  generalStore.loadPasesGeneral();
-  generalStore.loadAreasList();
+  cargarData();
 });
 
 const columns = [
@@ -85,17 +99,17 @@ const columns = [
     sortable: true,
   },
   {
-    name: "fechaSolicitud",
-    align: "center",
-    label: "Fecha del pase",
-    field: "fechaSolicitud",
-    sortable: true,
-  },
-  {
     name: "estatus",
     align: "center",
     label: "Estatus del pase",
     field: "estatus",
+    sortable: true,
+  },
+  {
+    name: "fechaSolicitud",
+    align: "center",
+    label: "Fecha del pase",
+    field: "fechaSolicitud",
     sortable: true,
   },
   {
@@ -163,16 +177,35 @@ const visisble_columns = [
 ];
 
 const pagination = ref({
-  //********** */
   page: 1,
-  rowsPerPage: 25,
+  rowsPerPage: 10,
   sortBy: "name",
   descending: false,
 });
 const filter = ref("");
+
+const cargarData = async () => {
+  await generalStore.loadPasesGeneral();
+  await generalStore.loadAreasList();
+};
 
 const visualizar = async (id) => {
   pasesStore.loadPaseConsulta(id);
   pasesStore.actualizarConsulta(true);
 };
 </script>
+<style lang="sass">
+.my-sticky-last-column-table
+  thead tr:last-child th:last-child
+    /* bg color is important for th; just specify one */
+    background-color: white
+
+  td:last-child
+    background-color: white
+
+  th:last-child,
+  td:last-child
+    position: sticky
+    right: 0
+    z-index: 1
+</style>

@@ -12,6 +12,7 @@
         />
 
         <q-toolbar-title> Pases de salida </q-toolbar-title>
+        <q-badge rounded :color="onLine == true ? 'green' : 'red'" />
         <q-btn flat round dense icon="notifications">
           <q-badge v-if="no_notificaciones > 0" color="red" floating>{{
             no_notificaciones > 5 ? "5+" : no_notificaciones
@@ -84,45 +85,46 @@
             expand-separator
             icon="menu_book"
             label="Pases de salida"
-            class="text-purple-ieen label-title text-bold"
+            class="text-grey-8 text-bold"
+            active-class="text-purple-ieen"
           >
             <q-item
               v-if="menuPasesList.some((element) => element == 'PS-REG-PAS')"
               :to="{ name: 'registro_Pases' }"
+              class="text-grey-8 text-bold"
+              active-class="text-purple-ieen"
             >
               <q-item-section avatar>
-                <q-icon name="person" color="purple-ieen" />
+                <q-icon name="person" />
               </q-item-section>
               <q-item-section>
-                <q-item-label class="text-purple-ieen label-title text-bold"
-                  >Mis solicitudes</q-item-label
-                >
+                <q-item-label>Mis solicitudes</q-item-label>
               </q-item-section>
             </q-item>
             <q-item
               v-if="menuPasesList.some((element) => element == 'PS-SOL-PAS')"
               :to="{ name: 'solicitudes_Pases' }"
+              class="text-grey-8 text-bold"
+              active-class="text-purple-ieen"
             >
               <q-item-section avatar>
-                <q-icon name="groups" color="purple-ieen" />
+                <q-icon name="groups" />
               </q-item-section>
               <q-item-section>
-                <q-item-label class="text-purple-ieen label-title text-bold"
-                  >Solicitudes del área</q-item-label
-                >
+                <q-item-label>Solicitudes del área</q-item-label>
               </q-item-section>
             </q-item>
             <q-item
               v-if="menuPasesList.some((element) => element == 'PS-REG-GEN')"
               :to="{ name: 'registro_General' }"
+              class="text-grey-8 text-bold"
+              active-class="text-purple-ieen"
             >
               <q-item-section avatar>
-                <q-icon name="list_alt" color="purple-ieen" />
+                <q-icon name="list_alt" />
               </q-item-section>
               <q-item-section>
-                <q-item-label class="text-purple-ieen label-title text-bold"
-                  >Registro general</q-item-label
-                >
+                <q-item-label>Registro general</q-item-label>
               </q-item-section>
             </q-item>
           </q-expansion-item>
@@ -130,72 +132,73 @@
             expand-separator
             icon="library_books"
             label="Justificantes"
-            class="text-purple-ieen label-title text-bold"
+            class="text-grey-8 text-bold"
+            active-class="text-purple-ieen"
           >
             <q-item
               v-if="menuPasesList.some((element) => element == 'PS-REG-JUS')"
               :to="{ name: 'registro_Justificante' }"
+              class="text-grey-8 text-bold"
+              active-class="text-purple-ieen"
             >
               <q-item-section avatar>
-                <q-icon name="person" color="purple-ieen" />
+                <q-icon name="person" />
               </q-item-section>
               <q-item-section>
-                <q-item-label class="text-purple-ieen label-title text-bold"
-                  >Mis solicitudes</q-item-label
-                >
+                <q-item-label>Mis solicitudes</q-item-label>
               </q-item-section>
             </q-item>
             <q-item
               v-if="menuPasesList.some((element) => element == 'PS-MIS-JUS')"
               :to="{ name: 'solicitudes_Justificantes' }"
+              class="text-grey-8 text-bold"
+              active-class="text-purple-ieen"
             >
               <q-item-section avatar>
-                <q-icon name="groups" color="purple-ieen" />
+                <q-icon name="groups" />
               </q-item-section>
               <q-item-section>
-                <q-item-label class="text-purple-ieen label-title text-bold"
-                  >Solicitudes del área</q-item-label
-                >
+                <q-item-label>Solicitudes del área</q-item-label>
               </q-item-section>
             </q-item>
             <q-item
               v-if="menuPasesList.some((element) => element == 'PS-GEN-JUS')"
               :to="{ name: 'registro_general_justificantes' }"
+              class="text-grey-8 text-bold"
+              active-class="text-purple-ieen"
             >
               <q-item-section avatar>
-                <q-icon name="list_alt" color="purple-ieen" />
+                <q-icon name="list_alt" />
               </q-item-section>
               <q-item-section>
-                <q-item-label class="text-purple-ieen label-title text-bold"
-                  >Registro general</q-item-label
-                >
+                <q-item-label>Registro general</q-item-label>
               </q-item-section>
             </q-item>
           </q-expansion-item>
           <q-item
             v-if="menuPasesList.some((element) => element == 'PS-MISCHECADAS')"
             :to="{ name: 'misChecadas' }"
+            class="text-grey-8 text-bold"
+            active-class="text-purple-ieen"
           >
             <q-item-section avatar>
-              <q-icon name="calendar_month" color="purple-ieen" />
+              <q-icon name="calendar_month" />
             </q-item-section>
             <q-item-section>
-              <q-item-label class="text-purple-ieen label-title text-bold"
-                >Mis checadas</q-item-label
-              >
+              <q-item-label>Mis checadas</q-item-label>
             </q-item-section>
           </q-item>
           <q-item
             v-if="menuPasesList.some((element) => element == 'PS-CHECADAS')"
             :to="{ name: 'checadas' }"
+            class="text-grey-8 text-bold"
+            active-class="text-purple-ieen"
           >
             <q-item-section avatar>
-              <q-icon name="calendar_month" color="purple-ieen" />
+              <q-icon name="calendar_month" />
             </q-item-section>
             <q-item-section>
-              <q-item-label class="text-purple-ieen label-title text-bold"
-                >Checadas</q-item-label
-              >
+              <q-item-label>Checadas</q-item-label>
             </q-item-section>
           </q-item>
         </q-list>
@@ -229,174 +232,166 @@
   </q-layout>
 </template>
 
-<script>
-import { defineComponent, ref } from "vue";
+<script setup>
+import { onMounted, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { onBeforeMount } from "vue";
 import { HubConnectionBuilder, LogLevel } from "@microsoft/signalr";
 import { useNotificacionStore } from "../stores/notificaciones_store";
 import { useAuthStore } from "../stores/auth_store";
 import { storeToRefs } from "pinia";
-import { useQuasar } from "quasar";
-//import EssentialLink from "components/EssentialLink.vue";
+import { useQuasar, QSpinnerFacebook } from "quasar";
 
-export default defineComponent({
-  name: "MainLayout",
+//----------------------------------------------------------
 
-  components: {
-    //EssentialLink,
-  },
+const $q = useQuasar();
+const leftDrawerOpen = ref(false);
+const route = useRoute();
+const router = useRouter();
+const notificacionStore = useNotificacionStore();
+const authStore = useAuthStore();
+const { notificaciones, no_notificaciones, notificaciones_all } =
+  storeToRefs(notificacionStore);
+const usuario = ref("");
+const { modulos, apps } = storeToRefs(authStore);
+const menuPasesList = ref([]);
+const onLine = ref(false);
 
-  setup() {
-    const $q = useQuasar();
-    const leftDrawerOpen = ref(false);
-    const route = useRoute();
-    const router = useRouter();
-    const notificacionStore = useNotificacionStore();
-    const authStore = useAuthStore();
-    const { notificaciones, no_notificaciones, notificaciones_all } =
-      storeToRefs(notificacionStore);
-    const usuario = ref("");
-    const { modulos, sistemas, apps } = storeToRefs(authStore);
-    const menuPasesList = ref([]);
-    onBeforeMount(async () => {
-      if (route.query.key) {
-        localStorage.setItem("key", route.query.key);
-      }
+//----------------------------------------------------------
 
-      if (route.query.sistema) {
-        localStorage.setItem("sistema", route.query.sistema);
-      }
+onBeforeMount(async () => {
+  if (route.query.key) {
+    localStorage.setItem("key", route.query.key);
+  }
 
-      if (route.query.usr) {
-        localStorage.setItem("usuario", route.query.usr);
-        usuario.value = localStorage.getItem("usuario");
-      } else {
-        if (localStorage.getItem("usuario") != null) {
-          usuario.value = localStorage.getItem("usuario");
-        }
-      }
-      await loadMenu();
-      notificacionStore.loadNotificaciones();
-      notificacionStore.loadNotificacionesAll();
-    });
+  if (route.query.sistema) {
+    localStorage.setItem("sistema", route.query.sistema);
+  }
 
-    const connection = new HubConnectionBuilder()
-      .withUrl("http://sistema.ieenayarit.org:9270/hubPases", {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("key")}`,
-        },
-      })
-      .configureLogging(LogLevel.Information)
-      .build();
-
-    connection.on("notificar", (data) => {
-      notificacionStore.loadNotificaciones();
-      notificacionStore.loadNotificacionesAll();
-      $q.notify({
-        message: data,
-        icon: "announcement",
-      });
-    });
-
-    connection
-      .start()
-      .then(() => {
-        console.log("connected");
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-
-    const show = () => {
-      $q.bottomSheet({
-        message: "Aplicaciones",
-        grid: true,
-        actions: apps.value,
-      }).onOk((action) => {
-        if (action.label == "Cerrar sesión") {
-          localStorage.clear();
-          //window.location = "http://sistema.ieenayarit.org:9271?return=false";
-          window.location = "http://sistema.ieenayarit.org:9271?return=false";
-        } else if (action.label == "Ir a universo") {
-          //window.location = "http://sistema.ieenayarit.org:9271?return=true";
-          window.location = "http://sistema.ieenayarit.org:9271?return=true";
-        } else {
-          window.location =
-            action.url +
-            `/#/?key=${localStorage.getItem("key")}&sistema=${
-              action.id
-            }&usr=${localStorage.getItem("usuario")}`;
-        }
-      });
-    };
-
-    const detalle = async (id, tipoSolicitud) => {
-      await notificacionStore.leerNotificacion(id);
-      notificacionStore.loadNotificaciones();
-      notificacionStore.loadNotificacionesAll();
-      if (tipoSolicitud == "Tiene una nueva solicitud") {
-        router.push({ name: "solicitudes_Pases" });
-      } else {
-        router.push({ name: "registro_Pases" });
-      }
-    };
-
-    const loadMenu = async () => {
-      $q.loading.show();
-      await authStore.loadSistemas();
-      await authStore.loadModulos();
-      await authStore.loadPerfil();
-      await authStore.loadDatosEmp();
-      await authStore.loadRolEmp();
-      //console.log("Estos son los modulos", modulos.value);
-      modulos.value.forEach((element) => {
-        switch (element.siglas_Modulo) {
-          case "PS-REG-PAS":
-            menuPasesList.value.push("PS-REG-PAS");
-            break;
-          case "PS-SOL-PAS":
-            menuPasesList.value.push("PS-SOL-PAS");
-            break;
-          case "PS-REG-GEN":
-            menuPasesList.value.push("PS-REG-GEN");
-            break;
-          case "PS-REG-JUS":
-            menuPasesList.value.push("PS-REG-JUS");
-            break;
-
-          case "PS-MIS-JUS":
-            menuPasesList.value.push("PS-MIS-JUS");
-            break;
-          case "PS-MISCHECADAS":
-            menuPasesList.value.push("PS-MISCHECADAS");
-            break;
-          case "PS-CHECADAS":
-            menuPasesList.value.push("PS-CHECADAS");
-            break;
-          case "PS-GEN-JUS":
-            menuPasesList.value.push("PS-GEN-JUS");
-            break;
-        }
-      });
-      $q.loading.hide();
-    };
-
-    return {
-      leftDrawerOpen,
-      menuPasesList,
-      usuario,
-      show,
-      no_notificaciones,
-      notificaciones,
-      notificaciones_all,
-      detalle,
-      toggleLeftDrawer() {
-        leftDrawerOpen.value = !leftDrawerOpen.value;
-      },
-    };
-  },
+  if (route.query.usr) {
+    localStorage.setItem("usuario", route.query.usr);
+    usuario.value = localStorage.getItem("usuario");
+  } else {
+    if (localStorage.getItem("usuario") != null) {
+      usuario.value = localStorage.getItem("usuario");
+    }
+  }
+  await loadMenu();
+  notificacionStore.loadNotificaciones();
+  notificacionStore.loadNotificacionesAll();
 });
+
+onMounted(() => {
+  const connection = new HubConnectionBuilder()
+    .withUrl("http://sistema.ieenayarit.org:9270/hubUniverso", {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("key")}`,
+      },
+    })
+    .configureLogging(LogLevel.Information)
+    .build();
+  connection
+    .start()
+    .then(() => {
+      onLine.value = true;
+    })
+    .catch((err) => {
+      onLine.value = false;
+    });
+  connection.on("notificarUsuario", (data) => {
+    notificacionStore.loadNotificaciones();
+    notificacionStore.loadNotificacionesAll();
+    $q.notify({
+      message: data,
+      icon: "announcement",
+    });
+  });
+});
+
+//----------------------------------------------------------
+
+const show = () => {
+  $q.bottomSheet({
+    message: "Aplicaciones",
+    grid: true,
+    actions: apps.value,
+  }).onOk((action) => {
+    if (action.label == "Cerrar sesión") {
+      localStorage.clear();
+      //window.location = "http://sistema.ieenayarit.org:9271?return=false";
+      window.location = "http://sistema.ieenayarit.org:9271?return=false";
+    } else if (action.label == "Ir a universo") {
+      //window.location = "http://sistema.ieenayarit.org:9271?return=true";
+      window.location = "http://sistema.ieenayarit.org:9271?return=true";
+    } else {
+      window.location =
+        action.url +
+        `/#/?key=${localStorage.getItem("key")}&sistema=${
+          action.id
+        }&usr=${localStorage.getItem("usuario")}`;
+    }
+  });
+};
+
+const detalle = async (id, tipoSolicitud) => {
+  await notificacionStore.leerNotificacion(id);
+  notificacionStore.loadNotificaciones();
+  notificacionStore.loadNotificacionesAll();
+  if (tipoSolicitud == "Tiene una nueva solicitud") {
+    router.push({ name: "solicitudes_Pases" });
+  } else {
+    router.push({ name: "registro_Pases" });
+  }
+};
+
+const toggleLeftDrawer = () => {
+  leftDrawerOpen.value = !leftDrawerOpen.value;
+};
+
+const loadMenu = async () => {
+  $q.loading.show({
+    spinner: QSpinnerFacebook,
+    spinnerColor: "purple-ieen",
+    spinnerSize: 140,
+    backgroundColor: "purple-3",
+    message: "Espere un momento, por favor...",
+    messageColor: "black",
+  });
+  await authStore.loadSistemas();
+  await authStore.loadModulos();
+  await authStore.loadPerfil();
+  await authStore.loadDatosEmp();
+  await authStore.loadRolEmp();
+  modulos.value.forEach((element) => {
+    switch (element.siglas_Modulo) {
+      case "PS-REG-PAS":
+        menuPasesList.value.push("PS-REG-PAS");
+        break;
+      case "PS-SOL-PAS":
+        menuPasesList.value.push("PS-SOL-PAS");
+        break;
+      case "PS-REG-GEN":
+        menuPasesList.value.push("PS-REG-GEN");
+        break;
+      case "PS-REG-JUS":
+        menuPasesList.value.push("PS-REG-JUS");
+        break;
+      case "PS-MIS-JUS":
+        menuPasesList.value.push("PS-MIS-JUS");
+        break;
+      case "PS-MISCHECADAS":
+        menuPasesList.value.push("PS-MISCHECADAS");
+        break;
+      case "PS-CHECADAS":
+        menuPasesList.value.push("PS-CHECADAS");
+        break;
+      case "PS-GEN-JUS":
+        menuPasesList.value.push("PS-GEN-JUS");
+        break;
+    }
+  });
+  $q.loading.hide();
+};
 </script>
 <style lang="scss">
 .text-purple-ieen {

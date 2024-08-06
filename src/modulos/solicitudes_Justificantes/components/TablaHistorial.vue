@@ -10,7 +10,7 @@
         row-key="id"
         rows-per-page-label="Filas por pagina"
         no-data-label="No hay registros"
-        class="tamanoCelda"
+        class="my-sticky-last-column-table"
       >
         <template v-slot:top-right>
           <q-input
@@ -50,15 +50,30 @@
                   <q-tooltip>Imprimir justificante</q-tooltip>
                 </q-btn>
               </div>
+              <div v-else-if="col.name == 'estatus'">
+                <q-badge
+                  :color="col.value == 'Aprobado' ? 'green' : 'red'"
+                  text-color="white"
+                  :label="col.value"
+                >
+                  <q-icon
+                    :name="col.value == 'Aprobado' ? 'done' : 'close'"
+                    color="white"
+                  />
+                </q-badge>
+              </div>
               <div v-else-if="col.name == 'area'">
                 <label>{{ col.value }}</label>
                 <q-tooltip
                   :offset="[10, 10]"
-                  v-if="col.value.length != props.row['area_Completa'].length"
+                  v-if="col.value.length != props.row.area_Completa.length"
                 >
-                  {{ props.row["area_Completa"] }}
+                  {{ props.row.area_Completa }}
                 </q-tooltip>
               </div>
+              <label v-else-if="col.name == 'folio'" class="text-bold">{{
+                col.value
+              }}</label>
               <label v-else>{{ col.value }}</label>
             </q-td>
           </q-tr>
@@ -69,7 +84,7 @@
 </template>
 <script setup>
 import { storeToRefs } from "pinia";
-import { useQuasar } from "quasar";
+import { useQuasar, QSpinnerFacebook } from "quasar";
 import { useJustificanteStore } from "src/stores/justificantes_store";
 import { useSolicitudJustificanteStore } from "src/stores/solicitudes_Justificantes_store";
 import { onBeforeMount, ref } from "vue";
@@ -88,8 +103,44 @@ const { historial } = storeToRefs(solicitudJustificanteStore);
 //-----------------------------------------------------------
 
 onBeforeMount(() => {
-  solicitudJustificanteStore.loadHistorialJustificante();
+  cargarData();
 });
+
+//-----------------------------------------------------------
+
+const cargarData = async () => {
+  await solicitudJustificanteStore.loadHistorialJustificante();
+};
+
+const visualizar = async (id) => {
+  await justificanteStore.loadJustificante(id);
+  await justificanteStore.loadDetalleJustificantes(id);
+  justificanteStore.updateVisualizar(true);
+  solicitudJustificanteStore.actualizarModal(true);
+};
+
+const generarVale = async (id) => {
+  let resp = null;
+  $q.loading.show({
+    spinner: QSpinnerFacebook,
+    spinnerColor: "purple-ieen",
+    spinnerSize: 140,
+    backgroundColor: "purple-3",
+    message: "Espere un momento, por favor...",
+    messageColor: "black",
+  });
+  resp = await justificanteStore.loadJustificante(id);
+  await justificanteStore.loadDetalleJustificantes(id);
+  if (resp.success === true) {
+    ValeJustificante();
+  } else {
+    $q.notify({
+      type: "negative",
+      message: msj,
+    });
+  }
+  $q.loading.hide();
+};
 
 //-----------------------------------------------------------
 
@@ -179,29 +230,19 @@ const pagination = ref({
 });
 
 const filter = ref("");
-
-//-----------------------------------------------------------
-
-const visualizar = async (id) => {
-  justificanteStore.loadJustificante(id);
-  justificanteStore.loadDetalleJustificantes(id);
-  justificanteStore.updateVisualizar(true);
-  justificanteStore.actualizarModal(true);
-};
-
-const generarVale = async (id) => {
-  let resp = null;
-  $q.loading.show();
-  resp = await justificanteStore.loadJustificante(id);
-  await justificanteStore.loadDetalleJustificantes(id);
-  if (resp.success === true) {
-    ValeJustificante();
-  } else {
-    $q.notify({
-      type: "negative",
-      message: msj,
-    });
-  }
-  $q.loading.hide();
-};
 </script>
+<style lang="sass">
+.my-sticky-last-column-table
+  thead tr:last-child th:last-child
+    /* bg color is important for th; just specify one */
+    background-color: white
+
+  td:last-child
+    background-color: white
+
+  th:last-child,
+  td:last-child
+    position: sticky
+    right: 0
+    z-index: 1
+</style>
