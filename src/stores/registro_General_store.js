@@ -14,14 +14,13 @@ export const useRegistroGeneralStore = defineStore("registroGeneral", {
     async loadPasesGeneral() {
       try {
         this.textoReporte = null;
-        const resp = await api.get("/PasesSalida/ObtenTodos");
-        let { success, data } = resp.data;
+        let resp = await api.get("/PasesSalida/ObtenTodos");
+        let { data } = resp.data;
         let listPases = data.map((pases) => {
           let fechaSolicitud = "";
           let horaSolicitud = "";
           let llegadaSolicitud = "";
           let vehiculoSolicitud = "";
-
           if (pases.tipo_Pase == "Entrada") {
             let filtro = pases.entrada.split(" ");
             fechaSolicitud = filtro[0];
@@ -56,6 +55,11 @@ export const useRegistroGeneralStore = defineStore("registroGeneral", {
             estatus: pases.estatus,
             folio: pases.folio,
             asunto: pases.asunto,
+            asunto:
+              pases.asunto.length >= 30
+                ? pases.asunto.slice(0, 30) + "..."
+                : pases.asunto,
+            asunto_Completo: pases.asunto,
             responsable_Area: pases.responsable_Area,
             capturista: pases.capturista,
             area: pases.area,
@@ -105,7 +109,6 @@ export const useRegistroGeneralStore = defineStore("registroGeneral", {
           };
         }
       } catch (error) {
-        console.log(error);
         return {
           success: false,
           data: "Ocurrió un error, inténtelo de nuevo. Si el error persiste, contacte a soporte",
@@ -126,7 +129,6 @@ export const useRegistroGeneralStore = defineStore("registroGeneral", {
         let pasesArray = null;
         let inicial = "";
         let final = "";
-
         let areasTrue = areas.filter((x) => x.select == true);
         let tipoPaseTrue = tipoPase.filter((x) => x.select == true);
         let asuntoPaseTrue = asuntoPase.filter((x) => x.select == true);
@@ -328,7 +330,6 @@ export const useRegistroGeneralStore = defineStore("registroGeneral", {
           data: "Filtro correctamente aplicado",
         };
       } catch (error) {
-        console.log(error);
         return {
           success: false,
           data: "Ocurrió un error, inténtelo de nuevo. Si el error persiste, contacte a soporte",
@@ -418,7 +419,6 @@ export const useRegistroGeneralStore = defineStore("registroGeneral", {
 
         doc.save("Reporte_General_Pases_Salida" + ".pdf");
       } catch (error) {
-        console.log(error);
         return {
           success: false,
           data: "Ocurrió un error, inténtelo de nuevo. Si el error persiste, contacte a soporte",

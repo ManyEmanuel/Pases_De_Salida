@@ -66,11 +66,14 @@
                 <label>{{ col.value }}</label>
                 <q-tooltip
                   :offset="[10, 10]"
-                  v-if="col.value.length != props.row['area_Completa'].length"
+                  v-if="col.value.length != props.row.area_Completa.length"
                 >
-                  {{ props.row["area_Completa"] }}
+                  {{ props.row.area_Completa }}
                 </q-tooltip>
               </div>
+              <label v-else-if="col.name == 'folio'" class="text-bold">{{
+                col.value
+              }}</label>
               <label v-else>{{ col.value }}</label>
             </q-td>
           </q-tr>
@@ -81,7 +84,7 @@
 </template>
 <script setup>
 import { storeToRefs } from "pinia";
-import { useQuasar } from "quasar";
+import { useQuasar, QSpinnerFacebook } from "quasar";
 import { useJustificanteStore } from "src/stores/justificantes_store";
 import { useSolicitudJustificanteStore } from "src/stores/solicitudes_Justificantes_store";
 import { onBeforeMount, ref } from "vue";
@@ -118,7 +121,14 @@ const visualizar = async (id) => {
 
 const generarVale = async (id) => {
   let resp = null;
-  $q.loading.show();
+  $q.loading.show({
+    spinner: QSpinnerFacebook,
+    spinnerColor: "purple-ieen",
+    spinnerSize: 140,
+    backgroundColor: "purple-3",
+    message: "Espere un momento, por favor...",
+    messageColor: "black",
+  });
   resp = await justificanteStore.loadJustificante(id);
   await justificanteStore.loadDetalleJustificantes(id);
   if (resp.success === true) {

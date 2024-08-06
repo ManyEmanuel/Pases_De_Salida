@@ -1,5 +1,5 @@
 <template>
-  <div class="row">
+  <div class="row q-pr-lg q-pl-lg">
     <div class="col">
       <q-table
         :visible-columns="visible_columns"
@@ -34,7 +34,7 @@
                   flat
                   round
                   color="purple-ieen"
-                  icon="search"
+                  icon="visibility"
                   @click="visualizar(col.value)"
                 >
                   <q-tooltip>Ver justificante</q-tooltip>
@@ -80,6 +80,31 @@
                   {{ props.row["area_Completa"] }}
                 </q-tooltip>
               </div>
+              <label v-else-if="col.name == 'folio'" class="text-bold">{{
+                col.value
+              }}</label>
+              <div v-else-if="col.name === 'estatus'">
+                <q-badge
+                  :color="
+                    col.value == 'Pendiente'
+                      ? 'orange'
+                      : col.value == 'Aprobado'
+                      ? 'green'
+                      : 'red'
+                  "
+                >
+                  {{ col.value }}
+                  <q-icon
+                    :name="
+                      col.value == 'Aprobado'
+                        ? 'done'
+                        : col.value == 'Pendiente'
+                        ? 'warning'
+                        : 'close'
+                    "
+                  />
+                </q-badge>
+              </div>
               <label v-else>{{ col.value }}</label>
             </q-td>
           </q-tr>
@@ -93,16 +118,16 @@
 import { onBeforeMount, ref } from "vue";
 import { useJustificanteStore } from "src/stores/justificantes_store";
 import { storeToRefs } from "pinia";
-import { useQuasar } from "quasar";
+import { useQuasar, QSpinnerFacebook } from "quasar";
 import { useAuthStore } from "src/stores/auth_store";
 import ValeJustificante from "src/helpers/ValeJustificante";
 
 //-----------------------------------------------------------
 
 const $q = useQuasar();
+const authStore = useAuthStore();
 const justificanteStore = useJustificanteStore();
 const { justificantes } = storeToRefs(justificanteStore);
-const authStore = useAuthStore();
 const { modulo } = storeToRefs(authStore);
 const activar_pdf = ref(false);
 
@@ -115,7 +140,16 @@ onBeforeMount(() => {
 //-----------------------------------------------------------
 
 const cargarData = async () => {
+  $q.loading.show({
+    spinner: QSpinnerFacebook,
+    spinnerColor: "purple-ieen",
+    spinnerSize: 140,
+    backgroundColor: "purple-3",
+    message: "Espere un momento, por favor...",
+    messageColor: "black",
+  });
   await justificanteStore.loadJustificantes();
+  $q.loading.hide();
 };
 
 const cancelar = async (id) => {
@@ -135,7 +169,14 @@ const cancelar = async (id) => {
       label: "No cancelar",
     },
   }).onOk(async () => {
-    $q.loading.show();
+    $q.loading.show({
+      spinner: QSpinnerFacebook,
+      spinnerColor: "purple-ieen",
+      spinnerSize: 140,
+      backgroundColor: "purple-3",
+      message: "Espere un momento, por favor...",
+      messageColor: "black",
+    });
     const resp = await justificanteStore.cancelarJustificante(id);
     if (resp.success) {
       $q.loading.hide();
@@ -157,7 +198,14 @@ const cancelar = async (id) => {
 };
 
 const editar = async (id) => {
-  $q.loading.show();
+  $q.loading.show({
+    spinner: QSpinnerFacebook,
+    spinnerColor: "purple-ieen",
+    spinnerSize: 140,
+    backgroundColor: "purple-3",
+    message: "Espere un momento, por favor...",
+    messageColor: "black",
+  });
   await justificanteStore.loadJustificante(id);
   await justificanteStore.loadDetalleJustificantes(id);
   justificanteStore.actualizarModal(true);
@@ -168,7 +216,14 @@ const editar = async (id) => {
 };
 
 const visualizar = async (id) => {
-  $q.loading.show();
+  $q.loading.show({
+    spinner: QSpinnerFacebook,
+    spinnerColor: "purple-ieen",
+    spinnerSize: 140,
+    backgroundColor: "purple-3",
+    message: "Espere un momento, por favor...",
+    messageColor: "black",
+  });
   await justificanteStore.loadJustificante(id);
   await justificanteStore.loadDetalleJustificantes(id);
   justificanteStore.actualizarModal(true);
@@ -179,7 +234,14 @@ const visualizar = async (id) => {
 
 const imprimir = async (id) => {
   let resp = null;
-  $q.loading.show();
+  $q.loading.show({
+    spinner: QSpinnerFacebook,
+    spinnerColor: "purple-ieen",
+    spinnerSize: 140,
+    backgroundColor: "purple-3",
+    message: "Espere un momento, por favor...",
+    messageColor: "black",
+  });
   resp = await justificanteStore.loadJustificante(id);
   await justificanteStore.loadDetalleJustificantes(id);
   if (resp.success === true) {
@@ -201,6 +263,13 @@ const columns = [
     align: "center",
     label: "Folio",
     field: "folio",
+    sortable: false,
+  },
+  {
+    name: "estatus",
+    align: "center",
+    label: "Estatus",
+    field: "estatus",
     sortable: false,
   },
   {
@@ -240,13 +309,6 @@ const columns = [
     sortable: false,
   },
   {
-    name: "estatus",
-    align: "center",
-    label: "Estatus",
-    field: "estatus",
-    sortable: false,
-  },
-  {
     name: "fecha_Creacion",
     align: "center",
     label: "Fecha de creación",
@@ -271,7 +333,7 @@ const columns = [
 
 const pagination = ref({
   page: 1,
-  rowsPerPage: 25,
+  rowsPerPage: 10,
   sortBy: "name",
   descending: false,
 });
@@ -283,8 +345,7 @@ const visible_columns = [
   "folio",
   "solicitante",
   "responsable_Area",
-  "capturista",
-  "area",
+  "area_Completa",
   "estatus",
   "fecha_Creacion",
   "fecha_Aprobacion_Rechazo",

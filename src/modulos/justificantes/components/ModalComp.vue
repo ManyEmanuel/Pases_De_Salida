@@ -7,15 +7,20 @@
   >
     <q-card style="width: 900px; max-width: 90vw">
       <q-card-section class="row">
-        <div class="text-h5 text-purple-ieen text-bold absolute-center">
+        <q-img src="../../../assets/IEEN300.png" width="90px" />
+        <div class="text-h5 text-gray-ieen-1 text-bold absolute-center">
           {{
             isEditar
-              ? "Editar justificante"
+              ? `EDITAR JUSTIFICANTE`
               : isVisualizar
-              ? "Ver justificante"
-              : "Crear justificante"
+              ? "VER JUSTIFICANTE"
+              : "CREAR JUSTIFICANTE"
           }}
+          <div class="text-subtitle1 text-purple-ieen text-center text-bold">
+            {{ justificante.folio }}
+          </div>
         </div>
+
         <q-space />
         <q-btn
           icon="close"
@@ -31,48 +36,48 @@
           <div class="row">
             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 q-pb-sm">
               <q-input
-                filled
                 v-if="isPersonal || isVisualizar"
-                readonly
+                disable
                 v-model="justificante.area"
                 label="Área"
+                color="purple-ieen"
+              >
+                <template v-slot:prepend> <q-icon name="apartment" /> </template
               ></q-input>
               <q-select
                 v-else
-                filled
-                :readonly="isAdmi || isEditar"
+                :disable="isAdmi || isEditar"
                 v-model="area_Id"
                 :options="areas"
                 label="Área del empleado"
                 hint="Seleccione un área"
                 lazy-rules
                 :rules="[(val) => !!val || 'El área es requerida']"
+                color="purple-ieen"
               >
+                <template v-slot:prepend>
+                  <q-icon name="apartment" />
+                </template>
               </q-select>
             </div>
             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 q-pb-sm">
               <q-input
-                filled
-                readonly
+                disable
                 v-model="justificante.capturista"
                 label="Personal que realiza la captura de la solicitud"
+                color="purple-ieen"
               >
+                <template v-slot:prepend>
+                  <q-icon name="person" />
+                </template>
               </q-input>
             </div>
             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 q-pb-sm">
-              <q-input
-                filled
-                v-if="isVisualizar || isPersonal || isEditar"
-                readonly
-                v-model="justificante.solicitante"
-                label="Solicitante"
-              >
-              </q-input>
               <q-select
-                v-else
-                filled
-                :readonly="isEditar"
+                v-if="!isVisualizar"
+                :disable="isEditar || isPersonal"
                 stack-label
+                color="purple-ieen"
                 v-model="empleado_Id"
                 :options="listEmpleados"
                 label="Solicitante"
@@ -80,25 +85,47 @@
                 lazy-rules
                 :rules="[(val) => !!val || 'El solicitante es requerido']"
               >
+                <template v-slot:prepend>
+                  <q-icon name="person" />
+                </template>
               </q-select>
+              <q-input
+                v-else
+                disable
+                v-model="justificante.solicitante"
+                label="Solicitante"
+                color="purple-ieen"
+              >
+                <template v-slot:prepend>
+                  <q-icon name="person" />
+                </template>
+              </q-input>
             </div>
             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
               <q-input
-                filled
-                readonly
+                color="purple-ieen"
+                disable
                 v-model="justificante.responsable_Area"
                 label="Personal que autoriza"
               >
+                <template v-slot:prepend>
+                  <q-icon name="supervisor_account" />
+                </template>
               </q-input>
-              <br />
-              <div class="text-h6 q-pt-xs text-bold">Incidencia</div>
+              <br /><br /><br /><br />
+              <div
+                class="text-h6 q-pt-xs text-bold text-center text-purple-ieen"
+              >
+                <q-icon name="playlist_add" />
+                INCIDENCIA
+              </div>
             </div>
             <div
               v-if="!isVisualizar"
               class="col-lg-3 col-md-3 col-sm-3 col-xs-12 q-pr-xs"
             >
               <q-select
-                filled
+                color="purple-ieen"
                 v-model="tipo"
                 :options="tipoJustificante"
                 label="Seleccione una opción"
@@ -108,14 +135,19 @@
               v-if="!isVisualizar && tipo == 'Vacaciones'"
               class="col-lg-3 col-md-3 col-sm-3 col-xs-12 q-pr-xs"
             >
-              <q-select filled v-model="year" :options="years" label="Año" />
+              <q-select
+                color="purple-ieen"
+                v-model="year"
+                :options="years"
+                label="Año"
+              />
             </div>
             <div
               v-if="tipo == 'Vacaciones' && !isVisualizar"
               class="col-lg-3 col-md-3 col-sm-3 col-xs-12 q-pr-xs"
             >
               <q-select
-                filled
+                color="purple-ieen"
                 v-model="periodoVacacional"
                 :options="periodos_Vacacionales"
                 label="Periodo vacacional"
@@ -126,7 +158,7 @@
               class="col-lg-3 col-md-3 col-sm-3 col-xs-12 q-pl-xs"
             >
               <q-input
-                filled
+                color="purple-ieen"
                 label="Fecha"
                 v-model="days"
                 :disable="tipo == null || vacacionesFijo == true"
@@ -192,10 +224,9 @@
           <div v-if="tipo == 'Otros'" class="text-caption text-red">
             Especificar concepto en el motivo.
           </div>
-
           <div v-if="!isVisualizar" class="col-12">
             <q-input
-              filled
+              color="purple-ieen"
               v-model="motivo"
               label="Motivo: (Especificar en todos los casos)"
               type="textarea"
@@ -208,9 +239,8 @@
             <div class="text-right">
               <q-btn
                 label="Agregar"
-                icon="add"
+                icon-right="add"
                 color="secondary"
-                size="sm"
                 class="q-ml-sm"
                 @click="agregarIncidencia()"
               />
@@ -247,7 +277,7 @@
 
 <script setup>
 import { storeToRefs } from "pinia";
-import { useQuasar, date } from "quasar";
+import { useQuasar, date, QSpinnerFacebook } from "quasar";
 import { useJustificanteStore } from "src/stores/justificantes_store";
 import { onBeforeMount, ref, watch } from "vue";
 import TablaConceptos from "./TablaConceptos.vue";
@@ -299,17 +329,10 @@ onBeforeMount(() => {
 
 //-----------------------------------------------------------
 
-const cargarData = async () => {
-  await justificanteStore.loadInformacionJustificante();
-  await justificanteStore.loadCapturista();
-};
-
 watch(justificante.value, (val) => {
-  if (isEditar == true) {
+  if (val != null) {
     cargarArea(val);
-  }
-  if (val.solicitante_Id != null) {
-    if (isPersonal.value == true) {
+    if (val.solicitante_Id != null && isPersonal.value == true) {
       justificanteStore.loadResponsabeAreaByEmpleado(val.solicitante_Id);
     }
   }
@@ -322,27 +345,6 @@ watch(area_Id, (val) => {
     justificanteStore.loadPersonalArea(val.value, false);
   }
 });
-
-//-----------------------------------------------------------
-
-const cargarArea = async (val) => {
-  if (area_Id.value == null) {
-    let areaFiltrado = areas.value.find((x) => x.value == `${val.area_Id}`);
-    area_Id.value = areaFiltrado;
-    await justificanteStore.loadPersonalArea(val.value, false);
-    cargarSolicitante(val);
-  }
-};
-
-const cargarSolicitante = async (val) => {
-  if (empleado_Id.value == null) {
-    let solicitanteFiltrado = listEmpleados.value.find(
-      (x) => x.value == `${val.solicitante_Id}`
-    );
-    empleado_Id.value = solicitanteFiltrado;
-    personalAutoriza.value = val.responsable_Area;
-  }
-};
 
 watch(tipo, async (val) => {
   if (val != null) {
@@ -373,19 +375,9 @@ watch(year, async (val) => {
   }
 });
 
-watch(modal, (val) => {
-  if (val == true) {
-    justificanteStore.loadInformacionJustificante();
-    cargarArea(justificante.value);
-  }
-});
-
 watch(empleado_Id, (val) => {
-  if (empleado_Id.value != null) {
+  if (val != null) {
     empleado(val);
-    if (isPersonal == false) {
-      justificante.value.responsable_Area = null;
-    }
   }
 });
 
@@ -404,6 +396,32 @@ watch(days, (val) => {
     }
   }
 });
+
+//-----------------------------------------------------------
+
+const cargarData = async () => {
+  await justificanteStore.loadInformacionJustificante();
+  await justificanteStore.loadCapturista();
+};
+
+const cargarArea = async (val) => {
+  if (area_Id.value == null) {
+    let areaFiltrado = areas.value.find((x) => x.value == `${val.area_Id}`);
+    area_Id.value = areaFiltrado;
+    await justificanteStore.loadPersonalArea(val.value, false);
+    cargarSolicitante(val);
+  }
+};
+
+const cargarSolicitante = async (val) => {
+  if (empleado_Id.value == null) {
+    let solicitanteFiltrado = listEmpleados.value.find(
+      (x) => x.value == val.solicitante_Id
+    );
+    empleado_Id.value = solicitanteFiltrado;
+    personalAutoriza.value = val.responsable_Area;
+  }
+};
 
 const diasRestantes = async () => {
   await justificanteStore.loadAsignacionesVacaciones(year.value);
@@ -431,6 +449,7 @@ const diasRestantes = async () => {
 };
 
 const empleado = async (val) => {
+  justificante.value.responsable_Area = null;
   await justificanteStore.loadResponsabeAreaByEmpleado(val.value);
   await justificanteStore.loadDiasRestantes(val.value, year.value);
   if (!tipoJustificante.value.includes("Omisión de entrada")) {
@@ -520,16 +539,22 @@ const calcularFechaNueva = (fecha, dias) => {
   return fechaLimite;
 };
 
-const actualizarModal = (valor) => {
-  $q.loading.show();
+const actualizarModal = async (valor) => {
+  $q.loading.show({
+    spinner: QSpinnerFacebook,
+    spinnerColor: "purple-ieen",
+    spinnerSize: 140,
+    backgroundColor: "purple-3",
+    message: "Espere un momento, por favor...",
+    messageColor: "black",
+  });
   justificanteStore.actualizarModal(valor);
   justificanteStore.updateVisualizar(false);
   justificanteStore.updateEditar(false);
   justificanteStore.updateEditarDetalle(false);
-  justificanteStore.loadCapturista();
+  await justificanteStore.loadCapturista();
   justificanteStore.initJustificante();
   limpiarCampos();
-  justificante.value.solicitante = null;
   listaIncidencias.value = [];
   empleado_Id.value = null;
   justificante.value.responsable_Area = null;
@@ -706,7 +731,14 @@ const limpiarCampos = () => {
 const onSubmit = async () => {
   let resp = null;
 
-  $q.loading.show();
+  $q.loading.show({
+    spinner: QSpinnerFacebook,
+    spinnerColor: "purple-ieen",
+    spinnerSize: 140,
+    backgroundColor: "purple-3",
+    message: "Espere un momento, por favor...",
+    messageColor: "black",
+  });
   if (listaIncidencias.value == "") {
     $q.dialog({
       title: "Atención",

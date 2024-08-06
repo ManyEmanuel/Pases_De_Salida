@@ -11,7 +11,7 @@
         row-key="id"
         rows-per-page-label="Filas por pagina"
         no-data-label="No hay registros"
-        class="tamanoCelda"
+        class="my-sticky-last-column-table"
       >
         <template v-slot:top-right>
           <q-input
@@ -61,7 +61,14 @@
                   <q-tooltip>Ver pase</q-tooltip>
                 </q-btn>
               </div>
-
+              <div v-else-if="col.name == 'estatus'">
+                <q-badge color="orange" text-color="white" :label="col.value">
+                  <q-icon name="warning" color="white" />
+                </q-badge>
+              </div>
+              <label v-else-if="col.name == 'folio'" class="text-bold">{{
+                col.value
+              }}</label>
               <label v-else>{{ col.value }}</label>
             </q-td>
           </q-tr>
@@ -72,7 +79,7 @@
 </template>
 <script setup>
 import { storeToRefs } from "pinia";
-import { useQuasar } from "quasar";
+import { useQuasar, QSpinnerFacebook } from "quasar";
 import { onBeforeMount, ref } from "vue";
 import { useAuthStore } from "../../../stores/auth_store";
 import { useSolicitudPaseStore } from "../../../stores/solicitudes_Pase_store";
@@ -98,17 +105,17 @@ const columns = [
     sortable: true,
   },
   {
-    name: "fechaSolicitud",
-    align: "center",
-    label: "Fecha del pase",
-    field: "fechaSolicitud",
-    sortable: true,
-  },
-  {
     name: "estatus",
     align: "center",
     label: "Estatus del pase",
     field: "estatus",
+    sortable: true,
+  },
+  {
+    name: "fechaSolicitud",
+    align: "center",
+    label: "Fecha del pase",
+    field: "fechaSolicitud",
     sortable: true,
   },
   {
@@ -204,7 +211,14 @@ const aceptar = async (id) => {
       label: "Cancelar",
     },
   }).onOk(async () => {
-    $q.loading.show();
+    $q.loading.show({
+      spinner: QSpinnerFacebook,
+      spinnerColor: "purple-ieen",
+      spinnerSize: 140,
+      backgroundColor: "purple-3",
+      message: "Espere un momento, por favor...",
+      messageColor: "black",
+    });
     const resp = await solicitudStore.aceptarSolicitud(id);
     if (resp.success == true) {
       $q.loading.hide();
@@ -240,7 +254,14 @@ const rechazar = async (id) => {
       label: "Cancelar",
     },
   }).onOk(async () => {
-    $q.loading.show();
+    $q.loading.show({
+      spinner: QSpinnerFacebook,
+      spinnerColor: "purple-ieen",
+      spinnerSize: 140,
+      backgroundColor: "purple-3",
+      message: "Espere un momento, por favor...",
+      messageColor: "black",
+    });
     const resp = await solicitudStore.rechazarSolicitud(id);
     if (resp.success == true) {
       $q.loading.hide();
@@ -259,3 +280,18 @@ const rechazar = async (id) => {
   });
 };
 </script>
+<style lang="sass">
+.my-sticky-last-column-table
+  thead tr:last-child th:last-child
+    /* bg color is important for th; just specify one */
+    background-color: white
+
+  td:last-child
+    background-color: white
+
+  th:last-child,
+  td:last-child
+    position: sticky
+    right: 0
+    z-index: 1
+</style>

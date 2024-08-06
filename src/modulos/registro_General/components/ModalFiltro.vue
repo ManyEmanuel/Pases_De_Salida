@@ -169,9 +169,9 @@
 </template>
 
 <script setup>
-import { onBeforeMount, ref, watch } from "vue";
+import { ref, watch } from "vue";
 import { storeToRefs } from "pinia";
-import { useQuasar } from "quasar";
+import { useQuasar, QSpinnerFacebook } from "quasar";
 import { useAuthStore } from "../../../stores/auth_store";
 import { useRegistroGeneralStore } from "../../../stores/registro_General_store";
 import { useRegistroPaseStore } from "../../../stores/registro_Pase_store";
@@ -228,7 +228,14 @@ watch(fecha, (val) => {
 });
 
 const busquedaFiltro = async () => {
-  $q.loading.show();
+  $q.loading.show({
+    spinner: QSpinnerFacebook,
+    spinnerColor: "purple-ieen",
+    spinnerSize: 140,
+    backgroundColor: "purple-3",
+    message: "Espere un momento, por favor...",
+    messageColor: "black",
+  });
   let areasTrue = listAreas.value.filter((x) => x.select == true);
   let tipoPaseTrue = opcionTipoPase.value.filter((x) => x.select == true);
   let asuntoPaseTrue = opcionAsuntoPase.value.filter((x) => x.select == true);

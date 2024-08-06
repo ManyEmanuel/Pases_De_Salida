@@ -136,7 +136,6 @@ export const useRegistroPaseStore = defineStore("registroPase", {
         let area = parseInt(localStorage.getItem("area"));
         let resp = await api.get("/ResponsablesAreas/ResposableByUsuario");
         let dataresp = resp.data.data;
-
         if (perfil == 1) {
           let respArea = await api.get("Areas/GetLista");
           let { data } = respArea.data;
@@ -233,11 +232,15 @@ export const useRegistroPaseStore = defineStore("registroPase", {
               area: pases.area,
               estatus: pases.estatus,
               folio: pases.folio,
-              asunto: pases.asunto,
               fechaSolicitud:
                 fechaFinal[2] + "-" + fechaFinal[1] + "-" + fechaFinal[0],
               responsable_Area: pases.responsable_Area,
               capturista: pases.capturista,
+              asunto:
+                pases.asunto.length >= 30
+                  ? pases.asunto.slice(0, 30) + "..."
+                  : pases.asunto,
+              asunto_Completa: pases.asunto,
             };
           });
         } else if (perfil == 2) {
@@ -259,7 +262,11 @@ export const useRegistroPaseStore = defineStore("registroPase", {
               area: pases.area,
               estatus: pases.estatus,
               folio: pases.folio,
-              asunto: pases.asunto,
+              asunto:
+                pases.asunto.length >= 30
+                  ? pases.asunto.slice(0, 30) + "..."
+                  : pases.asunto,
+              asunto_Completa: pases.asunto,
               fechaSolicitud:
                 fechaFinal[2] + "-" + fechaFinal[1] + "-" + fechaFinal[0],
               responsable_Area: pases.responsable_Area,
@@ -285,7 +292,11 @@ export const useRegistroPaseStore = defineStore("registroPase", {
               area: pases.area,
               estatus: pases.estatus,
               folio: pases.folio,
-              asunto: pases.asunto,
+              asunto:
+                pases.asunto.length >= 30
+                  ? pases.asunto.slice(0, 30) + "..."
+                  : pases.asunto,
+              asunto_Completa: pases.asunto,
               fechaSolicitud:
                 fechaFinal[2] + "-" + fechaFinal[1] + "-" + fechaFinal[0],
               responsable_Area: pases.responsable_Area,
@@ -608,7 +619,7 @@ export const useRegistroPaseStore = defineStore("registroPase", {
             this.recepcion.folio = "OP-0001-" + anio;
           }
         }
-        console.log("Este es el nuevo folio", this.recepcion.folio);
+        ("Este es el nuevo folio", this.recepcion.folio);
       }
     },*/
 

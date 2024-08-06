@@ -60,15 +60,23 @@
                   <q-tooltip>Ver justificante</q-tooltip>
                 </q-btn>
               </div>
+              <div v-else-if="col.name == 'estatus'">
+                <q-badge color="orange" text-color="white" :label="col.value">
+                  <q-icon name="warning" color="white" />
+                </q-badge>
+              </div>
               <div v-else-if="col.name == 'area'">
                 <label>{{ col.value }}</label>
                 <q-tooltip
                   :offset="[10, 10]"
-                  v-if="col.value.length != props.row['area_Completa'].length"
+                  v-if="col.value.length != props.row.area_Completa.length"
                 >
-                  {{ props.row["area_Completa"] }}
+                  {{ props.row.area_Completa }}
                 </q-tooltip>
               </div>
+              <label v-else-if="col.name == 'folio'" class="text-bold">{{
+                col.value
+              }}</label>
               <label v-else>{{ col.value }}</label>
             </q-td>
           </q-tr>
@@ -80,7 +88,7 @@
 
 <script setup>
 import { storeToRefs } from "pinia";
-import { useQuasar } from "quasar";
+import { useQuasar, QSpinnerFacebook } from "quasar";
 import { useJustificanteStore } from "src/stores/justificantes_store";
 import { onBeforeMount, ref } from "vue";
 import { useAuthStore } from "../../../stores/auth_store";
@@ -226,7 +234,14 @@ const aceptar = async (id) => {
       label: "Cancelar",
     },
   }).onOk(async () => {
-    $q.loading.show();
+    $q.loading.show({
+      spinner: QSpinnerFacebook,
+      spinnerColor: "purple-ieen",
+      spinnerSize: 140,
+      backgroundColor: "purple-3",
+      message: "Espere un momento, por favor...",
+      messageColor: "black",
+    });
     const resp = await solicitudJustificanteStore.aprobarJustificante(id);
     if (resp.success == true) {
       $q.loading.hide();
@@ -262,7 +277,14 @@ const rechazar = async (id) => {
       label: "Cancelar",
     },
   }).onOk(async () => {
-    $q.loading.show();
+    $q.loading.show({
+      spinner: QSpinnerFacebook,
+      spinnerColor: "purple-ieen",
+      spinnerSize: 140,
+      backgroundColor: "purple-3",
+      message: "Espere un momento, por favor...",
+      messageColor: "black",
+    });
     const resp = await solicitudJustificanteStore.rechazarJustificante(id);
     if (resp.success == true) {
       $q.loading.hide();

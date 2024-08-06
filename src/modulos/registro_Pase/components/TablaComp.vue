@@ -1,5 +1,5 @@
 <template>
-  <div class="row">
+  <div class="row q-pr-lg q-pl-lg">
     <div class="col">
       <q-table
         :visible-columns="visisble_columns"
@@ -93,7 +93,40 @@
                   <q-tooltip>Ver pase</q-tooltip>
                 </q-btn>
               </div>
-
+              <div v-else-if="col.name == 'asunto'">
+                <label>{{ col.value }}</label>
+                <q-tooltip
+                  :offset="[10, 10]"
+                  v-if="col.value.length != props.row.asunto_Completa.length"
+                >
+                  {{ props.row.asunto_Completa }}
+                </q-tooltip>
+              </div>
+              <div v-else-if="col.name === 'estatus'">
+                <q-badge
+                  :color="
+                    col.value == 'Pendiente'
+                      ? 'orange'
+                      : col.value == 'Aprobado'
+                      ? 'green'
+                      : 'red'
+                  "
+                >
+                  {{ col.value }}
+                  <q-icon
+                    :name="
+                      col.value == 'Aprobado'
+                        ? 'done'
+                        : col.value == 'Pendiente'
+                        ? 'warning'
+                        : 'close'
+                    "
+                  />
+                </q-badge>
+              </div>
+              <label v-else-if="col.name == 'folio'" class="text-bold">{{
+                col.value
+              }}</label>
               <label v-else>{{ col.value }}</label>
             </q-td>
           </q-tr>
@@ -104,7 +137,7 @@
 </template>
 <script setup>
 import { storeToRefs } from "pinia";
-import { useQuasar } from "quasar";
+import { useQuasar, QSpinnerFacebook } from "quasar";
 import { onBeforeMount, ref } from "vue";
 import { useAuthStore } from "../../../stores/auth_store";
 import { useRegistroPaseStore } from "../../../stores/registro_Pase_store";
@@ -118,7 +151,7 @@ const { modulo } = storeToRefs(authStore);
 const { pases } = storeToRefs(pasesStore);
 
 onBeforeMount(() => {
-  pasesStore.loadPases();
+  cargarData();
 });
 
 const columns = [
@@ -130,17 +163,17 @@ const columns = [
     sortable: true,
   },
   {
-    name: "fechaSolicitud",
-    align: "center",
-    label: "Fecha del pase",
-    field: "fechaSolicitud",
-    sortable: true,
-  },
-  {
     name: "estatus",
     align: "center",
     label: "Estatus del pase",
     field: "estatus",
+    sortable: true,
+  },
+  {
+    name: "fechaSolicitud",
+    align: "center",
+    label: "Fecha del pase",
+    field: "fechaSolicitud",
     sortable: true,
   },
   {
@@ -216,8 +249,28 @@ const pagination = ref({
 
 const filter = ref("");
 
+const cargarData = async () => {
+  $q.loading.show({
+    spinner: QSpinnerFacebook,
+    spinnerColor: "purple-ieen",
+    spinnerSize: 140,
+    backgroundColor: "purple-3",
+    message: "Espere un momento, por favor...",
+    messageColor: "black",
+  });
+  await pasesStore.loadPases();
+  $q.loading.hide();
+};
+
 const generarPase = async (id) => {
-  $q.loading.show();
+  $q.loading.show({
+    spinner: QSpinnerFacebook,
+    spinnerColor: "purple-ieen",
+    spinnerSize: 140,
+    backgroundColor: "purple-3",
+    message: "Espere un momento, por favor...",
+    messageColor: "black",
+  });
   let resp = await solicitudStore.crearPase(id);
   let { success, msj } = resp;
   if (success == true) {
@@ -240,7 +293,14 @@ const visualizar = async (id) => {
 };
 
 const editar = async (id) => {
-  $q.loading.show();
+  $q.loading.show({
+    spinner: QSpinnerFacebook,
+    spinnerColor: "purple-ieen",
+    spinnerSize: 140,
+    backgroundColor: "purple-3",
+    message: "Espere un momento, por favor...",
+    messageColor: "black",
+  });
   await pasesStore.loadPase(id);
   pasesStore.updateEditar(true);
   pasesStore.actualizarModal(true);
@@ -264,7 +324,14 @@ const cancelar = async (id) => {
       label: " No Cancelar",
     },
   }).onOk(async () => {
-    $q.loading.show();
+    $q.loading.show({
+      spinner: QSpinnerFacebook,
+      spinnerColor: "purple-ieen",
+      spinnerSize: 140,
+      backgroundColor: "purple-3",
+      message: "Espere un momento, por favor...",
+      messageColor: "black",
+    });
     const resp = await pasesStore.deletePase(id);
     if (resp.success) {
       $q.loading.hide();

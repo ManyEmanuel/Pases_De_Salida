@@ -7,8 +7,12 @@
   >
     <q-card style="width: 900px; max-width: 90vw">
       <q-card-section class="row">
-        <div class="text-h5 text-purple-ieen text-bold absolute-center">
-          Ver justificante
+        <q-img src="../../../assets/IEEN300.png" width="90px" />
+        <div class="text-h5 text-gray-ieen-1 text-bold absolute-center">
+          VER JUSTIFICANTE
+          <div class="text-subtitle1 text-purple-ieen text-center text-bold">
+            {{ justificante.folio }}
+          </div>
         </div>
         <q-space />
         <q-btn
@@ -23,33 +27,50 @@
       <q-card-section>
         <div class="row">
           <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 q-pb-sm">
-            <q-input filled readonly v-model="justificante.area" label="Área" />
+            <q-input disable v-model="justificante.area" label="Área">
+              <template v-slot:prepend>
+                <q-icon name="apartment" />
+              </template>
+            </q-input>
           </div>
           <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 q-pb-sm">
             <q-input
-              filled
-              readonly
+              disable
               v-model="justificante.capturista"
               label="Personal que realiza la captura de la solicitud"
-            />
+            >
+              <template v-slot:prepend>
+                <q-icon name="person" />
+              </template>
+            </q-input>
           </div>
           <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 q-pb-sm">
             <q-input
-              filled
-              readonly
+              disable
               v-model="justificante.solicitante"
               label="Solicitante"
-            />
+            >
+              <template v-slot:prepend>
+                <q-icon name="person" />
+              </template>
+            </q-input>
           </div>
           <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
             <q-input
-              filled
-              readonly
+              disable
               v-model="justificante.responsable_Area"
               label="Personal que autoriza"
-            />
+            >
+              <template v-slot:prepend>
+                <q-icon name="supervisor_account" />
+              </template>
+            </q-input>
+            <br /><br /><br />
+            <div class="text-h6 q-pt-xs text-bold text-center text-purple-ieen">
+              <q-icon name="playlist_add" />
+              INCIDENCIA
+            </div>
             <br />
-            <div class="text-h6 q-pt-xs text-bold">Incidencia</div>
           </div>
         </div>
         <div class="row">

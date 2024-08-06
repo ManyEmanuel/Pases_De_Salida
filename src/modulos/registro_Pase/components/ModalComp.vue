@@ -7,7 +7,10 @@
   >
     <q-card style="width: 800px; max-width: 80vw">
       <q-card-section class="row">
-        <div class="text-h6">Registro de pase</div>
+        <q-img src="../../../assets/IEEN300.png" width="90px" />
+        <div class="text-h5 text-gray-ieen-1 text-bold absolute-center">
+          REGISTRO DE PASE
+        </div>
         <q-space />
         <q-btn
           icon="close"
@@ -19,7 +22,7 @@
         />
       </q-card-section>
       <q-card-section>
-        <q-form class="row q-col-gutter-xs" @submit="onSubmit">
+        <q-form class="row q-col-gutter-md" @submit="onSubmit">
           <div
             v-if="isEditar == true"
             class="col-lg-6 col-md-6 col-sm-12 col-xs-12"
@@ -34,6 +37,7 @@
           </div>
           <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
             <q-select
+              color="purple-ieen"
               v-model="pase.tipo_Pase"
               :options="opcionTipoPase"
               label="Tipo de pase"
@@ -45,6 +49,7 @@
           </div>
           <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
             <q-select
+              color="purple-ieen"
               v-model="pase.tipo_Asunto"
               :options="opcionAsuntoPase"
               label="Asunto de pase"
@@ -56,6 +61,7 @@
           </div>
           <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
             <q-select
+              color="purple-ieen"
               v-model="area_Id"
               :options="areas"
               label="Area del empleado"
@@ -76,6 +82,7 @@
           </div>
           <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
             <q-select
+              color="purple-ieen"
               v-model="empleado_Id"
               :options="empleados"
               :readonly="personalRead"
@@ -90,12 +97,12 @@
             <q-input v-model="pase.puesto_Solicitante" disable label="Puesto">
             </q-input>
           </div>
-
           <div
             v-if="verEntrada == true"
             class="col-lg-6 col-md-6 col-sm-12 col-xs-12"
           >
             <q-input
+              color="purple-ieen"
               label="Fecha y hora de entrada"
               hint="Ingrese fecha y hora (Formato 24 horas)"
               v-model="pase.entrada"
@@ -161,6 +168,7 @@
             class="col-lg-6 col-md-6 col-sm-12 col-xs-12"
           >
             <q-input
+              color="purple-ieen"
               label="Fecha y hora de salida"
               hint="Ingrese fecha y hora (Formato 24 horas)"
               v-model="pase.salida"
@@ -225,6 +233,7 @@
             class="col-lg-6 col-md-6 col-sm-12 col-xs-12"
           >
             <q-input
+              color="purple-ieen"
               label="Hora estimada de llegada"
               hint="Ingrese hora estimada de llegada (Formato 24 horas)"
               v-model="pase.llegada"
@@ -259,7 +268,6 @@
               </template>
             </q-input>
           </div>
-
           <div
             v-if="verCombo == true"
             class="col-lg-6 col-md-6 col-sm-12 col-xs-12 text-center"
@@ -285,6 +293,7 @@
             class="col-lg-6 col-md-6 col-sm-12 col-xs-12"
           >
             <q-select
+              color="purple-ieen"
               v-model="vehiculo_Id"
               :options="vehiculos"
               label="Vehiculos disponibles"
@@ -295,9 +304,10 @@
           </div>
           <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
             <q-input
+              color="purple-ieen"
+              type="textarea"
               v-model="pase.asunto"
               label="Asunto"
-              autogrow
               counter
               maxlength="500"
               hint="Máximo 500 carácteres"
@@ -310,13 +320,15 @@
               <q-btn
                 label="Cancelar"
                 type="reset"
-                color="negative"
+                color="red"
+                icon-right="close"
                 @click="actualizarModal(false)"
               />
               <q-btn
                 label="Guardar"
                 type="submit"
-                color="positive"
+                color="secondary"
+                icon-right="save"
                 class="q-ml-sm"
               />
             </div>
@@ -330,7 +342,7 @@
 <script setup>
 import { onBeforeMount, ref, watch, watchEffect } from "vue";
 import { storeToRefs } from "pinia";
-import { useQuasar, date } from "quasar";
+import { useQuasar, date, QSpinnerFacebook } from "quasar";
 import { useAuthStore } from "../../../stores/auth_store";
 import { useRegistroPaseStore } from "../../../stores/registro_Pase_store";
 
@@ -509,7 +521,14 @@ const cargarVehiculo = async (val) => {
 
 const onSubmit = async () => {
   let resp = null;
-  $q.loading.show();
+  $q.loading.show({
+    spinner: QSpinnerFacebook,
+    spinnerColor: "purple-ieen",
+    spinnerSize: 140,
+    backgroundColor: "purple-3",
+    message: "Espere un momento, por favor...",
+    messageColor: "black",
+  });
   pase.value.solicitante_Id = empleado_Id.value.value;
   pase.value.area_Id = area_Id.value.value;
   if (verVehiculo.value == true) {

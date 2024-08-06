@@ -99,7 +99,8 @@ export const useJustificanteStore = defineStore("justificante", {
     initJustificante() {
       // this.justificante.id = null;
       this.justificante.solicitante = null;
-      this.justificante.solicitante_Id = null;
+      //this.justificante.solicitante_Id = null;
+      this.justificante.folio = null;
       //this.justificante.area = null;
       //this.justificante.area_Id = null;
       // this.justificante.capturista = null;
@@ -383,7 +384,6 @@ export const useJustificanteStore = defineStore("justificante", {
           let respArea = await api.get("/Areas/AreaByUsuario");
           let { data } = respArea.data;
           let listAreas = [{ value: data.area_Id, label: data.area }];
-
           let respPer = await api.get("/Empleados/ByUsuario");
           let data2 = respPer.data.data;
           let listPersonal = [

@@ -1,30 +1,44 @@
 <template>
-  <q-page padding>
-    <div class="row">
-      <div class="col">
+  <q-page>
+    <div class="row bg-grey-2">
+      <div class="col-9">
         <div class="q-pa-md q-gutter-sm">
+          <div class="text-gray-ieen-1 text-h6">
+            Solicitudes de justificantes
+          </div>
           <q-breadcrumbs>
-            <q-breadcrumbs-el icon="home" to="/" />
+            <template v-slot:separator>
+              <q-icon size="1.5em" name="chevron_right" color="primary" />
+            </template>
+            <q-breadcrumbs-el icon="home" label="Inicio" to="/" />
             <q-breadcrumbs-el
+              class="text-grey-7"
               label="Solicitudes de justificantes"
-              icon="library_books"
             />
           </q-breadcrumbs>
         </div>
       </div>
     </div>
-    <div class="row justify-center">
+    <div class="row justify-center q-pa-lg">
       <q-card class="col">
         <q-tabs
           v-model="tab"
           dense
           align="justify"
-          class="text-purple-ieen"
-          active-color="purple-ieen-1"
-          indicator-color="pink-ieen-1"
+          class="text-grey"
+          active-color="purple-ieen"
+          indicator-color="purple-ieen"
         >
-          <q-tab name="solicitudes" label="Solicitudes pendientes" />
-          <q-tab name="historial" label="Historial de solicitudes" />
+          <q-tab
+            icon="pending"
+            name="solicitudes"
+            label="Solicitudes pendientes"
+          />
+          <q-tab
+            icon="manage_search"
+            name="historial"
+            label="Historial de solicitudes"
+          />
         </q-tabs>
         <q-separator />
         <q-tab-panels v-model="tab" animated class="text-right">
@@ -42,12 +56,38 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { useQuasar, QSpinnerFacebook } from "quasar";
+import { onBeforeMount, ref } from "vue";
+import { useAuthStore } from "../../../stores/auth_store";
 import TablaSolicitudes from "../components/TablaSolicitudes.vue";
 import TablaHistorial from "../components/TablaHistorial.vue";
 import ModalComp from "../components/ModalComp.vue";
 
 //-----------------------------------------------------------
 
+const $q = useQuasar();
 const tab = ref("solicitudes");
+const authStore = useAuthStore();
+const siglas = "PS-MIS-JUS";
+
+//-----------------------------------------------------------
+
+onBeforeMount(() => {
+  leerPermisos();
+});
+
+//-----------------------------------------------------------
+
+const leerPermisos = async () => {
+  $q.loading.show({
+    spinner: QSpinnerFacebook,
+    spinnerColor: "purple-ieen",
+    spinnerSize: 140,
+    backgroundColor: "purple-3",
+    message: "Espere un momento, por favor...",
+    messageColor: "black",
+  });
+  await authStore.loadModulo(siglas);
+  $q.loading.hide();
+};
 </script>

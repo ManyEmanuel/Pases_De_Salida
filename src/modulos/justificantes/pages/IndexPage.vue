@@ -1,14 +1,15 @@
 <template>
-  <q-page padding>
-    <div class="row">
-      <div class="col">
+  <q-page>
+    <div class="row bg-grey-2">
+      <div class="col-9">
         <div class="q-pa-md q-gutter-sm">
+          <div class="text-gray-ieen-1 text-h6">Registro de justificantes</div>
           <q-breadcrumbs>
-            <q-breadcrumbs-el icon="home" to="/" />
-            <q-breadcrumbs-el
-              label="Registro de justificantes"
-              icon="library_books"
-            />
+            <template v-slot:separator>
+              <q-icon size="1.5em" name="chevron_right" color="primary" />
+            </template>
+            <q-breadcrumbs-el icon="home" label="Inicio" to="/" />
+            <q-breadcrumbs-el class="text-grey-7" label="Mis solicitudes" />
           </q-breadcrumbs>
         </div>
       </div>
@@ -35,7 +36,7 @@
 
 <script setup>
 import { storeToRefs } from "pinia";
-import { useQuasar } from "quasar";
+import { useQuasar, QSpinnerFacebook } from "quasar";
 import { useJustificanteStore } from "src/stores/justificantes_store";
 import { onBeforeMount } from "vue";
 import { useAuthStore } from "../../../stores/auth_store";
@@ -59,14 +60,19 @@ onBeforeMount(() => {
 //-----------------------------------------------------------
 
 const leerPermisos = async () => {
-  $q.loading.show();
+  $q.loading.show({
+    spinner: QSpinnerFacebook,
+    spinnerColor: "purple-ieen",
+    spinnerSize: 140,
+    backgroundColor: "purple-3",
+    message: "Espere un momento, por favor...",
+    messageColor: "black",
+  });
   await authStore.loadModulo(siglas);
   $q.loading.hide();
 };
 
 const actualizarModal = (valor) => {
-  $q.loading.show();
   justificanteStore.actualizarModal(valor);
-  $q.loading.hide();
 };
 </script>
