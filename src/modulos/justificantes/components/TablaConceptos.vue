@@ -28,16 +28,6 @@
           <q-tr :props="props">
             <q-td v-for="col in props.cols" :key="col.name" :props="props">
               <div v-if="col.name === 'id'">
-                <!-- <q-btn
-                  v-if="isEditar"
-                  flat
-                  round
-                  color="purple-ieen"
-                  icon="edit"
-                  @click="editar(col.value)"
-                >
-                  <q-tooltip>Editar incidencia</q-tooltip>
-                </q-btn> -->
                 <q-btn
                   flat
                   round
@@ -48,33 +38,6 @@
                   <q-tooltip>Eliminar incidencia</q-tooltip>
                 </q-btn>
               </div>
-              <!-- <div
-                v-else-if="
-                  (isEditar || isVisualizar) && col.name == 'dias_Incidencias'
-                "
-              >
-                <label>{{ col.value }}</label>
-                <q-tooltip
-                  :offset="[10, 10]"
-                  v-if="
-                    col.value.length !=
-                    props.row['dias_Incidencias_Completo'].length
-                  "
-                >
-                  {{ props.row["dias_Incidencias_Completo"] }}
-                </q-tooltip>
-              </div>
-              <div
-                v-else-if="(isEditar || isVisualizar) && col.name == 'motivo'"
-              >
-                <label>{{ col.value }}</label>
-                <q-tooltip
-                  :offset="[10, 10]"
-                  v-if="col.value.length != props.row['motivo_Completo'].length"
-                >
-                  {{ props.row["motivo_Completo"] }}
-                </q-tooltip>
-              </div> -->
               <label v-else>{{ col.value }}</label>
             </q-td>
           </q-tr>
@@ -86,7 +49,7 @@
 
 <script setup>
 import { storeToRefs } from "pinia";
-import { useQuasar } from "quasar";
+import { useQuasar, QSpinnerFacebook } from "quasar";
 import { useJustificanteStore } from "src/stores/justificantes_store";
 import { onBeforeMount, ref } from "vue";
 
@@ -150,6 +113,7 @@ const columns = [
     sortable: false,
   },
 ];
+
 const pagination = ref({
   page: 1,
   rowsPerPage: 25,
@@ -183,15 +147,22 @@ const eliminar = async (id) => {
     transitionShow: "scale",
     transitionHide: "scale",
     ok: {
-      color: "positive",
+      color: "secondary",
       label: "Si, Aceptar",
     },
     cancel: {
-      color: "negative",
+      color: "red",
       label: "No cancelar",
     },
   }).onOk(async () => {
-    $q.loading.show();
+    $q.loading.show({
+      spinner: QSpinnerFacebook,
+      spinnerColor: "purple-ieen",
+      spinnerSize: 140,
+      backgroundColor: "purple-3",
+      message: "Espere un momento, por favor...",
+      messageColor: "black",
+    });
     const resp = await justificanteStore.eliminarDetalleJusitifcante(id);
     if (resp.success) {
       $q.loading.hide();
@@ -211,14 +182,5 @@ const eliminar = async (id) => {
   });
 };
 
-const editar = async (id) => {
-  $q.loading.show();
-  await justificanteStore.loadDetalle(id);
-  justificanteStore.updateEditarDetalle(true);
-  $q.loading.hide();
-};
-
 //-----------------------------------------------------------
 </script>
-
-<style></style>

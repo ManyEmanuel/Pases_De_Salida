@@ -11,7 +11,7 @@ import axios from "axios";
 
 const api = axios.create({
   baseURL: "http://sistema.ieenayarit.org:9170/api",
-  //baseURL: "http://sistema.ieenayarit.org:9270/api",
+  //baseURL: "https://2h4s3xbt-7289.usw3.devtunnels.ms/api",
 });
 // const api = axios.create({
 //   baseURL: "http://sistema.ieenayarit.org:9270/api",

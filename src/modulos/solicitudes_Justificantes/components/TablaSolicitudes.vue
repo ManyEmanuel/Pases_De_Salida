@@ -2,6 +2,7 @@
   <div class="row">
     <div class="col">
       <q-table
+        class="my-sticky-last-column-table"
         :visible-columns="visible_columns"
         :rows="solicitudes"
         :columns="columns"
@@ -10,7 +11,6 @@
         row-key="id"
         rows-per-page-label="Filas por pagina"
         no-data-label="No hay registros"
-        class="tamanoCelda"
       >
         <template v-slot:top-right>
           <q-input
@@ -60,15 +60,23 @@
                   <q-tooltip>Ver justificante</q-tooltip>
                 </q-btn>
               </div>
+              <div v-else-if="col.name == 'estatus'">
+                <q-badge color="orange" text-color="white" :label="col.value">
+                  <q-icon name="warning" color="white" />
+                </q-badge>
+              </div>
               <div v-else-if="col.name == 'area'">
                 <label>{{ col.value }}</label>
                 <q-tooltip
                   :offset="[10, 10]"
-                  v-if="col.value.length != props.row['area_Completa'].length"
+                  v-if="col.value.length != props.row.area_Completa.length"
                 >
-                  {{ props.row["area_Completa"] }}
+                  {{ props.row.area_Completa }}
                 </q-tooltip>
               </div>
+              <label v-else-if="col.name == 'folio'" class="text-bold">{{
+                col.value
+              }}</label>
               <label v-else>{{ col.value }}</label>
             </q-td>
           </q-tr>
@@ -80,7 +88,7 @@
 
 <script setup>
 import { storeToRefs } from "pinia";
-import { useQuasar } from "quasar";
+import { useQuasar, QSpinnerFacebook } from "quasar";
 import { useJustificanteStore } from "src/stores/justificantes_store";
 import { onBeforeMount, ref } from "vue";
 import { useAuthStore } from "../../../stores/auth_store";
@@ -98,10 +106,14 @@ const { solicitudes } = storeToRefs(solicitudJustificanteStore);
 //-----------------------------------------------------------
 
 onBeforeMount(() => {
-  solicitudJustificanteStore.loadSolicitudesJustificantes();
+  cargarData();
 });
 
 //-----------------------------------------------------------
+
+const cargarData = async () => {
+  await solicitudJustificanteStore.loadSolicitudesJustificantes();
+};
 
 const columns = [
   {
@@ -200,10 +212,9 @@ const filter = ref("");
 //-----------------------------------------------------------
 
 const visualizar = async (id) => {
-  justificanteStore.loadJustificante(id);
-  justificanteStore.loadDetalleJustificantes(id);
-  justificanteStore.actualizarModal(true);
-  justificanteStore.updateVisualizar(true);
+  await justificanteStore.loadJustificante(id);
+  await justificanteStore.loadDetalleJustificantes(id);
+  solicitudJustificanteStore.actualizarModal(true);
 };
 
 const aceptar = async (id) => {
@@ -215,15 +226,22 @@ const aceptar = async (id) => {
     transitionShow: "scale",
     transitionHide: "scale",
     ok: {
-      color: "positive",
+      color: "secondary",
       label: "¡Sí!, aceptar",
     },
     cancel: {
-      color: "negative",
+      color: "red",
       label: "Cancelar",
     },
   }).onOk(async () => {
-    $q.loading.show();
+    $q.loading.show({
+      spinner: QSpinnerFacebook,
+      spinnerColor: "purple-ieen",
+      spinnerSize: 140,
+      backgroundColor: "purple-3",
+      message: "Espere un momento, por favor...",
+      messageColor: "black",
+    });
     const resp = await solicitudJustificanteStore.aprobarJustificante(id);
     if (resp.success == true) {
       $q.loading.hide();
@@ -251,15 +269,22 @@ const rechazar = async (id) => {
     transitionShow: "scale",
     transitionHide: "scale",
     ok: {
-      color: "positive",
+      color: "secondary",
       label: "¡Sí!, rechazar",
     },
     cancel: {
-      color: "negative",
+      color: "red",
       label: "Cancelar",
     },
   }).onOk(async () => {
-    $q.loading.show();
+    $q.loading.show({
+      spinner: QSpinnerFacebook,
+      spinnerColor: "purple-ieen",
+      spinnerSize: 140,
+      backgroundColor: "purple-3",
+      message: "Espere un momento, por favor...",
+      messageColor: "black",
+    });
     const resp = await solicitudJustificanteStore.rechazarJustificante(id);
     if (resp.success == true) {
       $q.loading.hide();
@@ -278,5 +303,18 @@ const rechazar = async (id) => {
   });
 };
 </script>
+<style lang="sass">
+.my-sticky-last-column-table
+  thead tr:last-child th:last-child
+    /* bg color is important for th; just specify one */
+    background-color: white
 
-<style></style>
+  td:last-child
+    background-color: white
+
+  th:last-child,
+  td:last-child
+    position: sticky
+    right: 0
+    z-index: 1
+</style>

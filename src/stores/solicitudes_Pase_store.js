@@ -68,7 +68,6 @@ export const useSolicitudPaseStore = defineStore("solicitudPase", {
         if (localStorage.getItem("tipoEmp").toString() == "JefeArea") {
           let respTodos = await api.get("/PasesSalida/ObtenTodos");
           let listTodos = respTodos.data.data;
-          console.log("Esto es todos", listTodos);
           let listPendientesTodos = listTodos.map((todos) => {
             let fechaPase = null;
             if (todos.tipo_Pase == "Entrada") {

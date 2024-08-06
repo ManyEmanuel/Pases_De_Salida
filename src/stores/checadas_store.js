@@ -31,7 +31,6 @@ export const useChecadaStore = defineStore("checadas", {
           }
         }
       } catch (error) {
-        console.log(error);
         return {
           success: false,
           data: "Ocurrió un error, inténtelo de nuevo. Si el error persiste, contacte a soporte",
@@ -65,7 +64,6 @@ export const useChecadaStore = defineStore("checadas", {
         if (resp.status == 200) {
           const { success, data } = resp.data;
           if (success) {
-            console.log(data);
             this.checadas = data;
           } else {
             return { success, data };

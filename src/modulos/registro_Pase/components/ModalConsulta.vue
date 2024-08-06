@@ -7,8 +7,12 @@
   >
     <q-card style="width: 800px; max-width: 80vw">
       <q-card-section class="row">
-        <div class="text-h6 text-center">
-          Detalle del pase {{ paseConsulta.folio }}
+        <q-img src="../../../assets/IEEN300.png" width="90px" />
+        <div class="text-h5 text-gray-ieen-1 text-bold absolute-center">
+          DETALLE DEL PASE <br />
+          <p class="text-purple-ieen text-h6 text-center text-bold">
+            {{ paseConsulta.folio }}
+          </p>
         </div>
         <q-space />
         <q-btn
@@ -21,7 +25,7 @@
         />
       </q-card-section>
       <q-card-section>
-        <div class="row q-col-gutter-xs">
+        <div class="row q-col-gutter-md">
           <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
             <q-input v-model="paseConsulta.folio" readonly label="Folio">
             </q-input>

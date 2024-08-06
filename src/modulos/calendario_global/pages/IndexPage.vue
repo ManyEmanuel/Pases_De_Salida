@@ -43,7 +43,7 @@
 </template>
 
 <script setup>
-import { useQuasar } from "quasar";
+import { useQuasar, QSpinnerFacebook } from "quasar";
 import { onBeforeMount, onMounted, ref, watchEffect } from "vue";
 import { storeToRefs } from "pinia";
 import { useChecadaStore } from "../../../stores/checadas_store";
@@ -72,14 +72,28 @@ onMounted(() => {
 });
 
 const load_empleados = async () => {
-  $q.loading.show();
+  $q.loading.show({
+    spinner: QSpinnerFacebook,
+    spinnerColor: "purple-ieen",
+    spinnerSize: 140,
+    backgroundColor: "purple-3",
+    message: "Espere un momento, por favor...",
+    messageColor: "black",
+  });
   await checador_store.load_empleados_calendario();
   await checador_store.load_checadas(fechas.value.from, fechas.value.from);
   $q.loading.hide();
 };
 
 const cargar_checadas = async () => {
-  $q.loading.show();
+  $q.loading.show({
+    spinner: QSpinnerFacebook,
+    spinnerColor: "purple-ieen",
+    spinnerSize: 140,
+    backgroundColor: "purple-3",
+    message: "Espere un momento, por favor...",
+    messageColor: "black",
+  });
   await checador_store.load_checadas(fechas.value.from, fechas.value.to);
   $q.loading.hide();
 };

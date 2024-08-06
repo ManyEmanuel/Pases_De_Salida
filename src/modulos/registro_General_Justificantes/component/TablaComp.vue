@@ -1,6 +1,8 @@
 <template>
-  <div class="row">
-    <div class="text-h6">Seleccione un rango de fechas: {{ nombreDate }}</div>
+  <div class="row q-pa-lg">
+    <div class="text-h6 text-grey-7">
+      Seleccione un rango de fechas: {{ nombreDate }}
+    </div>
     <div class="col">
       <div class="text-right q-pa-md items-start q-gutter-md">
         <q-btn
@@ -33,7 +35,7 @@
       </div>
     </div>
   </div>
-  <div class="row">
+  <div class="row q-pr-lg q-pl-lg">
     <div class="col">
       <q-table
         :rows="listFiltroReporte"
@@ -108,9 +110,9 @@
 </template>
 <script setup>
 import { storeToRefs } from "pinia";
-import { useQuasar } from "quasar";
+import { useQuasar, QSpinnerFacebook } from "quasar";
 import { useJustificanteStore } from "src/stores/justificantes_store";
-import { onBeforeMount, onMounted, ref, watch, watchEffect } from "vue";
+import { onBeforeMount, ref, watch, watchEffect } from "vue";
 import ReporteGeneralJustificantes from "../../../helpers/ReportGeneralJustificantes";
 
 //-----------------------------------------------------------
@@ -131,16 +133,15 @@ const area_Id = ref(null);
 const empleado_Id = ref(null);
 //-----------------------------------------------------------
 //Get fecha actual
-//-----------------------------------------------------------
-//Get fecha actual
 const newDate = new Date();
 const year = newDate.getFullYear();
 const month = String(newDate.getMonth() + 1).padStart(2, "0");
 const day = String(newDate.getDate()).padStart(2, "0");
 const dateActual = ref(`${year}/${month}/${day}`);
+
 //-----------------------------------------------------------
 onBeforeMount(() => {
-  justificanteStore.loadAsignacionesVacaciones();
+  justificanteStore.loadAsignacionesVacaciones(year);
   justificanteStore.loadListAreas();
   justificanteStore.isAdministracion();
   listReporte.value = [];
@@ -278,7 +279,14 @@ watchEffect(() => {
 
 const cargarTabla = async (date) => {
   let resp = null;
-  $q.loading.show();
+  $q.loading.show({
+    spinner: QSpinnerFacebook,
+    spinnerColor: "purple-ieen",
+    spinnerSize: 140,
+    backgroundColor: "purple-3",
+    message: "Espere un momento, por favor...",
+    messageColor: "black",
+  });
   resp = await justificanteStore.reporteJustificantes(date);
 
   if (resp.success) {
@@ -303,7 +311,14 @@ const crearReporte = async () => {
       transitionHide: "scale",
     });
   } else {
-    $q.loading.show();
+    $q.loading.show({
+      spinner: QSpinnerFacebook,
+      spinnerColor: "purple-ieen",
+      spinnerSize: 140,
+      backgroundColor: "purple-3",
+      message: "Espere un momento, por favor...",
+      messageColor: "black",
+    });
     ReporteGeneralJustificantes(date.value);
 
     $q.loading.hide();
