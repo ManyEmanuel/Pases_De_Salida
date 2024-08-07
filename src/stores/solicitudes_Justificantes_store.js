@@ -1,6 +1,8 @@
 import { defineStore } from "pinia";
 import { api } from "src/boot/axios";
+import { EncryptStorage } from "storage-encryption";
 
+const encryptStorage = new EncryptStorage("SECRET_KEY", "sessionStorage");
 export const useSolicitudJustificanteStore = defineStore(
   "solicitudJustifcante",
   {
@@ -72,7 +74,7 @@ export const useSolicitudJustificanteStore = defineStore(
           });
           this.solicitudes = listPendientesArea.filter(
             (x) =>
-              x.solicitante_Id != parseInt(localStorage.getItem("empleado"))
+              x.solicitante_Id != parseInt(encryptStorage.decrypt("empleado"))
           );
         } catch (error) {
           return {

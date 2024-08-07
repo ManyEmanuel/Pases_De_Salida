@@ -233,14 +233,15 @@
 </template>
 
 <script setup>
-import { onMounted, ref } from "vue";
+import { ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { onBeforeMount } from "vue";
-import { HubConnectionBuilder, LogLevel } from "@microsoft/signalr";
 import { useNotificacionStore } from "../stores/notificaciones_store";
 import { useAuthStore } from "../stores/auth_store";
 import { storeToRefs } from "pinia";
 import { useQuasar, QSpinnerFacebook } from "quasar";
+import { useNotifications } from "../helpers/signalRService";
+import { EncryptStorage } from "storage-encryption";
 
 //----------------------------------------------------------
 
@@ -250,63 +251,43 @@ const route = useRoute();
 const router = useRouter();
 const notificacionStore = useNotificacionStore();
 const authStore = useAuthStore();
+const encryptStorage = new EncryptStorage("SECRET_KEY", "sessionStorage");
+const { startConnection, onReceiveNotification, onLine } = useNotifications();
 const { notificaciones, no_notificaciones, notificaciones_all } =
   storeToRefs(notificacionStore);
 const usuario = ref("");
 const { modulos, apps } = storeToRefs(authStore);
 const menuPasesList = ref([]);
-const onLine = ref(false);
 
 //----------------------------------------------------------
 
 onBeforeMount(async () => {
   if (route.query.key) {
-    localStorage.setItem("key", route.query.key);
+    encryptStorage.encrypt("key", route.query.key);
   }
 
   if (route.query.sistema) {
-    localStorage.setItem("sistema", route.query.sistema);
+    encryptStorage.encrypt("sistema", route.query.sistema);
   }
 
   if (route.query.usr) {
-    localStorage.setItem("usuario", route.query.usr);
-    usuario.value = localStorage.getItem("usuario");
+    encryptStorage.encrypt("usuario", route.query.usr);
+    usuario.value = encryptStorage.decrypt("usuario");
   } else {
-    if (localStorage.getItem("usuario") != null) {
-      usuario.value = localStorage.getItem("usuario");
+    if (encryptStorage.decrypt("usuario") != null) {
+      usuario.value = encryptStorage.decrypt("usuario");
     }
   }
   await loadMenu();
-  notificacionStore.loadNotificaciones();
-  notificacionStore.loadNotificacionesAll();
+  await notificacionStore.loadNotificaciones();
+  await notificacionStore.loadNotificacionesAll();
+  conectar_signalr();
 });
 
-onMounted(() => {
-  const connection = new HubConnectionBuilder()
-    .withUrl("http://sistema.ieenayarit.org:9270/hubUniverso", {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("key")}`,
-      },
-    })
-    .configureLogging(LogLevel.Information)
-    .build();
-  connection
-    .start()
-    .then(() => {
-      onLine.value = true;
-    })
-    .catch((err) => {
-      onLine.value = false;
-    });
-  connection.on("notificarUsuario", (data) => {
-    notificacionStore.loadNotificaciones();
-    notificacionStore.loadNotificacionesAll();
-    $q.notify({
-      message: data,
-      icon: "announcement",
-    });
-  });
-});
+const conectar_signalr = async () => {
+  await startConnection();
+  onReceiveNotification();
+};
 
 //----------------------------------------------------------
 
@@ -326,9 +307,9 @@ const show = () => {
     } else {
       window.location =
         action.url +
-        `/#/?key=${localStorage.getItem("key")}&sistema=${
+        `/#/?key=${encryptStorage.decrypt("key")}&sistema=${
           action.id
-        }&usr=${localStorage.getItem("usuario")}`;
+        }&usr=${encryptStorage.decrypt("usuario")}`;
     }
   });
 };

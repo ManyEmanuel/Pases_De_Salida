@@ -1,7 +1,9 @@
 import { defineStore } from "pinia";
 import { api } from "src/boot/axios";
+import { EncryptStorage } from "storage-encryption";
 import moment from "moment-timezone";
 
+const encryptStorage = new EncryptStorage("SECRET_KEY", "sessionStorage");
 export const useRegistroPaseStore = defineStore("registroPase", {
   state: () => ({
     modal: false,
@@ -132,8 +134,8 @@ export const useRegistroPaseStore = defineStore("registroPase", {
 
     async loadInformacionPase() {
       try {
-        let perfil = parseInt(localStorage.getItem("perfil"));
-        let area = parseInt(localStorage.getItem("area"));
+        let perfil = parseInt(encryptStorage.decrypt("perfil"));
+        let area = parseInt(encryptStorage.decrypt("area"));
         let resp = await api.get("/ResponsablesAreas/ResposableByUsuario");
         let dataresp = resp.data.data;
         if (perfil == 1) {
@@ -209,8 +211,8 @@ export const useRegistroPaseStore = defineStore("registroPase", {
 
     async loadPases() {
       try {
-        let perfil = parseInt(localStorage.getItem("perfil"));
-        let area = parseInt(localStorage.getItem("area"));
+        let perfil = parseInt(encryptStorage.decrypt("perfil"));
+        let area = parseInt(encryptStorage.decrypt("area"));
         let resp = null;
         let listPases = null;
         if (perfil == 1) {

@@ -1,8 +1,10 @@
 import { defineStore } from "pinia";
 import { api } from "src/boot/axios";
+import { EncryptStorage } from "storage-encryption";
 import moment from "moment-timezone";
 import jsPDF from "jspdf";
 
+const encryptStorage = new EncryptStorage("SECRET_KEY", "sessionStorage");
 export const useSolicitudPaseStore = defineStore("solicitudPase", {
   state: () => ({
     solicitudes: [],
@@ -65,7 +67,7 @@ export const useSolicitudPaseStore = defineStore("solicitudPase", {
             capturista: pases.capturista,
           };
         });
-        if (localStorage.getItem("tipoEmp").toString() == "JefeArea") {
+        if (encryptStorage.decrypt("tipoEmp").toString() == "JefeArea") {
           let respTodos = await api.get("/PasesSalida/ObtenTodos");
           let listTodos = respTodos.data.data;
           let listPendientesTodos = listTodos.map((todos) => {
@@ -96,17 +98,18 @@ export const useSolicitudPaseStore = defineStore("solicitudPase", {
           });
           let listFiltro = listPendientesTodos.filter(
             (x) =>
-              x.area_Id != parseInt(localStorage.getItem("area")) &&
+              x.area_Id != parseInt(encryptStorage.decrypt("area")) &&
               x.estatus === "Pendiente" &&
               x.responsable_Area_Id ==
-                parseInt(localStorage.getItem("empleado"))
+                parseInt(encryptStorage.decrypt("empleado"))
           );
           listPendientes = listPendientesArea.concat(listFiltro);
         } else {
           listPendientes = listPendientesArea;
         }
         this.solicitudes = listPendientes.filter(
-          (x) => x.solicitante_Id != parseInt(localStorage.getItem("empleado"))
+          (x) =>
+            x.solicitante_Id != parseInt(encryptStorage.decrypt("empleado"))
         );
       } catch (error) {
         console.error(error);
@@ -148,7 +151,7 @@ export const useSolicitudPaseStore = defineStore("solicitudPase", {
             capturista: pases.capturista,
           };
         });
-        if (localStorage.getItem("tipoEmp").toString() == "JefeArea") {
+        if (encryptStorage.decrypt("tipoEmp").toString() == "JefeArea") {
           let respTodos = await api.get("/PasesSalida/ObtenTodos");
           let listTodos = respTodos.data.data;
           let listHistorialTodos = listTodos.map((todos) => {
@@ -179,10 +182,10 @@ export const useSolicitudPaseStore = defineStore("solicitudPase", {
           });
           let listFiltro = listHistorialTodos.filter(
             (x) =>
-              x.area_Id != parseInt(localStorage.getItem("area")) &&
+              x.area_Id != parseInt(encryptStorage.decrypt("area")) &&
               x.estatus != "Pendiente" &&
               x.responsable_Area_Id ==
-                parseInt(localStorage.getItem("empleado"))
+                parseInt(encryptStorage.decrypt("empleado"))
           );
           listHistorial = listHistorialArea.concat(listFiltro);
         } else {
