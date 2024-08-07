@@ -220,12 +220,16 @@ export const useRegistroPaseStore = defineStore("registroPase", {
           let { success, data } = resp.data;
           listPases = data.map((pases) => {
             let fechaPase = null;
+            let asuntoTexto = "";
             if (pases.tipo_Pase == "Entrada") {
               fechaPase = pases.entrada.split(" ");
             } else {
               fechaPase = pases.salida.split(" ");
             }
             let fechaFinal = fechaPase[0].split("-");
+            if (pases.asunto != null) {
+              asuntoTexto = pases.asunto;
+            }
             return {
               id: pases.id,
               solicitante: pases.solicitante,
@@ -239,23 +243,28 @@ export const useRegistroPaseStore = defineStore("registroPase", {
               responsable_Area: pases.responsable_Area,
               capturista: pases.capturista,
               asunto:
-                pases.asunto.length >= 30
-                  ? pases.asunto.slice(0, 30) + "..."
-                  : pases.asunto,
+                asuntoTexto.length >= 30
+                  ? asuntoTexto.slice(0, 30) + "..."
+                  : asuntoTexto,
               asunto_Completa: pases.asunto,
             };
           });
         } else if (perfil == 2) {
           resp = await api.get("/PasesSalida/ByArea");
           let { success, data } = resp.data;
+
           listPases = data.map((pases) => {
             let fechaPase = null;
+            let asuntoTexto = "";
             if (pases.tipo_Pase == "Entrada") {
               fechaPase = pases.entrada.split(" ");
             } else {
               fechaPase = pases.salida.split(" ");
             }
             let fechaFinal = fechaPase[0].split("-");
+            if (pases.asunto != null) {
+              asuntoTexto = pases.asunto;
+            }
             return {
               id: pases.id,
               solicitante: pases.solicitante,
@@ -265,9 +274,9 @@ export const useRegistroPaseStore = defineStore("registroPase", {
               estatus: pases.estatus,
               folio: pases.folio,
               asunto:
-                pases.asunto.length >= 30
-                  ? pases.asunto.slice(0, 30) + "..."
-                  : pases.asunto,
+                asuntoTexto.length >= 30
+                  ? asuntoTexto.slice(0, 30) + "..."
+                  : asuntoTexto,
               asunto_Completa: pases.asunto,
               fechaSolicitud:
                 fechaFinal[2] + "-" + fechaFinal[1] + "-" + fechaFinal[0],
@@ -280,12 +289,16 @@ export const useRegistroPaseStore = defineStore("registroPase", {
           let { success, data } = resp.data;
           listPases = data.map((pases) => {
             let fechaPase = null;
+            let asuntoTexto = "";
             if (pases.tipo_Pase == "Entrada") {
               fechaPase = pases.entrada.split(" ");
             } else {
               fechaPase = pases.salida.split(" ");
             }
             let fechaFinal = fechaPase[0].split("-");
+            if (pases.asunto != null) {
+              asuntoTexto = pases.asunto;
+            }
             return {
               id: pases.id,
               solicitante: pases.solicitante,
@@ -295,9 +308,9 @@ export const useRegistroPaseStore = defineStore("registroPase", {
               estatus: pases.estatus,
               folio: pases.folio,
               asunto:
-                pases.asunto.length >= 30
-                  ? pases.asunto.slice(0, 30) + "..."
-                  : pases.asunto,
+                asuntoTexto.length >= 30
+                  ? asuntoTexto.slice(0, 30) + "..."
+                  : asuntoTexto,
               asunto_Completa: pases.asunto,
               fechaSolicitud:
                 fechaFinal[2] + "-" + fechaFinal[1] + "-" + fechaFinal[0],
