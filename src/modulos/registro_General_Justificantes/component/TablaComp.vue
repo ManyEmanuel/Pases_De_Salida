@@ -92,6 +92,13 @@
                   }`
                 }}
               </div>
+              <div v-else-if="col.name === 'vacaciones_P1'">
+                {{
+                  `${configuracion[0].dias_Primer_Periodo - col.value}/${
+                    configuracion[0].dias_Primer_Periodo
+                  }`
+                }}
+              </div>
               <div v-else-if="col.name === 'vacaciones_P2'">
                 {{
                   `${configuracion[0].dias_Segundo_Periodo - col.value}/${
@@ -99,7 +106,6 @@
                   }`
                 }}
               </div>
-
               <label v-else>{{ col.value }}</label>
             </q-td>
           </q-tr>

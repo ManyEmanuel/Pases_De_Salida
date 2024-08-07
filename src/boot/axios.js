@@ -1,6 +1,8 @@
 import { boot } from "quasar/wrappers";
+import { EncryptStorage } from "storage-encryption";
 import axios from "axios";
 
+const encryptStorage = new EncryptStorage("SECRET_KEY", "sessionStorage");
 // Be careful when using SSR for cross-request state pollution
 // due to creating a Singleton instance here;
 // If any client changes this (global) instance, it might be a
@@ -18,7 +20,7 @@ const api = axios.create({
 // });
 api.interceptors.request.use((config) => {
   config.headers = {
-    Authorization: `Bearer ${localStorage.getItem("key")}`,
+    Authorization: `Bearer ${encryptStorage.decrypt("key")}`,
   };
   return config;
 });

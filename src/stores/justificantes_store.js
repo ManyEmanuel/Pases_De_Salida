@@ -1,6 +1,8 @@
 import { defineStore } from "pinia";
 import { api } from "src/boot/axios";
+import { EncryptStorage } from "storage-encryption";
 
+const encryptStorage = new EncryptStorage("SECRET_KEY", "sessionStorage");
 export const useJustificanteStore = defineStore("justificante", {
   state: () => ({
     modal: false,
@@ -117,7 +119,7 @@ export const useJustificanteStore = defineStore("justificante", {
 
     //-----------------------------------------------------------
     async isAdministracion() {
-      let area = parseInt(localStorage.getItem("area"));
+      let area = parseInt(encryptStorage.decrypt("area"));
       if (area == 6) {
         this.administracion = true;
       } else {
@@ -128,11 +130,11 @@ export const useJustificanteStore = defineStore("justificante", {
     //-----------------------------------------------------------
     async loadJustificantes() {
       try {
-        let tipoEmp = localStorage.getItem("tipoEmp").toString();
+        let tipoEmp = encryptStorage.decrypt("tipoEmp").toString();
         tipoEmp == "JefeArea"
           ? (this.jefeArea = true)
           : (this.jefeArea = false);
-        let perfil = parseInt(localStorage.getItem("perfil"));
+        let perfil = parseInt(encryptStorage.decrypt("perfil"));
         let resp = null;
         let listJustificantes = null;
         if (perfil == 1) {
@@ -349,8 +351,8 @@ export const useJustificanteStore = defineStore("justificante", {
     //-----------------------------------------------------------
     async loadInformacionJustificante() {
       try {
-        let perfil = parseInt(localStorage.getItem("perfil"));
-        let area = parseInt(localStorage.getItem("area"));
+        let perfil = parseInt(encryptStorage.decrypt("perfil"));
+        let area = parseInt(encryptStorage.decrypt("area"));
         let resp = await api.get("/ResponsablesAreas/ResposableByUsuario");
         let dataResp = resp.data.data;
         if (perfil == 1) {
@@ -663,7 +665,7 @@ export const useJustificanteStore = defineStore("justificante", {
     //-----------------------------------------------------------
     async loadPersonalArea(id, especial) {
       try {
-        let area = parseInt(localStorage.getItem("area"));
+        let area = parseInt(encryptStorage.decrypt("area"));
         let idNuevo;
         id == undefined ? (idNuevo = area) : (idNuevo = id);
 

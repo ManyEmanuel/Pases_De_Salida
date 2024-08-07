@@ -1,6 +1,8 @@
 import { defineStore } from "pinia";
 import { api } from "src/boot/axios";
+import { EncryptStorage } from "storage-encryption";
 
+const encryptStorage = new EncryptStorage("SECRET_KEY", "sessionStorage");
 export const useAuthStore = defineStore("auth", {
   state: () => ({
     modulos: [],
@@ -19,14 +21,14 @@ export const useAuthStore = defineStore("auth", {
           const { success, data } = resp.data;
           if (success === true) {
             if (data) {
-              localStorage.setItem("empleado", data.id);
+              encryptStorage.encrypt("empleado", data.id);
               if (data.area_Id == 13) {
                 const emp = await api.get("/ResponsablesAreas");
                 let datosEmp = emp.data.data;
                 let numEmp = datosEmp.find((x) => x.empleado_Id == data.id);
-                localStorage.setItem("area", numEmp.area_Id);
+                encryptStorage.encrypt("area", numEmp.area_Id);
               } else {
-                localStorage.setItem("area", data.area_Id);
+                encryptStorage.encrypt("area", data.area_Id);
               }
             }
           } else {
@@ -55,14 +57,14 @@ export const useAuthStore = defineStore("auth", {
           if (success === true) {
             if (data != null) {
               if (
-                data.empleado_Id == parseInt(localStorage.getItem("empleado"))
+                data.empleado_Id == parseInt(encryptStorage.decrypt("empleado"))
               ) {
-                localStorage.setItem("tipoEmp", "JefeArea");
+                encryptStorage.encrypt("tipoEmp", "JefeArea");
               } else {
-                localStorage.setItem("tipoEmp", "Empleado");
+                encryptStorage.encrypt("tipoEmp", "Empleado");
               }
             } else {
-              localStorage.setItem("tipoEmp", "JefeArea");
+              encryptStorage.encrypt("tipoEmp", "JefeArea");
             }
           } else {
             return { success, data };
@@ -145,7 +147,7 @@ export const useAuthStore = defineStore("auth", {
     },
     async loadModulos() {
       try {
-        const sistema = localStorage.getItem("sistema");
+        const sistema = encryptStorage.decrypt("sistema");
         const resp = await api.get(
           `/PermisosModulosUsuarios/Bysuario/${sistema}`
         );
@@ -198,9 +200,9 @@ export const useAuthStore = defineStore("auth", {
         const resp = await api.get("/SistemasUsuarios/ByUSuario");
         let { data } = resp.data;
         let filtro = data.find(
-          (x) => x.sistema_Id == parseInt(localStorage.getItem("sistema"))
+          (x) => x.sistema_Id == parseInt(encryptStorage.decrypt("sistema"))
         );
-        localStorage.setItem("perfil", filtro.perfil_Id);
+        encryptStorage.encrypt("perfil", filtro.perfil_Id);
       } catch (error) {
         return {
           success: false,
