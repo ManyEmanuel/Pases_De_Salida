@@ -8,7 +8,7 @@ const onLine = ref(false);
 const connection = new signalR.HubConnectionBuilder()
   .withUrl("http://sistema.ieenayarit.org:9170/hubUniverso", {
     accessTokenFactory: () => encryptStorage.decrypt("key"),
-  }) // Reemplaza con la URL de tu hub
+  })
   .withAutomaticReconnect()
   .configureLogging(signalR.LogLevel.Information)
   .build();

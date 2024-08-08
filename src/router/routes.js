@@ -46,6 +46,12 @@ const routes = [
         name: "checadas",
         component: () => import("../modulos/calendario_global/pages/IndexPage"),
       },
+      {
+        path: "/notificaciones",
+        name: "notificaciones",
+        component: () =>
+          import("../modulos/notificaciones/pages/IndexPage.vue"),
+      },
     ],
   },
 

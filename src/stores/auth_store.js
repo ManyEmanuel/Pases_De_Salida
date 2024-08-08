@@ -10,9 +10,6 @@ export const useAuthStore = defineStore("auth", {
     apps: [],
     modulo: null,
   }),
-  getters: {
-    doubleCount: (state) => state.counter * 2,
-  },
   actions: {
     async loadDatosEmp() {
       try {
@@ -93,14 +90,15 @@ export const useAuthStore = defineStore("auth", {
           const { success, data } = resp.data;
           if (success === true) {
             if (data) {
-              const sistemasArray = data.map((sistema) => {
+              this.sistemas = data.map((sistema) => {
                 return {
                   sistema_Id: sistema.sistema_Id,
                   sistema: sistema.sistema,
                   url: sistema.url,
+                  label: sistema.sistema,
+                  value: sistema.sistema_Id,
                 };
               });
-              this.sistemas = sistemasArray;
 
               const appsArray = data.map((app) => {
                 return {
