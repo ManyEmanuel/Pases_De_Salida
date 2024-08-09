@@ -550,8 +550,17 @@ const onSubmit = async () => {
 
     if (resp.success) {
       $q.notify({
+        position: "top-right",
         type: "positive",
         message: resp.data,
+        actions: [
+          {
+            icon: "close",
+            color: "white",
+            round: true,
+            handler: () => {},
+          },
+        ],
       });
       pasesStore.loadPases();
       actualizarModal(false);
@@ -559,6 +568,14 @@ const onSubmit = async () => {
       $q.notify({
         type: "negative",
         message: resp.data,
+        actions: [
+          {
+            icon: "close",
+            color: "white",
+            round: true,
+            handler: () => {},
+          },
+        ],
       });
       //loading.value = false;
     }
@@ -573,15 +590,33 @@ const onSubmit = async () => {
       }
       if (resp.success) {
         $q.notify({
+          position: "top-right",
           type: "positive",
           message: resp.data,
+          actions: [
+            {
+              icon: "close",
+              color: "white",
+              round: true,
+              handler: () => {},
+            },
+          ],
         });
         pasesStore.loadPases();
         actualizarModal(false);
       } else {
         $q.notify({
+          position: "top-right",
           type: "negative",
           message: resp.data,
+          actions: [
+            {
+              icon: "close",
+              color: "white",
+              round: true,
+              handler: () => {},
+            },
+          ],
         });
         //loading.value = false;
       }
@@ -589,6 +624,15 @@ const onSubmit = async () => {
       $q.notify({
         type: "negative",
         message: comparacion.data,
+        position: "top-right",
+        actions: [
+          {
+            icon: "close",
+            color: "white",
+            round: true,
+            handler: () => {},
+          },
+        ],
       });
     }
   }

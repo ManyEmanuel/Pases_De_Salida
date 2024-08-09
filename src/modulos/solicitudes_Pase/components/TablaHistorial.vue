@@ -141,13 +141,31 @@ const generarPase = async (id) => {
   let { success, msj } = resp;
   if (success == true) {
     $q.notify({
+      position: "top-right",
       type: "positive",
       message: msj,
+      actions: [
+        {
+          icon: "close",
+          color: "white",
+          round: true,
+          handler: () => {},
+        },
+      ],
     });
   } else {
     $q.notify({
+      position: "top-right",
       type: "negative",
       message: msj,
+      actions: [
+        {
+          icon: "close",
+          color: "white",
+          round: true,
+          handler: () => {},
+        },
+      ],
     });
   }
   $q.loading.hide();

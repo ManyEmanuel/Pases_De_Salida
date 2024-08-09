@@ -20,7 +20,7 @@
           <q-menu>
             <q-list style="min-width: 100px">
               <div
-                class="q-pl-md q-pt-sm q-pb-sm text-bold text-h6 text-grey-9"
+                class="q-pl-md q-pt-sm q-pb-sm q-pr-md text-bold text-h6 text-grey-9"
               >
                 Notificaciones
               </div>
@@ -81,7 +81,6 @@
         <q-btn flat round dense icon="apps" @click="show" />
       </q-toolbar>
     </q-header>
-
     <q-drawer
       v-model="leftDrawerOpen"
       show-if-above
@@ -232,7 +231,6 @@
         </div>
       </q-img>
     </q-drawer>
-
     <q-page-container>
       <router-view />
     </q-page-container>
@@ -279,7 +277,24 @@ const menuPasesList = ref([]);
 
 onBeforeMount(async () => {
   if (route.query.key) {
+    $q.loading.show({
+      spinner: QSpinnerFacebook,
+      spinnerColor: "purple-ieen",
+      spinnerSize: 140,
+      backgroundColor: "purple-3",
+      message: "Espere un momento, por favor...",
+      messageColor: "black",
+    });
     encryptStorage.encrypt("key", route.query.key);
+    const resp = await authStore.validarToken(
+      route.query.key,
+      route.query.sistema
+    );
+    $q.loading.hide();
+    if (resp.success == false) {
+      encryptStorage.remove("key");
+      window.location = "http://sistema.ieenayarit.org:9271?return=false";
+    }
   }
 
   if (route.query.sistema) {
@@ -357,12 +372,38 @@ const detalle = async (id, tipoSolicitud) => {
 };
 
 const marcarLeido = async () => {
-  for (let index = 0; index < notificaciones_all.value.length; index++) {
-    const element = notificaciones_all.value[index];
-    await notificacionStore.leerNotificacion(element.id);
+  let resp = await notificacionStore.leerTodas();
+  if (resp.success) {
+    $q.notify({
+      position: "top-right",
+      type: "positive",
+      message: resp.data,
+      actions: [
+        {
+          icon: "close",
+          color: "white",
+          round: true,
+          handler: () => {},
+        },
+      ],
+    });
+    await notificacionStore.loadNotificaciones();
+    await notificacionStore.loadNotificacionesAll();
+  } else {
+    $q.notify({
+      position: "top-right",
+      type: "negative",
+      message: resp.data,
+      actions: [
+        {
+          icon: "close",
+          color: "white",
+          round: true,
+          handler: () => {},
+        },
+      ],
+    });
   }
-  await notificacionStore.loadNotificaciones();
-  await notificacionStore.loadNotificacionesAll();
 };
 
 const toggleLeftDrawer = () => {

@@ -12,8 +12,7 @@ const encryptStorage = new EncryptStorage("SECRET_KEY", "sessionStorage");
 // for each client)
 
 const api = axios.create({
-  baseURL: "http://sistema.ieenayarit.org:9270/api",
-  //baseURL: "http://sistema.ieenayarit.org:9270/api",
+  baseURL: "http://sistema.ieenayarit.org:9170/api",
 });
 // const api = axios.create({
 //   baseURL: "http://sistema.ieenayarit.org:9270/api",

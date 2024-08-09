@@ -96,8 +96,28 @@ export const useNotificacionStore = defineStore("Notificaciones", {
     async leerNotificacion(notificacionId) {
       try {
         const resp = await api.get(
-          `/NotificacionesPases/Leer/${notificacionId}`
+          `/NotificacionesUniverso/Leer/${notificacionId}`
         );
+        if (resp.status == 200) {
+          const { success, data } = resp.data;
+          return { success, data };
+        } else {
+          return {
+            success: false,
+            data: "Ocurrió un error, inténtelo de nuevo. Si el error persiste, contacte a soporte",
+          };
+        }
+      } catch (error) {
+        return {
+          success: false,
+          data: "Ocurrió un error, inténtelo de nuevo. Si el error persiste, contacte a soporte",
+        };
+      }
+    },
+
+    async leerTodas() {
+      try {
+        const resp = await api.get("/NotificacionesUniverso/LeerTodas");
         if (resp.status == 200) {
           const { success, data } = resp.data;
           return { success, data };

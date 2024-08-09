@@ -31,10 +31,20 @@ export function useNotifications() {
   const onReceiveNotification = () => {
     connection.on("notificarUsuario", (data) => {
       $q.notify({
+        position: "top-right",
         message: data.titulo,
-        icon: "announcement",
-        color: "purple",
+        icon: data.tipo == "I" ? "announcement" : "warning",
+        color:
+          data.tipo == "I" ? "purple" : data.tipo == "E" ? "red" : "orange",
         caption: data.sistema,
+        actions: [
+          {
+            icon: "close",
+            color: "white",
+            round: true,
+            handler: () => {},
+          },
+        ],
       });
     });
   };

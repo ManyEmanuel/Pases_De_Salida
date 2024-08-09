@@ -25,7 +25,7 @@
             label="Sistemas"
           >
             <template v-slot:before>
-              <div class="text-h6">
+              <div class="text-subtitle1">
                 <q-icon name="arrow_right" />Filtrar por:
               </div>
             </template>
@@ -123,11 +123,20 @@ const cargarData = async () => {
     message: "Espere un momento, por favor...",
     messageColor: "black",
   });
+  await notificacionStore.loadNotificaciones();
   await notificacionStore.loadNotificacionesAll();
   $q.loading.hide();
 };
 
 const toSolicitudes = async (id) => {
+  $q.loading.show({
+    spinner: QSpinnerFacebook,
+    spinnerColor: "purple-ieen",
+    spinnerSize: 140,
+    backgroundColor: "purple-3",
+    message: "Espere un momento, por favor...",
+    messageColor: "black",
+  });
   let resp = await notificacionStore.leerNotificacion(id);
   if (resp.success == true) {
     cargarData();
@@ -135,6 +144,7 @@ const toSolicitudes = async (id) => {
   // router.push({
   //   name: "misSolicitudes",
   // });
+  $q.loading.hide();
 };
 
 const filtrar = (notificaciones, filtro) => {
