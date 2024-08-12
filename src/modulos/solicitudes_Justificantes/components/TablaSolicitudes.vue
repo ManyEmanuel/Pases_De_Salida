@@ -248,13 +248,31 @@ const aceptar = async (id) => {
       $q.notify({
         type: "positive",
         message: resp.data,
+        position: "top-right",
+        actions: [
+          {
+            icon: "close",
+            color: "white",
+            round: true,
+            handler: () => {},
+          },
+        ],
       });
       solicitudJustificanteStore.loadSolicitudesJustificantes();
     } else {
       $q.loading.hide();
       $q.notify({
+        position: "top-right",
         type: "negative",
         message: resp.data,
+        actions: [
+          {
+            icon: "close",
+            color: "white",
+            round: true,
+            handler: () => {},
+          },
+        ],
       });
     }
   });
@@ -289,15 +307,33 @@ const rechazar = async (id) => {
     if (resp.success == true) {
       $q.loading.hide();
       $q.notify({
+        position: "top-right",
         type: "positive",
         message: resp.data,
+        actions: [
+          {
+            icon: "close",
+            color: "white",
+            round: true,
+            handler: () => {},
+          },
+        ],
       });
       solicitudJustificanteStore.loadSolicitudesJustificantes();
     } else {
       $q.loading.hide();
       $q.notify({
+        position: "top-right",
         type: "negative",
         message: resp.data,
+        actions: [
+          {
+            icon: "close",
+            color: "white",
+            round: true,
+            handler: () => {},
+          },
+        ],
       });
     }
   });

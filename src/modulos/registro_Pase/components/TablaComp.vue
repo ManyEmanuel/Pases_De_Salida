@@ -275,13 +275,31 @@ const generarPase = async (id) => {
   let { success, msj } = resp;
   if (success == true) {
     $q.notify({
+      position: "top-right",
       type: "positive",
       message: msj,
+      actions: [
+        {
+          icon: "close",
+          color: "white",
+          round: true,
+          handler: () => {},
+        },
+      ],
     });
   } else {
     $q.notify({
+      position: "top-right",
       type: "negative",
       message: msj,
+      actions: [
+        {
+          icon: "close",
+          color: "white",
+          round: true,
+          handler: () => {},
+        },
+      ],
     });
   }
   $q.loading.hide();
@@ -336,15 +354,33 @@ const cancelar = async (id) => {
     if (resp.success) {
       $q.loading.hide();
       $q.notify({
+        position: "top-right",
         type: "positive",
         message: resp.data,
+        actions: [
+          {
+            icon: "close",
+            color: "white",
+            round: true,
+            handler: () => {},
+          },
+        ],
       });
       pasesStore.loadPases();
     } else {
       $q.loading.hide();
       $q.notify({
+        position: "top-right",
         type: "negative",
         message: resp.data,
+        actions: [
+          {
+            icon: "close",
+            color: "white",
+            round: true,
+            handler: () => {},
+          },
+        ],
       });
     }
   });

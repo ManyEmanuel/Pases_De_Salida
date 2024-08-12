@@ -272,30 +272,70 @@ const busquedaFiltro = async () => {
             $q.notify({
               type: "negative",
               message: "Seleccione al menos un estatus de pase",
+              actions: [
+                {
+                  icon: "close",
+                  color: "white",
+                  round: true,
+                  handler: () => {},
+                },
+              ],
             });
           }
         } else {
           $q.notify({
             type: "negative",
             message: "Seleccione al menos un asunto",
+            actions: [
+              {
+                icon: "close",
+                color: "white",
+                round: true,
+                handler: () => {},
+              },
+            ],
           });
         }
       } else {
         $q.notify({
           type: "negative",
           message: "Seleccione al menos un tipo de pase",
+          actions: [
+            {
+              icon: "close",
+              color: "white",
+              round: true,
+              handler: () => {},
+            },
+          ],
         });
       }
     } else {
       $q.notify({
         type: "negative",
         message: "Seleccione al menos un área",
+        actions: [
+          {
+            icon: "close",
+            color: "white",
+            round: true,
+            handler: () => {},
+          },
+        ],
       });
     }
   } else {
     $q.notify({
       type: "negative",
       message: "Ingrese una fecha, o rango de fechas",
+      actions: [
+        {
+          icon: "close",
+          color: "white",
+          round: true,
+          handler: () => {},
+        },
+      ],
     });
   }
 

@@ -301,6 +301,14 @@ const cargarTabla = async (date) => {
       position: "top-right",
       type: "negative",
       message: resp.data,
+      actions: [
+        {
+          icon: "close",
+          color: "white",
+          round: true,
+          handler: () => {},
+        },
+      ],
     });
   }
   $q.loading.hide();

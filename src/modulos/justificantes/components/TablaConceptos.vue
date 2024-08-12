@@ -170,6 +170,14 @@ const eliminar = async (id) => {
         position: "top-right",
         type: "positive",
         message: resp.data,
+        actions: [
+          {
+            icon: "close",
+            color: "white",
+            round: true,
+            handler: () => {},
+          },
+        ],
       });
     } else {
       $q.loading.hide();
@@ -177,6 +185,14 @@ const eliminar = async (id) => {
         position: "top-right",
         type: "negative",
         message: resp.data,
+        actions: [
+          {
+            icon: "close",
+            color: "white",
+            round: true,
+            handler: () => {},
+          },
+        ],
       });
     }
   });

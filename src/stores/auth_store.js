@@ -10,10 +10,50 @@ export const useAuthStore = defineStore("auth", {
     apps: [],
     modulo: null,
   }),
-  getters: {
-    doubleCount: (state) => state.counter * 2,
-  },
   actions: {
+    //-----------------------------------------------------------
+    async validarToken(token, sistemaId) {
+      try {
+        const resp = await api.get(
+          `/Accesos/ValidaToken/?token=${token}&SistemaId=${sistemaId}`
+        );
+        if (resp.status == 200) {
+          const {
+            success,
+            empleado,
+            perfil,
+            perfil_Id,
+            area,
+            area_Id,
+            puesto,
+            puesto_Id,
+          } = resp.data;
+          if (success === true) {
+            encryptStorage.encrypt("empleado", empleado);
+            encryptStorage.encrypt("perfil", perfil);
+            encryptStorage.encrypt("perfil_Id", perfil_Id);
+            encryptStorage.encrypt("area", area);
+            encryptStorage.encrypt("area_Id", area_Id);
+            encryptStorage.encrypt("puesto", puesto);
+            encryptStorage.encrypt("puesto_Id", puesto_Id);
+            return success;
+          } else {
+            return { success };
+          }
+        } else {
+          return {
+            success: false,
+            data: "Ocurrió un error, inténtelo de nuevo. Si el error persiste, contacte a soporte",
+          };
+        }
+      } catch (error) {
+        return {
+          success: false,
+          data: "Ocurrió un error, inténtelo de nuevo. Si el error persiste, contacte a soporte",
+        };
+      }
+    },
+
     async loadDatosEmp() {
       try {
         const resp = await api.get(`/Empleados/ByUsuario`);
@@ -93,14 +133,15 @@ export const useAuthStore = defineStore("auth", {
           const { success, data } = resp.data;
           if (success === true) {
             if (data) {
-              const sistemasArray = data.map((sistema) => {
+              this.sistemas = data.map((sistema) => {
                 return {
                   sistema_Id: sistema.sistema_Id,
                   sistema: sistema.sistema,
                   url: sistema.url,
+                  label: sistema.sistema,
+                  value: sistema.sistema_Id,
                 };
               });
-              this.sistemas = sistemasArray;
 
               const appsArray = data.map((app) => {
                 return {
@@ -145,6 +186,7 @@ export const useAuthStore = defineStore("auth", {
         };
       }
     },
+
     async loadModulos() {
       try {
         const sistema = encryptStorage.decrypt("sistema");

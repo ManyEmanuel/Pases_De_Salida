@@ -19,10 +19,15 @@
           }}</q-badge>
           <q-menu>
             <q-list style="min-width: 100px">
+              <div
+                class="q-pl-md q-pt-sm q-pb-sm q-pr-md text-bold text-h6 text-grey-9"
+              >
+                Notificaciones
+              </div>
               <div>
                 <q-item
                   style="max-width: 420px"
-                  v-for="notificacion in notificaciones_all"
+                  v-for="notificacion in notificaciones"
                   :key="notificacion.id"
                   clickable
                   v-ripple
@@ -31,7 +36,7 @@
                   <q-item-section>
                     <q-item-label>{{ notificacion.titulo }}</q-item-label>
                     <q-item-label caption lines="3"
-                      >{{ notificacion.descripcion }}
+                      >{{ notificacion.mensaje }}
                     </q-item-label>
                   </q-item-section>
 
@@ -48,16 +53,27 @@
               </div>
               <q-card
                 v-if="notificaciones.length > 0"
-                class="text-center no-shadow no-border"
+                class="text-center no-shadow no-border q-pa-sm"
               >
                 <q-btn
+                  label="Marcar todo como leido"
+                  color="purple-ieen"
+                  flat
+                  class="text-indigo-8"
+                  @click="marcarLeido"
+                ></q-btn>
+                <q-btn
+                  flat
                   label="Ver todos"
                   color="purple-ieen"
-                  style="max-width: 120px !important"
-                  flat
-                  dense
                   class="text-indigo-8"
+                  @click="toNotificaciones"
                 ></q-btn>
+              </q-card>
+              <q-card class="text-center no-shadow no-border q-pa-sm" v-else>
+                <div class="text-indigo-8 text-purple-ieen">
+                  Sin notificaciones
+                </div>
               </q-card>
             </q-list>
           </q-menu>
@@ -65,7 +81,6 @@
         <q-btn flat round dense icon="apps" @click="show" />
       </q-toolbar>
     </q-header>
-
     <q-drawer
       v-model="leftDrawerOpen"
       show-if-above
@@ -216,7 +231,6 @@
         </div>
       </q-img>
     </q-drawer>
-
     <q-page-container>
       <router-view />
     </q-page-container>
@@ -263,7 +277,24 @@ const menuPasesList = ref([]);
 
 onBeforeMount(async () => {
   if (route.query.key) {
+    $q.loading.show({
+      spinner: QSpinnerFacebook,
+      spinnerColor: "purple-ieen",
+      spinnerSize: 140,
+      backgroundColor: "purple-3",
+      message: "Espere un momento, por favor...",
+      messageColor: "black",
+    });
     encryptStorage.encrypt("key", route.query.key);
+    const resp = await authStore.validarToken(
+      route.query.key,
+      route.query.sistema
+    );
+    $q.loading.hide();
+    if (resp.success == false) {
+      encryptStorage.remove("key");
+      window.location = "http://sistema.ieenayarit.org:9271?return=false";
+    }
   }
 
   if (route.query.sistema) {
@@ -291,6 +322,12 @@ const conectar_signalr = async () => {
 
 //----------------------------------------------------------
 
+const toNotificaciones = () => {
+  router.push({
+    name: "notificaciones",
+  });
+};
+
 const show = () => {
   $q.bottomSheet({
     message: "Aplicaciones",
@@ -315,13 +352,57 @@ const show = () => {
 };
 
 const detalle = async (id, tipoSolicitud) => {
+  $q.loading.show({
+    spinner: QSpinnerFacebook,
+    spinnerColor: "purple-ieen",
+    spinnerSize: 140,
+    backgroundColor: "purple-3",
+    message: "Espere un momento, por favor...",
+    messageColor: "black",
+  });
   await notificacionStore.leerNotificacion(id);
-  notificacionStore.loadNotificaciones();
-  notificacionStore.loadNotificacionesAll();
-  if (tipoSolicitud == "Tiene una nueva solicitud") {
-    router.push({ name: "solicitudes_Pases" });
+  await notificacionStore.loadNotificaciones();
+  await notificacionStore.loadNotificacionesAll();
+  // if (tipoSolicitud == "Tiene una nueva solicitud") {
+  //   router.push({ name: "solicitudes_Pases" });
+  // } else {
+  //   router.push({ name: "registro_Pases" });
+  // }
+  $q.loading.hide();
+};
+
+const marcarLeido = async () => {
+  let resp = await notificacionStore.leerTodas();
+  if (resp.success) {
+    $q.notify({
+      position: "top-right",
+      type: "positive",
+      message: resp.data,
+      actions: [
+        {
+          icon: "close",
+          color: "white",
+          round: true,
+          handler: () => {},
+        },
+      ],
+    });
+    await notificacionStore.loadNotificaciones();
+    await notificacionStore.loadNotificacionesAll();
   } else {
-    router.push({ name: "registro_Pases" });
+    $q.notify({
+      position: "top-right",
+      type: "negative",
+      message: resp.data,
+      actions: [
+        {
+          icon: "close",
+          color: "white",
+          round: true,
+          handler: () => {},
+        },
+      ],
+    });
   }
 };
 

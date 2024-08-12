@@ -625,6 +625,14 @@ const agregarIncidencia = async () => {
               position: "top-right",
               type: "positive",
               message: "Se creo con exito",
+              actions: [
+                {
+                  icon: "close",
+                  color: "white",
+                  round: true,
+                  handler: () => {},
+                },
+              ],
             });
             await justificanteStore.loadDetalleJustificantes(
               justificante.value.id
@@ -634,6 +642,14 @@ const agregarIncidencia = async () => {
               position: "top-right",
               type: "negative",
               message: resp.data,
+              actions: [
+                {
+                  icon: "close",
+                  color: "white",
+                  round: true,
+                  handler: () => {},
+                },
+              ],
             });
           }
         } else {
@@ -659,6 +675,14 @@ const agregarIncidencia = async () => {
               position: "top-right",
               type: "positive",
               message: "Se creo con exito",
+              actions: [
+                {
+                  icon: "close",
+                  color: "white",
+                  round: true,
+                  handler: () => {},
+                },
+              ],
             });
             await justificanteStore.loadDetalleJustificantes(
               justificante.value.id
@@ -668,6 +692,14 @@ const agregarIncidencia = async () => {
               position: "top-right",
               type: "negative",
               message: resp.data,
+              actions: [
+                {
+                  icon: "close",
+                  color: "white",
+                  round: true,
+                  handler: () => {},
+                },
+              ],
             });
           }
         }
@@ -770,6 +802,14 @@ const onSubmit = async () => {
         position: "top-right",
         type: "positive",
         message: "Se creo con exito",
+        actions: [
+          {
+            icon: "close",
+            color: "white",
+            round: true,
+            handler: () => {},
+          },
+        ],
       });
       justificanteStore.loadJustificantes();
       actualizarModal(false);
@@ -778,6 +818,14 @@ const onSubmit = async () => {
         position: "top-right",
         type: "negative",
         message: resp.data,
+        actions: [
+          {
+            icon: "close",
+            color: "white",
+            round: true,
+            handler: () => {},
+          },
+        ],
       });
     }
   }

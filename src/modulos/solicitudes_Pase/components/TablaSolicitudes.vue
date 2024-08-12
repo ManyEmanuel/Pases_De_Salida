@@ -225,6 +225,15 @@ const aceptar = async (id) => {
       $q.notify({
         type: "positive",
         message: resp.data,
+        position: "top-right",
+        actions: [
+          {
+            icon: "close",
+            color: "white",
+            round: true,
+            handler: () => {},
+          },
+        ],
       });
       solicitudStore.loadSolicitudes();
     } else {
@@ -232,6 +241,15 @@ const aceptar = async (id) => {
       $q.notify({
         type: "negative",
         message: resp.data,
+        position: "top-right",
+        actions: [
+          {
+            icon: "close",
+            color: "white",
+            round: true,
+            handler: () => {},
+          },
+        ],
       });
     }
   });
@@ -268,6 +286,15 @@ const rechazar = async (id) => {
       $q.notify({
         type: "positive",
         message: resp.data,
+        position: "top-right",
+        actions: [
+          {
+            icon: "close",
+            color: "white",
+            round: true,
+            handler: () => {},
+          },
+        ],
       });
       solicitudStore.loadSolicitudes();
     } else {
@@ -275,6 +302,15 @@ const rechazar = async (id) => {
       $q.notify({
         type: "negative",
         message: resp.data,
+        position: "top-right",
+        actions: [
+          {
+            icon: "close",
+            color: "white",
+            round: true,
+            handler: () => {},
+          },
+        ],
       });
     }
   });
