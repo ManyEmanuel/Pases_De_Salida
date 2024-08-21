@@ -252,5 +252,36 @@ export const useAuthStore = defineStore("auth", {
         };
       }
     },
+
+    async rechazar_Factura(id, motivo) {
+      try {
+        const body = `${motivo}`;
+        const resp = await api.post(
+          `/FacturasDevengadas/Rechazar/${id}`,
+          body,
+          {
+            headers: {
+              "Content-Type": "application/json",
+              accept: "application/json",
+            },
+          }
+        );
+
+        if (resp.status === 200) {
+          const { success, data } = resp.data;
+          return { success, data };
+        } else {
+          return {
+            success: false,
+            data: "Ocurrió un error, inténtelo de nuevo. Si el error persiste, contacte a soporte",
+          };
+        }
+      } catch (error) {
+        return {
+          success: false,
+          data: "Ocurrió un error, inténtelo de nuevo. Si el error persiste, contacte a soporte",
+        };
+      }
+    },
   },
 });

@@ -13,6 +13,7 @@
 
         <q-toolbar-title> Pases de salida </q-toolbar-title>
         <q-badge rounded :color="onLine == true ? 'green' : 'red'" />
+        <q-btn label="Rechazar" @click="rechazar()"></q-btn>
         <q-btn flat round dense icon="notifications">
           <q-badge v-if="no_notificaciones > 0" color="red" floating>{{
             no_notificaciones > 5 ? "5+" : no_notificaciones
@@ -453,6 +454,10 @@ const loadMenu = async () => {
     }
   });
   $q.loading.hide();
+};
+
+const rechazar = async () => {
+  await authStore.rechazar_Factura(24, "hola");
 };
 </script>
 <style lang="scss">
