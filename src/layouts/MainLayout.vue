@@ -13,7 +13,6 @@
 
         <q-toolbar-title> Pases de salida </q-toolbar-title>
         <q-badge rounded :color="onLine == true ? 'green' : 'red'" />
-        <q-btn label="Rechazar" @click="rechazar()"></q-btn>
         <q-btn flat round dense icon="notifications">
           <q-badge v-if="no_notificaciones > 0" color="red" floating>{{
             no_notificaciones > 5 ? "5+" : no_notificaciones
@@ -32,7 +31,7 @@
                   :key="notificacion.id"
                   clickable
                   v-ripple
-                  @click="detalle(notificacion.id, notificacion.titulo)"
+                  @click="detalle(notificacion)"
                 >
                   <q-item-section>
                     <q-item-label>{{ notificacion.titulo }}</q-item-label>
@@ -271,7 +270,7 @@ const { startConnection, onReceiveNotification, onLine } = useNotifications();
 const { notificaciones, no_notificaciones, notificaciones_all } =
   storeToRefs(notificacionStore);
 const usuario = ref("");
-const { modulos, apps } = storeToRefs(authStore);
+const { modulos, apps, sistemas } = storeToRefs(authStore);
 const menuPasesList = ref([]);
 
 //----------------------------------------------------------
@@ -337,6 +336,8 @@ const show = () => {
   }).onOk((action) => {
     if (action.label == "Cerrar sesión") {
       localStorage.clear();
+      sessionStorage.clear();
+      encryptStorage.remove("key");
       //window.location = "http://sistema.ieenayarit.org:9271?return=false";
       window.location = "http://sistema.ieenayarit.org:9271?return=false";
     } else if (action.label == "Ir a universo") {
@@ -352,7 +353,7 @@ const show = () => {
   });
 };
 
-const detalle = async (id, tipoSolicitud) => {
+const detalle = async (row) => {
   $q.loading.show({
     spinner: QSpinnerFacebook,
     spinnerColor: "purple-ieen",
@@ -361,14 +362,22 @@ const detalle = async (id, tipoSolicitud) => {
     message: "Espere un momento, por favor...",
     messageColor: "black",
   });
-  await notificacionStore.leerNotificacion(id);
-  await notificacionStore.loadNotificaciones();
-  await notificacionStore.loadNotificacionesAll();
-  // if (tipoSolicitud == "Tiene una nueva solicitud") {
-  //   router.push({ name: "solicitudes_Pases" });
-  // } else {
-  //   router.push({ name: "registro_Pases" });
-  // }
+  let resp = await notificacionStore.leerNotificacion(row.id);
+  if (resp.success == true) {
+    await notificacionStore.loadNotificaciones();
+  }
+  let url = sistemas.value.find((x) => x.value == row.sistema_Id);
+  if (url.label == "Pases de salida") {
+    router.push({
+      name: "misSolicitudes",
+    });
+  } else {
+    window.location =
+      url.url +
+      `/#/?key=${encryptStorage.decrypt("key")}&sistema=${
+        row.sistema_Id
+      }&usr=${encryptStorage.decrypt("usuario")}`;
+  }
   $q.loading.hide();
 };
 
@@ -454,10 +463,6 @@ const loadMenu = async () => {
     }
   });
   $q.loading.hide();
-};
-
-const rechazar = async () => {
-  await authStore.rechazar_Factura(24, "hola");
 };
 </script>
 <style lang="scss">

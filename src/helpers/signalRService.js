@@ -6,7 +6,7 @@ import * as signalR from "@microsoft/signalr";
 const encryptStorage = new EncryptStorage("SECRET_KEY", "sessionStorage");
 const onLine = ref(false);
 const connection = new signalR.HubConnectionBuilder()
-  .withUrl("http://sistema.ieenayarit.org:9170/hubUniverso", {
+  .withUrl("http://sistema.ieenayarit.org:9270/hubUniverso", {
     accessTokenFactory: () => encryptStorage.decrypt("key"),
   })
   .withAutomaticReconnect()

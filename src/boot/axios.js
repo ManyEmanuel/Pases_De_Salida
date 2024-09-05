@@ -12,7 +12,7 @@ const encryptStorage = new EncryptStorage("SECRET_KEY", "sessionStorage");
 // for each client)
 
 const api = axios.create({
-  baseURL: "http://sistema.ieenayarit.org:9170/api",
+  baseURL: "http://sistema.ieenayarit.org:9270/api",
 });
 // const api = axios.create({
 //   baseURL: "http://sistema.ieenayarit.org:9270/api",
@@ -30,6 +30,8 @@ api.interceptors.response.use(
     if (error.response.status == 401) {
       alert("Su sesión ha expirado, sera redireccionado al logín");
       localStorage.clear();
+      sessionStorage.clear();
+      encryptStorage.remove("key");
       window.location = "http://sistema.ieenayarit.org:9271?return=false";
     }
     return Promise.reject();

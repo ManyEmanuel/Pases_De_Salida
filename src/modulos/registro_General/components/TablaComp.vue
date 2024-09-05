@@ -6,7 +6,6 @@
         :rows="pasesGeneral"
         :columns="columns"
         :filter="filter"
-        :loading="loading"
         :pagination="pagination"
         rows-per-page-label="Filas por pagina"
         no-data-label="No hay registros"

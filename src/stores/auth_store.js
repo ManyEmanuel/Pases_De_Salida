@@ -155,14 +155,14 @@ export const useAuthStore = defineStore("auth", {
                 id: 0,
                 label: "Cerrar sesión",
                 avatar:
-                  "http://sistema.ieenayarit.org:9170/Imagenes/Sistemas/dbb9640f-dd18-4fc3-b530-7041d8594240.png",
+                  "http://sistema.ieenayarit.org:9270/Imagenes/Sistemas/dbb9640f-dd18-4fc3-b530-7041d8594240.png",
                 url: "",
               };
               const universoIEEN = {
                 id: 0,
                 label: "Ir a universo",
                 avatar:
-                  "http://sistema.ieenayarit.org:9170/Imagenes/Sistemas/67cfdabe-0538-4324-b711-93bcb6cb9a60.png",
+                  "http://sistema.ieenayarit.org:9270/Imagenes/Sistemas/67cfdabe-0538-4324-b711-93bcb6cb9a60.png",
                 url: "",
               };
 
@@ -245,37 +245,6 @@ export const useAuthStore = defineStore("auth", {
           (x) => x.sistema_Id == parseInt(encryptStorage.decrypt("sistema"))
         );
         encryptStorage.encrypt("perfil", filtro.perfil_Id);
-      } catch (error) {
-        return {
-          success: false,
-          data: "Ocurrió un error, inténtelo de nuevo. Si el error persiste, contacte a soporte",
-        };
-      }
-    },
-
-    async rechazar_Factura(id, motivo) {
-      try {
-        const body = `${motivo}`;
-        const resp = await api.post(
-          `/FacturasDevengadas/Rechazar/${id}`,
-          body,
-          {
-            headers: {
-              "Content-Type": "application/json",
-              accept: "application/json",
-            },
-          }
-        );
-
-        if (resp.status === 200) {
-          const { success, data } = resp.data;
-          return { success, data };
-        } else {
-          return {
-            success: false,
-            data: "Ocurrió un error, inténtelo de nuevo. Si el error persiste, contacte a soporte",
-          };
-        }
       } catch (error) {
         return {
           success: false,

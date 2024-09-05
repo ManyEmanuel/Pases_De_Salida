@@ -55,7 +55,7 @@
                     icon="check_circle"
                     color="purple-ieen"
                     flat
-                    @click="toSolicitudes(props.row.id)"
+                    @click="toSolicitudes(props.row)"
                   >
                     <q-tooltip>Marcar como leido</q-tooltip>
                   </q-btn>
@@ -94,6 +94,7 @@ import { storeToRefs } from "pinia";
 import { useRouter } from "vue-router";
 import { useNotificacionStore } from "../../../stores/notificaciones_store";
 import { useAuthStore } from "src/stores/auth_store";
+import { EncryptStorage } from "storage-encryption";
 
 //-----------------------------------------------------------
 
@@ -101,6 +102,7 @@ const $q = useQuasar();
 const router = useRouter();
 const notificacionStore = useNotificacionStore();
 const authStore = useAuthStore();
+const encryptStorage = new EncryptStorage("SECRET_KEY", "sessionStorage");
 const { sistemas } = storeToRefs(authStore);
 const { notificaciones_all, isLoading } = storeToRefs(notificacionStore);
 const sistema_Id = ref({ value: 0, label: "Todos" });
@@ -128,7 +130,7 @@ const cargarData = async () => {
   $q.loading.hide();
 };
 
-const toSolicitudes = async (id) => {
+const toSolicitudes = async (row) => {
   $q.loading.show({
     spinner: QSpinnerFacebook,
     spinnerColor: "purple-ieen",
@@ -137,13 +139,22 @@ const toSolicitudes = async (id) => {
     message: "Espere un momento, por favor...",
     messageColor: "black",
   });
-  let resp = await notificacionStore.leerNotificacion(id);
+  let resp = await notificacionStore.leerNotificacion(row.id);
   if (resp.success == true) {
     cargarData();
   }
-  // router.push({
-  //   name: "misSolicitudes",
-  // });
+  let url = sistemas.value.find((x) => x.value == row.sistema_Id);
+  if (url.label == "Pases de salida") {
+    router.push({
+      name: "notificaciones",
+    });
+  } else {
+    window.location =
+      url.url +
+      `/#/?key=${encryptStorage.decrypt("key")}&sistema=${
+        row.sistema_Id
+      }&usr=${encryptStorage.decrypt("usuario")}`;
+  }
   $q.loading.hide();
 };
 
