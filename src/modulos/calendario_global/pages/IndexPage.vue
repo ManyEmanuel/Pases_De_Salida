@@ -15,7 +15,12 @@
                 transition-show="scale"
                 transition-hide="scale"
               >
-                <q-date v-model="fechas" range />
+                <q-date
+                  v-model="fechas"
+                  range
+                  :options="FiltroFecha"
+                  :locale="myLocale"
+                />
               </q-popup-proxy>
             </q-icon>
           </template>
@@ -35,6 +40,8 @@
       :resources="empleados"
       :events="checadas"
       :currentDate="currentDate"
+      :rangeDate="fechas_texto"
+      :stopDate="fechaTope"
     />
     <div v-else class="fixed-center">
       <div class="text-center h-1">NO HAY REGISTROS DISPONIBLES</div>
@@ -51,7 +58,8 @@ import SchedulerResourceCalendar from "../components/SchedulerResourceCalendar.v
 
 const $q = useQuasar();
 const checador_store = useChecadaStore();
-const { checadas, empleados } = storeToRefs(checador_store);
+const { checadas, empleados, fechaTope, myLocale } =
+  storeToRefs(checador_store);
 const currentDate = ref(new Date());
 const year = currentDate.value.getFullYear();
 const month = (currentDate.value.getMonth() + 1).toString().padStart(2, "0");
@@ -71,6 +79,14 @@ onMounted(() => {
   load_empleados();
 });
 
+const FiltroFecha = (fechha) => {
+  let hoy = new Date();
+  let fechaHoy = hoy.toISOString().split("T");
+  let FechaFormato = fechaHoy[0];
+  let FechaFinal = FechaFormato.replace(/-/g, "/");
+  return fechha <= FechaFinal;
+};
+
 const load_empleados = async () => {
   $q.loading.show({
     spinner: QSpinnerFacebook,
@@ -82,6 +98,7 @@ const load_empleados = async () => {
   });
   await checador_store.load_empleados_calendario();
   await checador_store.load_checadas(fechas.value.from, fechas.value.from);
+
   $q.loading.hide();
 };
 
