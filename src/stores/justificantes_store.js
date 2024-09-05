@@ -138,6 +138,7 @@ export const useJustificanteStore = defineStore("justificante", {
         let resp = null;
         let listJustificantes = null;
         if (perfil == 1) {
+          console.log("Esto es perfil 1");
           resp = await api.get("/Justificantes/ObtenTodos");
           let { data } = resp.data;
           listJustificantes = data.map((justificante) => {
