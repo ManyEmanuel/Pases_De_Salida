@@ -5,6 +5,15 @@
       <h2>{{ formatMonthHeader }}</h2>
       <q-btn color="secondary" label="Siguiente" @click="nextMonth" />
     </div>
+    <div class="text-right q-px-lg">
+      <q-btn
+        icon="download"
+        color="secondary"
+        label="Excel"
+        @click="obtenerExcel"
+      />
+    </div>
+    <br />
     <div class="table-container">
       <div class="table-fixed">
         <table>
@@ -43,12 +52,21 @@ import { useQuasar } from "quasar";
 import { storeToRefs } from "pinia";
 import { ref, defineProps, computed } from "vue";
 import { format, isWithinInterval, addMonths, subMonths } from "date-fns";
+import * as XLSX from "xlsx";
 
 const $q = useQuasar();
-const props = defineProps(["resources", "events", "currentDate"]);
+const props = defineProps([
+  "resources",
+  "events",
+  "currentDate",
+  "rangeDate",
+  "stopDate",
+]);
 const resources = ref(props.resources);
 const events = ref(props.events);
 const currentDate = ref(props.currentDate);
+const rangoFecha = ref(props.rangeDate);
+const stopDate = ref(props.stopDate);
 
 const currentMonthDays = computed(() => {
   const year = currentDate.value.getFullYear();
@@ -65,6 +83,33 @@ const currentMonthDays = computed(() => {
   }
   return days;
 });
+
+const obtenerExcel = async () => {
+  let encabezado = ["Empleado"];
+  let datos = [];
+  for (let fecha of stopDate.value) {
+    encabezado.push(fecha);
+  }
+  for (let empleado of resources.value) {
+    let objeto = {};
+    stopDate.value.forEach((fecha) => {
+      let filtro = events.value.filter(
+        (x) => x.resourceId == empleado.id && x.dateCompare == fecha
+      );
+      let texto = "";
+      for (let registro of filtro) {
+        texto = texto + " " + registro.title;
+      }
+      objeto[fecha] = texto;
+    });
+    datos.push({ Empleado: empleado.title, ...objeto });
+  }
+
+  const worksheet = XLSX.utils.json_to_sheet(datos, { header: encabezado });
+  const workbook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(workbook, worksheet, "Checador");
+  XLSX.writeFile(workbook, "Reporte_Checador_Fechas.xlsx");
+};
 
 const obtenColor = (title) => {
   if (title.includes("Entrada") || title.includes("Salida")) {
