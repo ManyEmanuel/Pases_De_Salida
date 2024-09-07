@@ -93,11 +93,9 @@ export const useNotificacionStore = defineStore("Notificaciones", {
       }
     },
 
-    async leerNotificacion(notificacionId) {
+    async leerNotificacion(id) {
       try {
-        const resp = await api.get(
-          `/NotificacionesUniverso/Leer/${notificacionId}`
-        );
+        const resp = await api.get(`/NotificacionesUniverso/Leer/${id}`);
         if (resp.status == 200) {
           const { success, data } = resp.data;
           return { success, data };

@@ -6,7 +6,6 @@
         :rows="solicitudes"
         :columns="columns"
         :filter="filter"
-        :loading="loading"
         :pagination="pagination"
         row-key="id"
         rows-per-page-label="Filas por pagina"
@@ -182,12 +181,13 @@ const visisble_columns = [
 ];
 
 const pagination = ref({
-  //********** */
   page: 1,
   rowsPerPage: 25,
   sortBy: "name",
   descending: false,
 });
+
+const filter = ref("");
 
 const visualizar = async (id) => {
   pasesStore.loadPaseConsulta(id);
