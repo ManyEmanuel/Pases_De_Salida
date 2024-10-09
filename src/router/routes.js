@@ -25,12 +25,6 @@ const routes = [
         component: () => import("../modulos/justificantes/pages/IndexPage"),
       },
       {
-        path: "/registro_general_justificantes",
-        name: "registro_general_justificantes",
-        component: () =>
-          import("../modulos/registro_General_Justificantes/pages/IndexPage"),
-      },
-      {
         path: "/solicitudes_Justificantes",
         name: "solicitudes_Justificantes",
         component: () =>
@@ -51,6 +45,11 @@ const routes = [
         name: "notificaciones",
         component: () =>
           import("../modulos/notificaciones/pages/IndexPage.vue"),
+      },
+      {
+        path: "/reportes",
+        name: "reportes",
+        component: () => import("../modulos/reportes/pages/IndexPage.vue"),
       },
     ],
   },

@@ -8,7 +8,10 @@ export const useRegistroGeneralStore = defineStore("registroGeneral", {
     modalFiltro: null,
     textoReporte: null,
     pasesGeneral: [],
+    pasesGeneralFiltrado: [],
     listAreas: [],
+    listPasesIntermedios: [],
+    documentoExcel: null,
   }),
   actions: {
     async loadPasesGeneral() {
@@ -56,13 +59,20 @@ export const useRegistroGeneralStore = defineStore("registroGeneral", {
             folio: pases.folio,
             asunto: pases.asunto,
             asunto:
-              pases.asunto.length >= 30
-                ? pases.asunto.slice(0, 30) + "..."
-                : pases.asunto,
+              pases.asunto != null
+                ? pases.asunto.length >= 30
+                  ? pases.asunto.slice(0, 30) + "..."
+                  : pases.asunto
+                : "",
             asunto_Completo: pases.asunto,
             responsable_Area: pases.responsable_Area,
             capturista: pases.capturista,
-            area: pases.area,
+            area_Id: pases.area_Id,
+            area:
+              pases.area.length >= 30
+                ? pases.area.slice(0, 30) + "..."
+                : pases.area,
+            area_Completa: pases.area,
             entrada: pases.entrada,
             salida: pases.salida,
             fechaSolicitud:
@@ -93,7 +103,8 @@ export const useRegistroGeneralStore = defineStore("registroGeneral", {
             if (data) {
               let areaArray = data.map((area) => {
                 return {
-                  value: area.nombre,
+                  label: area.nombre,
+                  value: area.id,
                   select: false,
                 };
               });
@@ -347,11 +358,11 @@ export const useRegistroGeneralStore = defineStore("registroGeneral", {
           this.textoReporte = "";
         }
         let num = 1;
-        this.pasesGeneral.forEach((item) => {
+        this.pasesGeneralFiltrado.forEach((item) => {
           body.push([
             num.toString(),
             item.folio,
-            item.area,
+            item.area_Completa,
             item.solicitante,
             item.tipo_Asunto,
             item.tipo_Pase,
@@ -422,6 +433,83 @@ export const useRegistroGeneralStore = defineStore("registroGeneral", {
         return {
           success: false,
           data: "Ocurrió un error, inténtelo de nuevo. Si el error persiste, contacte a soporte",
+        };
+      }
+    },
+
+    async loadPasesIntermedios() {
+      try {
+        const resp = await api.get("/PasesSalida/ObtenTodosIntermedios");
+        if (resp.status == 200) {
+          const { success, data } = resp.data;
+          if (success === true) {
+            if (data) {
+              let list = data.map((pase) => {
+                return {
+                  id: pase.id,
+                  solicitante_Id: pase.solicitante_Id,
+                  solicitante: pase.solicitante,
+                  puesto_Solicitante: pase.puesto_Solicitante,
+                  vehiculo_Id: pase.vehiculo_Id,
+                  vehiculo: pase.vehiculo,
+                  area_Id: pase.area_Id,
+                  area: pase.area,
+                  estatus: pase.estatus,
+                  folio: pase.folio,
+                  entrada: pase.entrada,
+                  salida: pase.salida,
+                  llegada: pase.llegada,
+                  tipo_Asunto: pase.tipo_Asunto,
+                  tipo_Pase: pase.tipo_Pase,
+                  asunto: pase.asunto,
+                  rol: pase.rol,
+                };
+              });
+              this.listPasesIntermedios = list.sort((a, b) => b.id - a.id);
+            }
+          } else {
+            return { success, data };
+          }
+        } else {
+          return {
+            success: false,
+            data: "Ocurrió un error, inténtelo de nuevo. Si el error persiste, contacte a soporte",
+          };
+        }
+      } catch (error) {
+        return {
+          success: false,
+          data: "Ocurrió un error, inténtelo de nuevo. Si el error persiste, contacte a soporte",
+        };
+      }
+    },
+
+    //-----------------------------------------------------------------------
+    async downloadExcel(tipo, fecha_Inicio, fecha_Fin) {
+      try {
+        this.documentoExcel = "";
+        const resp = await api.get(
+          `/Justificantes/Excel_Reporte_Justificantes?eleccion=${tipo}&fecha_Inicio=${fecha_Inicio}&fecha_Final=${fecha_Fin}`,
+          {
+            responseType: "blob",
+          }
+        );
+        if (resp.status == 200) {
+          let blob = new window.Blob([resp.data], {
+            type: "application/xlsx",
+          });
+          this.documentoExcel = window.URL.createObjectURL(blob);
+          return { success: true };
+        } else {
+          return {
+            success: false,
+            data: "Error al descargar archivo, intentelo de nuevo",
+          };
+        }
+      } catch (error) {
+        return {
+          success: false,
+          data: "Ocurrio un error, intentelo de nuevo. Si el error persiste contacte a soporte",
         };
       }
     },

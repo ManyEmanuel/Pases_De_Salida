@@ -7,8 +7,13 @@
   >
     <q-card style="width: 800px; max-width: 80vw">
       <q-card-section class="row">
-        <q-img src="../../../assets/IEEN300.png" width="90px" />
-        <div class="text-h5 text-gray-ieen-1 text-bold absolute-center">
+        <q-img
+          src="../../../assets/IEEN300.png"
+          :width="$q.screen.xs ? '60px' : '90px'"
+        />
+        <div
+          class="text-h6 text-gray-ieen-1 text-bold absolute-center text-center"
+        >
           REGISTRO DE PASE
         </div>
         <q-space />
@@ -387,6 +392,8 @@ const actualizarModal = (valor) => {
   area_Id.value = null;
   vehiculo_Id.value = null;
   verVehiculo.value = false;
+  personalRead.value = false;
+  areaRead.value = false;
 };
 
 onBeforeMount(() => {

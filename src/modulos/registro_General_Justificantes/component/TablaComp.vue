@@ -1,48 +1,44 @@
 <template>
-  <div class="row q-pa-lg">
-    <div class="text-h6 text-grey-7">
-      Seleccione un rango de fechas: {{ nombreDate }}
+  <div class="row q-pa-md">
+    <div
+      class="col-lg-10 col-md-10 col-sm-12 col-xs-12 text-right text-h6 text-grey-7"
+    >
+      <b>Seleccione un rango de fechas:</b> {{ nombreDate }}
     </div>
-    <div class="col">
-      <div class="text-right q-pa-md items-start q-gutter-md">
-        <q-btn
-          type="button"
-          class="q-ma-sm"
-          color="purple-ieen"
-          icon-right="calendar_month"
-          label="Filtrar"
-        >
-          <q-tooltip>Filtrar por rango de fechas</q-tooltip>
-          <q-popup-proxy cover transition-show="scale" transition-hide="scale">
-            <q-date
-              :options="optionsCalendar"
-              color="purple"
-              v-model="date"
-              range
-              ><div class="row items-center justify-end">
-                <q-btn v-close-popup label="Cerrar" color="black" flat /></div
-            ></q-date> </q-popup-proxy
-        ></q-btn>
-        <q-btn
-          round
-          class="q-ma-sm"
-          color="purple-ieen"
-          icon="picture_as_pdf"
-          @click="crearReporte()"
-        >
-          <q-tooltip>Generar reporte con la información de la tabla</q-tooltip>
-        </q-btn>
-      </div>
+    <div class="col-lg-2 col-md-2 col-sm-12 col-xs-12 text-right">
+      <q-btn
+        type="button"
+        color="purple-ieen"
+        icon-right="calendar_month"
+        label="Filtrar"
+      >
+        <q-tooltip>Filtrar por rango de fechas</q-tooltip>
+        <q-popup-proxy cover transition-show="scale" transition-hide="scale">
+          <q-date :options="optionsCalendar" color="purple" v-model="date" range
+            ><div class="row items-center justify-end">
+              <q-btn v-close-popup label="Cerrar" color="black" flat /></div
+          ></q-date> </q-popup-proxy
+      ></q-btn>
+      <q-btn
+        class="q-ml-sm q-mr-sm"
+        color="purple-ieen"
+        icon="picture_as_pdf"
+        @click="crearReporte()"
+      >
+        <q-tooltip>Generar reporte con la información de la tabla</q-tooltip>
+      </q-btn>
     </div>
   </div>
   <div class="row q-pr-lg q-pl-lg">
     <div class="col">
       <q-table
+        :grid="$q.screen.xs"
         :rows="listFiltroReporte"
         :columns="columns"
         :filter="filter"
         :pagination="pagination"
         rows-per-page-label="Filas por pagina"
+        :rows-per-page-options="[5, 10, 15, 20, 25, 50]"
         no-data-label="No hay registros"
       >
         <template v-slot:top-left>
@@ -57,7 +53,6 @@
               style="width: 260px"
             >
             </q-select>
-
             <q-select
               v-show="administracion == true"
               v-model="empleado_Id"
@@ -82,31 +77,100 @@
             </template>
           </q-input>
         </template>
-        <template v-slot:body="props">
+        <!--TEMPLATE SCREEN XS-->
+        <template v-if="$q.screen.xs" v-slot:item="props">
+          <div
+            class="q-pa-xs col-xs-12 col-sm-6 col-md-4 col-lg-3 grid-style-transition"
+          >
+            <q-card bordered class="no-shadow">
+              <q-list dense>
+                <q-item v-for="col in props.cols" :key="col.name">
+                  <q-item-section>
+                    <q-item-label class="text-bold"
+                      >{{ col.label }}:</q-item-label
+                    >
+                  </q-item-section>
+                  <q-item-section class="flex-center">
+                    <div v-if="col.name === 'permiso_Economico'">
+                      <q-badge color="purple-3">
+                        {{
+                          `${configuracion[0].dias_Economicos - col.value}/${
+                            configuracion[0].dias_Economicos
+                          }`
+                        }}
+                      </q-badge>
+                    </div>
+                    <div v-else-if="col.name === 'vacaciones_P1'">
+                      <q-badge color="purple-3">
+                        {{
+                          `${
+                            configuracion[0].dias_Primer_Periodo - col.value
+                          }/${configuracion[0].dias_Primer_Periodo}`
+                        }}
+                      </q-badge>
+                    </div>
+                    <div v-else-if="col.name === 'vacaciones_P2'">
+                      <q-badge color="purple-3">
+                        {{
+                          `${
+                            configuracion[0].dias_Segundo_Periodo - col.value
+                          }/${configuracion[0].dias_Segundo_Periodo}`
+                        }}
+                      </q-badge>
+                    </div>
+                    <label v-else-if="col.name == 'empleado'">{{
+                      col.value
+                    }}</label>
+                    <label v-else>
+                      <q-badge color="grey">
+                        {{ col.value }}
+                      </q-badge>
+                    </label>
+                  </q-item-section>
+                </q-item>
+              </q-list>
+            </q-card>
+          </div>
+        </template>
+        <!--TEMPLATE SCREEN DESKTOP-->
+        <template v-else v-slot:body="props">
           <q-tr :props="props">
             <q-td v-for="col in props.cols" :key="col.name" :props="props">
               <div v-if="col.name === 'permiso_Economico'">
-                {{
-                  `${configuracion[0].dias_Economicos - col.value}/${
-                    configuracion[0].dias_Economicos
-                  }`
-                }}
+                <q-badge color="purple-3">
+                  {{
+                    `${configuracion[0].dias_Economicos - col.value}/${
+                      configuracion[0].dias_Economicos
+                    }`
+                  }}
+                </q-badge>
               </div>
               <div v-else-if="col.name === 'vacaciones_P1'">
-                {{
-                  `${configuracion[0].dias_Primer_Periodo - col.value}/${
-                    configuracion[0].dias_Primer_Periodo
-                  }`
-                }}
+                <q-badge color="purple-3">
+                  {{
+                    `${configuracion[0].dias_Primer_Periodo - col.value}/${
+                      configuracion[0].dias_Primer_Periodo
+                    }`
+                  }}
+                </q-badge>
               </div>
               <div v-else-if="col.name === 'vacaciones_P2'">
-                {{
-                  `${configuracion[0].dias_Segundo_Periodo - col.value}/${
-                    configuracion[0].dias_Segundo_Periodo
-                  }`
-                }}
+                <q-badge color="purple-3">
+                  {{
+                    `${configuracion[0].dias_Segundo_Periodo - col.value}/${
+                      configuracion[0].dias_Segundo_Periodo == null
+                        ? 10
+                        : configuracion[0].dias_Segundo_Periodo
+                    }`
+                  }}
+                </q-badge>
               </div>
-              <label v-else>{{ col.value }}</label>
+              <label v-else-if="col.name == 'empleado'">{{ col.value }}</label>
+              <label v-else>
+                <q-badge color="grey">
+                  {{ col.value }}
+                </q-badge>
+              </label>
             </q-td>
           </q-tr>
         </template>
@@ -146,14 +210,15 @@ const day = String(newDate.getDate()).padStart(2, "0");
 const dateActual = ref(`${year}/${month}/${day}`);
 
 //-----------------------------------------------------------
+
 onBeforeMount(() => {
-  justificanteStore.loadAsignacionesVacaciones(year);
-  justificanteStore.loadListAreas();
-  justificanteStore.isAdministracion();
+  cargarData();
   listReporte.value = [];
   area_Id.value = { value: 0, label: "Todos" };
   empleado_Id.value = { value: 0, label: "Todos" };
 });
+
+//-----------------------------------------------------------
 
 watch(date, (val) => {
   if (val == null) {
@@ -176,6 +241,106 @@ watch(area_Id, (val) => {
     justificanteStore.loadPersonalArea(val.value, true);
   }
 });
+
+//-----------------------------------------------------------
+
+const cargarData = async () => {
+  await justificanteStore.loadAsignacionesVacaciones(year);
+  await justificanteStore.loadListAreas();
+  justificanteStore.isAdministracion();
+};
+
+const optionsCalendar = (date) => {
+  return date <= dateActual.value;
+};
+
+const filtrar = (listReporte, filtro) => {
+  listFiltroReporte.value = listReporte.filter((item) => {
+    let cumple = true;
+    if (filtro.area !== undefined) {
+      if (filtro.area == 0) {
+        cumple = cumple && item.area_Id === item.area_Id;
+      } else {
+        cumple = cumple && item.area_Id == filtro.area;
+      }
+    }
+    if (filtro.empleado !== undefined) {
+      if (filtro.empleado == 0) {
+        cumple = cumple && item.empleado_Id === item.empleado_Id;
+      } else {
+        cumple = cumple && item.empleado_Id === filtro.empleado;
+      }
+    }
+    return cumple;
+  });
+};
+
+const cargarTabla = async (date) => {
+  let resp = null;
+  $q.loading.show({
+    spinner: QSpinnerFacebook,
+    spinnerColor: "purple-ieen",
+    spinnerSize: 140,
+    backgroundColor: "purple-3",
+    message: "Espere un momento, por favor...",
+    messageColor: "black",
+  });
+  resp = await justificanteStore.reporteJustificantes(date);
+
+  if (resp.success) {
+  } else {
+    $q.notify({
+      position: "top-right",
+      type: "negative",
+      message: resp.data,
+      actions: [
+        {
+          icon: "close",
+          color: "white",
+          round: true,
+          handler: () => {},
+        },
+      ],
+    });
+  }
+  $q.loading.hide();
+};
+
+const crearReporte = async () => {
+  if (Object.keys(listReporte.value).length == 0) {
+    $q.dialog({
+      title: "Atención",
+      message: "Seleccione un rango de fechas",
+      icon: "Warning",
+      persistent: true,
+      transitionShow: "scale",
+      transitionHide: "scale",
+    });
+  } else {
+    $q.loading.show({
+      spinner: QSpinnerFacebook,
+      spinnerColor: "purple-ieen",
+      spinnerSize: 140,
+      backgroundColor: "purple-3",
+      message: "Espere un momento, por favor...",
+      messageColor: "black",
+    });
+    ReporteGeneralJustificantes(date.value);
+
+    $q.loading.hide();
+  }
+};
+
+//-----------------------------------------------------------
+
+watchEffect(() => {
+  const filtro = {};
+  if (area_Id.value != null) filtro.area = area_Id.value.value;
+  if (empleado_Id.value != null) filtro.empleado = empleado_Id.value.value;
+  filtrar(listReporte.value, filtro);
+});
+
+//-----------------------------------------------------------
 
 const columns = [
   {
@@ -250,93 +415,4 @@ const pagination = ref({
   descending: false,
 });
 const filter = ref("");
-
-const optionsCalendar = (date) => {
-  return date <= dateActual.value;
-};
-
-const filtrar = (listReporte, filtro) => {
-  listFiltroReporte.value = listReporte.filter((item) => {
-    let cumple = true;
-    if (filtro.area !== undefined) {
-      if (filtro.area == 0) {
-        cumple = cumple && item.area_Id === item.area_Id;
-      } else {
-        cumple = cumple && item.area_Id == filtro.area;
-      }
-    }
-    if (filtro.empleado !== undefined) {
-      if (filtro.empleado == 0) {
-        cumple = cumple && item.empleado_Id === item.empleado_Id;
-      } else {
-        cumple = cumple && item.empleado_Id === filtro.empleado;
-      }
-    }
-    return cumple;
-  });
-};
-
-watchEffect(() => {
-  const filtro = {};
-  if (area_Id.value != null) filtro.area = area_Id.value.value;
-  if (empleado_Id.value != null) filtro.empleado = empleado_Id.value.value;
-  filtrar(listReporte.value, filtro);
-});
-
-const cargarTabla = async (date) => {
-  let resp = null;
-  $q.loading.show({
-    spinner: QSpinnerFacebook,
-    spinnerColor: "purple-ieen",
-    spinnerSize: 140,
-    backgroundColor: "purple-3",
-    message: "Espere un momento, por favor...",
-    messageColor: "black",
-  });
-  resp = await justificanteStore.reporteJustificantes(date);
-
-  if (resp.success) {
-  } else {
-    $q.notify({
-      position: "top-right",
-      type: "negative",
-      message: resp.data,
-      actions: [
-        {
-          icon: "close",
-          color: "white",
-          round: true,
-          handler: () => {},
-        },
-      ],
-    });
-  }
-  $q.loading.hide();
-};
-
-const crearReporte = async () => {
-  if (Object.keys(listReporte.value).length == 0) {
-    $q.dialog({
-      title: "Atención",
-      message: "Seleccione un rango de fechas",
-      icon: "Warning",
-      persistent: true,
-      transitionShow: "scale",
-      transitionHide: "scale",
-    });
-  } else {
-    $q.loading.show({
-      spinner: QSpinnerFacebook,
-      spinnerColor: "purple-ieen",
-      spinnerSize: 140,
-      backgroundColor: "purple-3",
-      message: "Espere un momento, por favor...",
-      messageColor: "black",
-    });
-    ReporteGeneralJustificantes(date.value);
-
-    $q.loading.hide();
-  }
-};
-//-----------------------------------------------------------
 </script>

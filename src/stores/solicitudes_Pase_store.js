@@ -8,7 +8,10 @@ const encryptStorage = new EncryptStorage("SECRET_KEY", "sessionStorage");
 export const useSolicitudPaseStore = defineStore("solicitudPase", {
   state: () => ({
     solicitudes: [],
+    solicitudes_Filtrado: [],
     historial: [],
+    historial_Filtrado: [],
+    cargar: false,
     solicitud: {
       id: null,
       responsable_Area_Id: null,
@@ -36,6 +39,10 @@ export const useSolicitudPaseStore = defineStore("solicitudPase", {
     },
   }),
   actions: {
+    actualizarCargar(valor) {
+      this.cargar = valor;
+    },
+
     async loadSolicitudes() {
       try {
         let resp = await api.get("/PasesSalida/Pendientes");
@@ -236,6 +243,7 @@ export const useSolicitudPaseStore = defineStore("solicitudPase", {
         };
       }
     },
+
     async crearPase(id) {
       try {
         let resp = await api.get(`/PasesSalida/${id}`);

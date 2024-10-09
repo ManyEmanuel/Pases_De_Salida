@@ -8,8 +8,11 @@ export const useSolicitudJustificanteStore = defineStore(
   {
     state: () => ({
       modal: false,
-      solicitudes: [],
+      cargar: false,
+      solicitudesArea: [],
+      solicitudesArea_Filtrado: [],
       historial: [],
+      historial_Filtrado: [],
       solicitudJustificante: {
         id: null,
         responsable_Area_Id: null,
@@ -34,10 +37,17 @@ export const useSolicitudJustificanteStore = defineStore(
       aprobar: {
         encabezado_Detalle_Justificantes_Id: 0,
       },
+      list_Justificantes_Todos: [],
+      list_Justificantes_Todos_Filtrado: [],
+      documentoExcel: null,
     }),
     actions: {
       actualizarModal(valor) {
         this.modal = valor;
+      },
+
+      actualizarCargar(valor) {
+        this.cargar = valor;
       },
 
       //-----------------------------------------------------------------------
@@ -70,9 +80,10 @@ export const useSolicitudJustificanteStore = defineStore(
                   : justificante.area,
               area_Completa: justificante.area,
               area_Id: justificante.area_Id,
+              detalles: justificante.detalles,
             };
           });
-          this.solicitudes = listPendientesArea.filter(
+          this.solicitudesArea = listPendientesArea.filter(
             (x) =>
               x.solicitante_Id != parseInt(encryptStorage.decrypt("empleado"))
           );
@@ -83,6 +94,7 @@ export const useSolicitudJustificanteStore = defineStore(
           };
         }
       },
+
       //-----------------------------------------------------------------------
 
       async loadHistorialJustificante() {
@@ -114,6 +126,7 @@ export const useSolicitudJustificanteStore = defineStore(
                   : justificante.area,
               area_Completa: justificante.area,
               area_Id: justificante.area_Id,
+              detalles: justificante.detalles,
             };
           });
           this.historial = listHistorialArea.filter(
@@ -174,6 +187,78 @@ export const useSolicitudJustificanteStore = defineStore(
               data: "Ocurrió un error, inténtelo de nuevo. Si el error persiste, contacte a soporte",
             };
           }
+        } catch (error) {
+          return {
+            success: false,
+            data: "Ocurrió un error, inténtelo de nuevo. Si el error persiste, contacte a soporte",
+          };
+        }
+      },
+
+      //-----------------------------------------------------------------------
+      async downloadExcel() {
+        try {
+          this.documentoExcel = "";
+          const resp = await api.get(
+            "/Justificantes/Excel_Reporte_Justificantes",
+            {
+              responseType: "blob",
+            }
+          );
+          if (resp.status == 200) {
+            let blob = new window.Blob([resp.data], {
+              type: "application/xlsx",
+            });
+            this.documentoExcel = window.URL.createObjectURL(blob);
+            return { success: true };
+          } else {
+            return {
+              success: false,
+              data: "Error al descargar archivo, intentelo de nuevo",
+            };
+          }
+        } catch (error) {
+          return {
+            success: false,
+            data: "Ocurrio un error, intentelo de nuevo. Si el error persiste contacte a soporte",
+          };
+        }
+      },
+
+      //-----------------------------------------------------------------------
+
+      async loadJustificantesTodos() {
+        try {
+          let resp = await api.get("/Justificantes/ObtenTodos");
+          let { data } = resp.data;
+          let list = data.map((justificante) => {
+            return {
+              id: justificante.id,
+              responsable_Area_Id: justificante.responsable_Area_Id,
+              responsable_Area: justificante.responsable_Area,
+              solicitante_Id: justificante.solicitante_Id,
+              solicitante: justificante.solicitante,
+              puesto_Solicitante_Id: justificante.puesto_Solicitante_Id,
+              puesto_Solicitante: justificante.puesto_Solicitante,
+              capturista_Id: justificante.capturista_Id,
+              capturista: justificante.capturista,
+              puesto_Capturista_Id: justificante.puesto_Capturista_Id,
+              puesto_Capturista: justificante.puesto_Capturista,
+              area_Id: justificante.area_Id,
+              estatus: justificante.estatus,
+              folio: justificante.folio,
+              fecha_Creacion: justificante.fecha_Creacion,
+              fecha_Aprobacion_Rechazo: justificante.fecha_Aprobacion_Rechazo,
+              area:
+                justificante.area.length >= 30
+                  ? justificante.area.slice(0, 30) + "..."
+                  : justificante.area,
+              area_Completa: justificante.area,
+            };
+          });
+          this.list_Justificantes_Todos = list.sort(
+            (a, b) => b.id - a.id
+          );
         } catch (error) {
           return {
             success: false,

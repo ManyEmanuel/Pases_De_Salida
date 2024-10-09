@@ -6,21 +6,25 @@
     transition-hide="scale"
   >
     <q-card style="width: 900px; max-width: 90vw">
-      <q-card-section class="row">
-        <q-img src="../../../assets/IEEN300.png" width="90px" />
-        <div class="text-h5 text-gray-ieen-1 text-bold absolute-center">
+      <q-card-section class="row flotante">
+        <q-img
+          src="../../../assets/IEEN300.png"
+          :width="$q.screen.xs ? '60px' : '90px'"
+        />
+        <div
+          class="text-h6 text-gray-ieen-1 text-bold absolute-center text-center"
+        >
           {{
             isEditar
               ? `EDITAR JUSTIFICANTE`
               : isVisualizar
-              ? "VER JUSTIFICANTE"
+              ? "JUSTIFICANTE"
               : "CREAR JUSTIFICANTE"
           }}
           <div class="text-subtitle1 text-purple-ieen text-center text-bold">
             {{ justificante.folio }}
           </div>
         </div>
-
         <q-space />
         <q-btn
           icon="close"
@@ -32,9 +36,9 @@
         />
       </q-card-section>
       <q-card-section>
-        <q-form class="q-col-gutter-xs" @submit="onSubmit">
-          <div class="row">
-            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 q-pb-sm">
+        <q-form @submit="onSubmit">
+          <div class="row q-col-gutter-sm">
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
               <q-input
                 v-if="isPersonal || isVisualizar"
                 disable
@@ -60,19 +64,7 @@
                 </template>
               </q-select>
             </div>
-            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 q-pb-sm">
-              <q-input
-                disable
-                v-model="justificante.capturista"
-                label="Personal que realiza la captura de la solicitud"
-                color="purple-ieen"
-              >
-                <template v-slot:prepend>
-                  <q-icon name="person" />
-                </template>
-              </q-input>
-            </div>
-            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 q-pb-sm">
+            <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
               <q-select
                 v-if="!isVisualizar"
                 :disable="isEditar || isPersonal"
@@ -101,7 +93,7 @@
                 </template>
               </q-input>
             </div>
-            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
               <q-input
                 color="purple-ieen"
                 disable
@@ -112,9 +104,11 @@
                   <q-icon name="supervisor_account" />
                 </template>
               </q-input>
-              <br /><br /><br /><br />
+            </div>
+            <div class="col-12">
+              <br /><br />
               <div
-                class="text-h6 q-pt-xs text-bold text-center text-purple-ieen"
+                class="text-h6 q-pt-xs text-bold text-center text-gray-ieen-1"
               >
                 <q-icon name="playlist_add" />
                 INCIDENCIA
@@ -122,7 +116,11 @@
             </div>
             <div
               v-if="!isVisualizar"
-              class="col-lg-3 col-md-3 col-sm-3 col-xs-12 q-pr-xs"
+              :class="
+                tipo == 'Vacaciones'
+                  ? 'col-lg-4 col-md-4 col-sm-4 col-xs-12  '
+                  : 'col-lg-6 col-md-6 col-sm-6 col-xs-12  '
+              "
             >
               <q-select
                 color="purple-ieen"
@@ -133,7 +131,7 @@
             </div>
             <div
               v-if="!isVisualizar && tipo == 'Vacaciones'"
-              class="col-lg-3 col-md-3 col-sm-3 col-xs-12 q-pr-xs"
+              class="col-lg-4 col-md-4 col-sm-4 col-xs-12"
             >
               <q-select
                 color="purple-ieen"
@@ -144,7 +142,7 @@
             </div>
             <div
               v-if="tipo == 'Vacaciones' && !isVisualizar"
-              class="col-lg-3 col-md-3 col-sm-3 col-xs-12 q-pr-xs"
+              class="col-lg-4 col-md-4 col-sm-4 col-xs-12"
             >
               <q-select
                 color="purple-ieen"
@@ -155,62 +153,20 @@
             </div>
             <div
               v-if="!isVisualizar"
-              class="col-lg-3 col-md-3 col-sm-3 col-xs-12 q-pl-xs"
+              :class="
+                tipo == 'Vacaciones'
+                  ? 'col-11'
+                  : 'col-lg-5 col-md-5 col-sm-5 col-xs-10 '
+              "
             >
               <q-input
                 color="purple-ieen"
                 label="Fecha"
                 v-model="days"
-                :disable="tipo == null || vacacionesFijo == true"
-              >
-                <template v-slot:append>
-                  <q-icon name="event" class="cursor-pointer">
-                    <q-popup-proxy
-                      cover
-                      transition-show="scale"
-                      transition-hide="scale"
-                    >
-                      <q-date
-                        v-if="
-                          tipo == 'Omisión de entrada' ||
-                          tipo == 'Omisión de salida'
-                        "
-                        color="purple"
-                        v-model="days"
-                        multiple
-                        :locale="myLocale"
-                        :options="FiltroFecha"
-                      >
-                        <div class="row items-center justify-end">
-                          <q-btn
-                            v-close-popup
-                            label="Cerrar"
-                            color="black"
-                            flat
-                          /></div
-                      ></q-date>
-                      <q-date
-                        v-else
-                        color="purple"
-                        v-model="days"
-                        multiple
-                        :locale="myLocale"
-                        @click="validateDates"
-                      >
-                        <div class="row items-center justify-end">
-                          <q-btn
-                            v-close-popup
-                            label="Cerrar"
-                            color="black"
-                            flat
-                          /></div
-                      ></q-date>
-                    </q-popup-proxy>
-                  </q-icon>
-                </template>
-              </q-input>
+                disable
+              />
               <div
-                class="text-body2 q-pt-md"
+                class="text-body2 q-pt-md text-bold"
                 v-show="tipo == 'Vacaciones' || tipo == 'Permiso día económico'"
               >
                 {{
@@ -219,6 +175,64 @@
                     : `Periodo establecido`
                 }}
               </div>
+            </div>
+            <div
+              v-if="!isVisualizar"
+              :class="
+                tipo == 'Vacaciones'
+                  ? 'col-1'
+                  : 'col-lg-1 col-md-1 col-sm-1 col-xs-2 q-pt-sm'
+              "
+            >
+              <q-btn
+                flat
+                icon="event"
+                size="lg"
+                color="purple-ieen"
+                class="cursor-pointer"
+              >
+                <q-popup-proxy
+                  cover
+                  transition-show="scale"
+                  transition-hide="scale"
+                >
+                  <q-date
+                    v-if="
+                      tipo == 'Omisión de entrada' ||
+                      tipo == 'Omisión de salida'
+                    "
+                    color="purple"
+                    v-model="days"
+                    multiple
+                    :locale="myLocale"
+                    :options="filtroFecha"
+                  >
+                    <div class="row items-center justify-end">
+                      <q-btn
+                        v-close-popup
+                        label="Cerrar"
+                        color="black"
+                        flat
+                      /></div
+                  ></q-date>
+                  <q-date
+                    v-else
+                    color="purple"
+                    v-model="days"
+                    multiple
+                    :locale="myLocale"
+                    @click="validateDates"
+                  >
+                    <div class="row items-center justify-end">
+                      <q-btn
+                        v-close-popup
+                        label="Cerrar"
+                        color="black"
+                        flat
+                      /></div
+                  ></q-date>
+                </q-popup-proxy>
+              </q-btn>
             </div>
           </div>
           <div v-if="tipo == 'Otros'" class="text-caption text-red">
@@ -235,9 +249,10 @@
               hint="Máximo 200 carácteres"
             />
           </div>
-          <div v-if="!isVisualizar" class="col-12">
+          <div v-if="!isVisualizar" class="col-12 q-pt-md">
             <div class="text-right">
               <q-btn
+                :size="$q.screen.xs ? 'sm' : 'md'"
                 label="Agregar"
                 icon-right="add"
                 color="secondary"
@@ -246,10 +261,11 @@
               />
             </div>
           </div>
-          <br />
+          <br /><br />
           <TablaConceptos />
+          <br />
           <q-space />
-          <div class="col-12">
+          <div class="col-12 q-pt-md flotanteFooter">
             <div class="text-right">
               <q-btn
                 label="Cerrar"
@@ -260,9 +276,9 @@
               />
               <q-btn
                 icon-right="save"
-                v-if="!isVisualizar && !isEditar"
+                v-if="!isVisualizar"
                 :disable="listaIncidencias.value == ''"
-                label="Guardar"
+                :label="isEditar ? 'Editar' : 'Guardar'"
                 type="submit"
                 color="secondary"
                 class="q-ml-sm"
@@ -295,14 +311,19 @@ const {
   isVisualizar,
   listaIncidencias,
   detalle,
-  editarDetalle,
   myLocale,
   isPersonal,
   isAdmi,
   dias_restantes,
   configuracion,
 } = storeToRefs(justificanteStore);
-const tipoJustificante = ref([]);
+const tipoJustificante = ref([
+  "Omisión de entrada",
+  "Omisión de salida",
+  "Comisión oficial",
+  "Permuta por día laborado",
+  "Otros",
+]);
 const years = ref([2023, 2024]);
 const year = ref(2024);
 const days = ref([]);
@@ -332,9 +353,7 @@ onBeforeMount(() => {
 watch(justificante.value, (val) => {
   if (val != null) {
     cargarArea(val);
-    if (val.solicitante_Id != null && isPersonal.value == true) {
-      justificanteStore.loadResponsabeAreaByEmpleado(val.solicitante_Id);
-    }
+    cargarSolicitante(val);
   }
 });
 
@@ -342,56 +361,60 @@ watch(area_Id, (val) => {
   if (val != null) {
     empleado_Id.value = null;
     personalAutoriza.value = null;
-    justificanteStore.loadPersonalArea(val.value, false);
+    cargarPersonalArea(val);
   }
 });
 
-watch(tipo, async (val) => {
+watch(tipo, (val) => {
   if (val != null) {
-    await justificanteStore.loadDiasRestantes(
-      empleado_Id.value.value,
-      year.value
-    );
     days.value = [];
+
     diasRestantes();
   }
 });
 
 watch(periodoVacacional, (val) => {
   if (val != null) {
-    diasRestantes();
     days.value = [];
+    diasRestantes();
   }
 });
 
-watch(year, async (val) => {
-  days.value = [];
+watch(year, (val) => {
   if (val != null) {
-    await justificanteStore.loadDiasRestantes(
-      empleado_Id.value.value,
-      year.value
-    );
+    days.value = [];
     diasRestantes();
   }
 });
 
 watch(empleado_Id, (val) => {
   if (val != null) {
-    empleado(val);
+    getResponsable(val);
+    getTiposJustificantesByEmpleado(val);
   }
 });
 
 watch(days, (val) => {
-  if (val != null) {
-    if (tipo.value == "Vacaciones") {
-      //resta los dias disponibles de vacaciones
+  if (tipo.value == "Vacaciones") {
+    //resta los dias disponibles de vacaciones
+    if (val == null) {
+      if (periodoVacacional.value.value == 1) {
+        restanDias.value = dias_restantes.value.primer_Periodo;
+      } else if (periodoVacacional.value.value == 2) {
+        restanDias.value = dias_restantes.value.segundo_Periodo;
+      }
+    } else {
       if (periodoVacacional.value.value == 1) {
         restanDias.value = dias_restantes.value.primer_Periodo - val.length;
       } else if (periodoVacacional.value.value == 2) {
         restanDias.value = dias_restantes.value.segundo_Periodo - val.length;
       }
-    } else if (tipo.value == "Permiso día económico") {
-      //resta los dias disponibles de permiso economico
+    }
+  } else if (tipo.value == "Permiso día económico") {
+    //resta los dias disponibles de permiso economico
+    if (val == null) {
+      restanDias.value = dias_restantes.value.dias_Economicos;
+    } else {
       restanDias.value = dias_restantes.value.dias_Economicos - val.length;
     }
   }
@@ -404,8 +427,13 @@ const cargarData = async () => {
   await justificanteStore.loadCapturista();
 };
 
+const cargarPersonalArea = async (val) => {
+  await justificanteStore.loadPersonalArea(val.value, false);
+};
+
 const cargarArea = async (val) => {
   if (area_Id.value == null) {
+    await justificanteStore.loadListAreas();
     let areaFiltrado = areas.value.find((x) => x.value == `${val.area_Id}`);
     area_Id.value = areaFiltrado;
     await justificanteStore.loadPersonalArea(val.value, false);
@@ -424,49 +452,64 @@ const cargarSolicitante = async (val) => {
 };
 
 const diasRestantes = async () => {
+  await justificanteStore.loadDiasRestantes(
+    empleado_Id.value.value,
+    year.value
+  );
   await justificanteStore.loadAsignacionesVacaciones(year.value);
   if (tipo.value == "Permiso día económico") {
-    restanDias.value = dias_restantes.value.dias_Economicos;
+    let diasEconomicos = listaIncidencias.value.find(
+      (incidencia) => incidencia.tipo_Justificantes === "Permiso día económico"
+    );
+    if (diasEconomicos != undefined) {
+      days.value = diasEconomicos.dias_Incidencias
+        .replaceAll(" ", "")
+        .split(",");
+    } else {
+      restanDias.value = dias_restantes.value.dias_Economicos;
+    }
   } else if (tipo.value == "Vacaciones") {
-    if (periodoVacacional.value.value == 1) {
-      if (configuracion.value[0].tipo_Primer_Periodo == "Fijo") {
-        vacacionesFijo.value = true;
-        days.value = configuracion.value[0].fechas_Primer_Periodo.split(",");
-      } else {
-        vacacionesFijo.value = false;
-        restanDias.value = dias_restantes.value.primer_Periodo;
-      }
-    } else if (periodoVacacional.value.value == 2) {
-      if (configuracion.value[0].tipo_Segundo_Periodo == "Fijo") {
-        vacacionesFijo.value = true;
-        days.value = configuracion.value[0].fechas_Segundo_Periodo.split(",");
-      } else {
-        vacacionesFijo.value = false;
-        restanDias.value = dias_restantes.value.segundo_Periodo;
+    let vacaciones = findVacaciones();
+    if (vacaciones != undefined) {
+      days.value = vacaciones.dias_Incidencias.replaceAll(" ", "").split(",");
+    } else {
+      if (periodoVacacional.value.value == 1) {
+        if (configuracion.value[0].tipo_Primer_Periodo == "Fijo") {
+          vacacionesFijo.value = true;
+          days.value = configuracion.value[0].fechas_Primer_Periodo.split(",");
+        } else {
+          vacacionesFijo.value = false;
+          restanDias.value = dias_restantes.value.primer_Periodo;
+        }
+      } else if (periodoVacacional.value.value == 2) {
+        if (configuracion.value[0].tipo_Segundo_Periodo == "Fijo") {
+          vacacionesFijo.value = true;
+          days.value = configuracion.value[0].fechas_Segundo_Periodo.split(",");
+        } else {
+          vacacionesFijo.value = false;
+          restanDias.value = dias_restantes.value.segundo_Periodo;
+        }
       }
     }
   }
 };
 
-const empleado = async (val) => {
+const findVacaciones = () => {
+  return listaIncidencias.value.find(
+    (incidencia) =>
+      incidencia.tipo_Justificantes === "Vacaciones" &&
+      incidencia.year == year.value &&
+      incidencia.periodo_Vacacional == periodoVacacional.value.value
+  );
+};
+
+const getResponsable = async (val) => {
   justificante.value.responsable_Area = null;
   await justificanteStore.loadResponsabeAreaByEmpleado(val.value);
+};
+
+const getTiposJustificantesByEmpleado = async (val) => {
   await justificanteStore.loadDiasRestantes(val.value, year.value);
-  if (!tipoJustificante.value.includes("Omisión de entrada")) {
-    tipoJustificante.value.push("Omisión de entrada");
-  }
-  if (!tipoJustificante.value.includes("Omisión de salida")) {
-    tipoJustificante.value.push("Omisión de salida");
-  }
-  if (!tipoJustificante.value.includes("Comisión oficial")) {
-    tipoJustificante.value.push("Comisión oficial");
-  }
-  if (!tipoJustificante.value.includes("Permuta por día laborado")) {
-    tipoJustificante.value.push("Permuta por día laborado");
-  }
-  if (!tipoJustificante.value.includes("Otros")) {
-    tipoJustificante.value.push("Otros");
-  }
   if (dias_restantes.value.dias_Economicos != 0) {
     if (!tipoJustificante.value.includes("Permiso día económico")) {
       tipoJustificante.value.push("Permiso día económico");
@@ -480,7 +523,6 @@ const empleado = async (val) => {
       tipoJustificante.value.push("Vacaciones");
     }
   }
-
   limpiarCampos();
 };
 
@@ -511,7 +553,7 @@ const esObjeto = (variable) => {
   return variable !== null && typeof variable === "object";
 };
 
-const FiltroFecha = (fecha) => {
+const filtroFecha = (fecha) => {
   const today = new Date();
   let diaSemana = today.getDay();
   let diasContar = 3;
@@ -534,32 +576,18 @@ const calcularFechaNueva = (fecha, dias) => {
   const anioPrevio = fechaFormato.getFullYear();
   const mesPrevio = formatoMes;
   const diaPrevio = formatoDia;
-
   const fechaLimite = `${anioPrevio}/${mesPrevio}/${diaPrevio}`;
   return fechaLimite;
 };
 
 const actualizarModal = async (valor) => {
-  $q.loading.show({
-    spinner: QSpinnerFacebook,
-    spinnerColor: "purple-ieen",
-    spinnerSize: 140,
-    backgroundColor: "purple-3",
-    message: "Espere un momento, por favor...",
-    messageColor: "black",
-  });
   justificanteStore.actualizarModal(valor);
-  justificanteStore.updateVisualizar(false);
-  justificanteStore.updateEditar(false);
-  justificanteStore.updateEditarDetalle(false);
-  await justificanteStore.loadCapturista();
+  justificanteStore.updateVisualizar(valor);
+  justificanteStore.updateEditar(valor);
   justificanteStore.initJustificante();
-  limpiarCampos();
-  listaIncidencias.value = [];
   empleado_Id.value = null;
-  justificante.value.responsable_Area = null;
   area_Id.value = null;
-  $q.loading.hide();
+  limpiarCampos();
 };
 
 const agregarIncidencia = async () => {
@@ -593,33 +621,107 @@ const agregarIncidencia = async () => {
         transitionHide: "scale",
       });
     } else {
-      if (editarDetalle.value == true) {
+      if (isEditar.value == true) {
         let respObjeto = esObjeto(days.value);
         if (tipo.value == "Vacaciones") {
-          let periodo;
-          if (respObjeto == true) {
-            const resultado = days.value.join(", ");
-            detalle.value.dias_Incidencias = resultado;
-          } else {
-            detalle.value.dias_Incidencias = detalle.value.dias_Incidencias;
-          }
-
-          if (periodoVacacional.value.value == 1) {
-            periodo = 1;
-          } else if (periodoVacacional.value.value == 2) {
-            periodo = 2;
-          }
+          let incidenciaExistente = listaIncidencias.value.find(
+            (incidencia) =>
+              incidencia.tipo_Justificantes === "Vacaciones" &&
+              incidencia.year == year.value &&
+              incidencia.periodo_Vacacional == periodoVacacional.value.value
+          );
           detalle.value.tipo_Justificantes = tipo.value;
           detalle.value.motivo = motivo.value;
           detalle.value.primer_Periodo = 0;
           detalle.value.segundo_Periodo = 0;
           detalle.value.dias_Economicos = 0;
-          detalle.value.periodo_Vacacional = periodo;
+          detalle.value.periodo_Vacacional = periodoVacacional.value.value;
           detalle.value.year = year.value;
-          resp = await justificanteStore.createDetalleJustificantes(
-            justificante.value.id,
-            detalle.value
+
+          if (incidenciaExistente) {
+            if (respObjeto == true && !vacacionesFijo.value) {
+              const resultado = days.value.join(", ");
+              detalle.value.dias_Incidencias = resultado;
+            } else {
+              detalle.value.dias_Incidencias = detalle.value.dias_Incidencias;
+            }
+            detalle.value.id = incidenciaExistente.id;
+            resp = await justificanteStore.updateDetalle(detalle.value);
+          } else {
+            if (respObjeto == true) {
+              const resultado = days.value.join(", ");
+              detalle.value.dias_Incidencias = resultado;
+            } else {
+              detalle.value.dias_Incidencias = detalle.value.dias_Incidencias;
+            }
+            resp = await justificanteStore.createDetalleJustificantes(
+              justificante.value.id,
+              detalle.value
+            );
+          }
+          if (resp.success === true) {
+            $q.notify({
+              position: "top-right",
+              type: "positive",
+              message: "Se creo con exito",
+              actions: [
+                {
+                  icon: "close",
+                  color: "white",
+                  round: true,
+                  handler: () => {},
+                },
+              ],
+            });
+            await justificanteStore.loadDetalleJustificantes(
+              justificante.value.id
+            );
+          } else {
+            $q.notify({
+              position: "top-right",
+              type: "negative",
+              message: resp.data,
+              actions: [
+                {
+                  icon: "close",
+                  color: "white",
+                  round: true,
+                  handler: () => {},
+                },
+              ],
+            });
+          }
+        } else if (tipo.value == "Permiso día económico") {
+          let diasEconomicos = listaIncidencias.value.find(
+            (incidencia) =>
+              incidencia.tipo_Justificantes === "Permiso día económico"
           );
+
+          detalle.value.tipo_Justificantes = tipo.value;
+          detalle.value.motivo = motivo.value;
+          detalle.value.primer_Periodo = 0;
+          detalle.value.segundo_Periodo = 0;
+          detalle.value.dias_Economicos = 0;
+          detalle.value.periodo_Vacacional = periodoVacacional.value.value;
+          detalle.value.year = year.value;
+
+          if (diasEconomicos) {
+            if (respObjeto == true) {
+              const resultado = days.value.join(", ");
+              detalle.value.dias_Incidencias = resultado;
+            }
+            detalle.value.id = diasEconomicos.id;
+            resp = await justificanteStore.updateDetalle(detalle.value);
+          } else {
+            if (respObjeto == true) {
+              const resultado = days.value.join(", ");
+              detalle.value.dias_Incidencias = resultado;
+            }
+            resp = await justificanteStore.createDetalleJustificantes(
+              justificante.value.id,
+              detalle.value
+            );
+          }
           if (resp.success === true) {
             $q.notify({
               position: "top-right",
@@ -703,8 +805,6 @@ const agregarIncidencia = async () => {
             });
           }
         }
-
-        justificanteStore.updateEditarDetalle(false);
         limpiarCampos();
       } else {
         if (tipo.value == "Vacaciones") {
@@ -754,7 +854,7 @@ const agregarIncidencia = async () => {
 
 const limpiarCampos = () => {
   tipo.value = null;
-  days.value = null;
+  days.value = [];
   motivo.value = null;
   cambioDays.value = false;
   restanDias.value = null;
@@ -762,7 +862,6 @@ const limpiarCampos = () => {
 
 const onSubmit = async () => {
   let resp = null;
-
   $q.loading.show({
     spinner: QSpinnerFacebook,
     spinnerColor: "purple-ieen",
@@ -784,10 +883,12 @@ const onSubmit = async () => {
     justificante.value.area_Id = area_Id.value.value;
     justificante.value.area = area_Id.value.label;
     justificante.value.solicitante_Id = empleado_Id.value.value;
+
     if (isPersonal.value != true) {
       justificante.value.puesto_Solicitante_Id = empleado_Id.value.puesto_Id;
     }
     if (isEditar.value == true) {
+      resp = await justificanteStore.updateJustificante(justificante.value);
     } else {
       resp = await justificanteStore.createJustificante(justificante.value);
       if (resp.success == true) {
@@ -796,7 +897,6 @@ const onSubmit = async () => {
         });
       }
     }
-
     if (resp.success === true) {
       $q.notify({
         position: "top-right",
@@ -811,7 +911,7 @@ const onSubmit = async () => {
           },
         ],
       });
-      justificanteStore.loadJustificantes();
+      await justificanteStore.loadJustificantes();
       actualizarModal(false);
     } else {
       $q.notify({
@@ -829,7 +929,22 @@ const onSubmit = async () => {
       });
     }
   }
-
   $q.loading.hide();
 };
 </script>
+<style scoped>
+.flotante {
+  position: sticky;
+  top: 1px;
+  z-index: 999;
+  background-color: white;
+}
+.flotanteFooter {
+  margin-top: auto;
+  width: 100%;
+  position: sticky;
+  bottom: 0;
+  padding: 10px;
+  background-color: white;
+}
+</style>

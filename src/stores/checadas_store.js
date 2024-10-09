@@ -3,10 +3,14 @@ import { api } from "src/boot/axios";
 
 export const useChecadaStore = defineStore("checadas", {
   state: () => ({
+    personal_Id: null,
     checadas: [],
     mis_checadas: [],
     empleados: [],
     fechaTope: [],
+    list_Areas: [],
+    list_Personal: [],
+    list_Checadas_Personal: [],
     myLocale: {
       days: "Domingo_Lunes_Martes_Miércoles_Jueves_Viernes_Sábado".split("_"),
       daysShort: "Dom_Lun_Mar_Mié_Jue_Vie_Sáb".split("_"),
@@ -22,9 +26,11 @@ export const useChecadaStore = defineStore("checadas", {
   }),
 
   actions: {
-    async load_mis_checadas() {
+    async load_mis_checadas(fecha_inicio, fecha_fin) {
       try {
-        const resp = await api.get("/Checador/MisChecadas");
+        const resp = await api.get(
+          `/Checador/MisChecadas?Fecha_Inicio=${fecha_inicio}&Fecha_Fin=${fecha_fin}`
+        );
         if (resp.status == 200) {
           const { success, data } = resp.data;
           if (success) {
@@ -115,6 +121,67 @@ export const useChecadaStore = defineStore("checadas", {
         return {
           success: false,
           data: "Ocurrio un error intentelo de nuevo, si el error persiste comuniquese con el administrador del sistema",
+        };
+      }
+    },
+
+    //-----------------------------------------------------------------------
+    async load_Areas() {
+      try {
+        let respArea = await api.get("/Areas/GetLista");
+        let { data } = respArea.data;
+        this.list_Areas = data.map((areas) => {
+          return {
+            value: areas.value,
+            label: areas.label,
+          };
+        });
+      } catch (error) {
+        return {
+          success: false,
+          data: "Ocurrió un error, inténtelo de nuevo. Si el error persiste, contacte a soporte",
+        };
+      }
+    },
+
+    //-----------------------------------------------------------------------
+    async load_Personal_ByArea(id) {
+      try {
+        let respArea = await api.get(`/Empleados/GetListaByArea/${id}`);
+        let { data } = respArea.data;
+        this.list_Personal = data.map((personal) => {
+          return {
+            value: personal.value,
+            label: personal.label,
+          };
+        });
+      } catch (error) {
+        return {
+          success: false,
+          data: "Ocurrió un error, inténtelo de nuevo. Si el error persiste, contacte a soporte",
+        };
+      }
+    },
+
+    //-----------------------------------------------------------------------
+    async load_Checadas_ByPersonal(id, fecha_Inicio, fecha_Fin) {
+      try {
+        this.list_Checadas_Personal = [];
+        let respArea = await api.get(
+          `/Checador/ByEmpleado/${id}/?Fecha_Inicio=${fecha_Inicio}&Fecha_Fin=${fecha_Fin}`
+        );
+        let { data } = respArea.data;
+        this.list_Checadas_Personal = data.map((checada) => {
+          return {
+            id: checada.id,
+            title: checada.title,
+            start: checada.fecha,
+          };
+        });
+      } catch (error) {
+        return {
+          success: false,
+          data: "Ocurrió un error, inténtelo de nuevo. Si el error persiste, contacte a soporte",
         };
       }
     },

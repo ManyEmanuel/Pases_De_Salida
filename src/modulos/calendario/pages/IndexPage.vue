@@ -1,144 +1,62 @@
 <template>
-  <div class="demo-app">
-    <div class="demo-app-main">
-      <FullCalendar class="demo-app-calendar" :options="calendarOptions">
-        <template v-slot:eventContent="arg">
-          <q-badge
-            v-if="
-              arg.event.title == 'Retardo' ||
-              arg.event.title == 'Salida anticipada'
-            "
-            rounded
-            color="yellow"
-          />
-          <q-badge
-            v-else-if="
-              arg.event.title == 'Entrada' || arg.event.title == 'Salida'
-            "
-            rounded
-            color="green"
-          />
-          <q-badge v-else-if="arg.event.title == 'Falta'" rounded color="red" />
-          <q-badge
-            v-else-if="
-              arg.event.title.includes('permiso') ||
-              arg.event.title.includes('Pase') ||
-              arg.event.title.includes('Comisión') ||
-              arg.event.title.includes('Incapacidad')
-            "
-            rounded
-            color="blue"
-          />
-          <q-badge v-else rounded color="orange" />
-          <b>{{ arg.timeText }}</b>
-          <i>{{ arg.event.title }}</i>
-
-          <q-tooltip :delay="500">{{ arg.event.title }}</q-tooltip>
-        </template>
-      </FullCalendar>
+  <div class="row bg-grey-1">
+    <div class="col-9">
+      <div class="q-pa-md q-gutter-sm">
+        <div class="text-gray-ieen-1 text-h6">Mis checadas</div>
+        <q-breadcrumbs>
+          <template v-slot:separator>
+            <q-icon size="1.5em" name="chevron_right" color="primary" />
+          </template>
+          <q-breadcrumbs-el icon="home" label="Inicio" to="/" />
+          <q-breadcrumbs-el class="text-grey-7" label="Mis checadas" />
+        </q-breadcrumbs>
+      </div>
     </div>
   </div>
-  <ModalFecha />
+  <CalendarPersonal :tipo="'personal'" />
 </template>
 
 <script setup>
-import { onBeforeMount, ref, defineComponent } from "vue";
 import { storeToRefs } from "pinia";
-import FullCalendar from "@fullcalendar/vue3";
-import dayGridPlugin from "@fullcalendar/daygrid";
-import timeGridPlugin from "@fullcalendar/timegrid";
-import interactionPlugin from "@fullcalendar/interaction";
-import { useChecadaStore } from "../../../stores/checadas_store";
+import { useChecadaStore } from "src/stores/checadas_store";
+import { onBeforeMount, ref } from "vue";
+import { useQuasar, QSpinnerFacebook } from "quasar";
+import CalendarPersonal from "../components/CalendarPersonal.vue";
 
+//-----------------------------------------------------------
+
+const $q = useQuasar();
 const checada_store = useChecadaStore();
 const { mis_checadas } = storeToRefs(checada_store);
+const currentDate = ref(new Date());
+const currentYear = currentDate.value.getFullYear();
+const currentMonth = (currentDate.value.getMonth() + 1)
+  .toString()
+  .padStart(2, "0");
+
+//-----------------------------------------------------------
 
 onBeforeMount(() => {
-  checada_store.load_mis_checadas();
+  cargarData();
 });
 
-const calendarOptions = ref({
-  plugins: [
-    dayGridPlugin,
-    timeGridPlugin,
-    interactionPlugin, // needed for dateClick
-  ],
-  headerToolbar: {
-    left: "prev,next today",
-    center: "title",
-    right: "dayGridMonth,timeGridWeek,timeGridDay",
-  },
+//-----------------------------------------------------------
 
-  initialView: "dayGridMonth",
-  events: mis_checadas,
-  editable: false,
-  selectable: true,
-  selectMirror: true,
-  dayMaxEvents: true,
-  weekends: true,
-  locale: "es",
-});
-
-const currentEvents = ref([]);
-
-const handleWeekendsToggle = () => {
-  calendarOptions.value.weekends = !calendarOptions.value.weekends;
+const cargarData = async () => {
+  $q.loading.show({
+    spinner: QSpinnerFacebook,
+    spinnerColor: "purple-ieen",
+    spinnerSize: 140,
+    backgroundColor: "purple-3",
+    message: "Espere un momento, por favor...",
+    messageColor: "black",
+  });
+  mis_checadas.value = [];
+  let dias_Mes = new Date(currentYear, currentMonth, 0).getDate();
+  await checada_store.load_mis_checadas(
+    `${currentYear}-${currentMonth}-01`,
+    `${currentYear}-${currentMonth}-${dias_Mes}`
+  );
+  $q.loading.hide();
 };
 </script>
-
-<style lang="css">
-h2 {
-  margin: 0;
-  font-size: 16px;
-}
-
-ul {
-  margin: 0;
-  padding: 0 0 0 1.5em;
-}
-
-li {
-  margin: 1.5em 0;
-  padding: 0;
-}
-
-b {
-  /* used for event dates/times */
-  margin-right: 3px;
-}
-
-.demo-app {
-  display: flex;
-  min-height: 100%;
-  font-family: Arial, Helvetica Neue, Helvetica, sans-serif;
-  font-size: 14px;
-}
-
-.demo-app-sidebar {
-  width: 300px;
-  line-height: 1.5;
-  background: #eaf9ff;
-  border-right: 1px solid #d3e2e8;
-}
-
-.demo-app-sidebar-section {
-  padding: 2em;
-}
-
-.demo-app-main {
-  flex-grow: 1;
-  padding: 3em;
-}
-
-.fc {
-  /* the calendar root */
-  max-width: 1100px;
-  margin: 0 auto;
-}
-.fc-event {
-  text-align: justify;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-</style>

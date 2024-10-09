@@ -80,7 +80,7 @@
             >
               <q-checkbox
                 v-model="items.select"
-                :label="items.value"
+                :label="items.label"
                 color="purple"
                 checked-icon="task_alt"
                 unchecked-icon="highlight_off"
@@ -101,7 +101,7 @@
             >
               <q-checkbox
                 v-model="items.select"
-                :label="items.value"
+                :label="items.label"
                 color="purple"
                 checked-icon="task_alt"
                 unchecked-icon="highlight_off"

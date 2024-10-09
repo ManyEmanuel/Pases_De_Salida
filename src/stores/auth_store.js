@@ -33,6 +33,7 @@ export const useAuthStore = defineStore("auth", {
             encryptStorage.encrypt("perfil", perfil);
             encryptStorage.encrypt("perfil_Id", perfil_Id);
             encryptStorage.encrypt("area", area);
+            encryptStorage.encrypt("areaLetra", area);
             encryptStorage.encrypt("area_Id", area_Id);
             encryptStorage.encrypt("puesto", puesto);
             encryptStorage.encrypt("puesto_Id", puesto_Id);

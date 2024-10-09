@@ -7,7 +7,6 @@ export const useJustificanteStore = defineStore("justificante", {
   state: () => ({
     modal: false,
     isEditar: false,
-    editarDetalle: false,
     isVisualizar: false,
     isPersonal: false,
     isAdmi: false,
@@ -94,33 +93,30 @@ export const useJustificanteStore = defineStore("justificante", {
       this.isVisualizar = valor;
     },
 
-    updateEditarDetalle(valor) {
-      this.editarDetalle = valor;
-    },
-
     initJustificante() {
-      // this.justificante.id = null;
+      this.justificante.id = null;
       this.justificante.solicitante = null;
-      //this.justificante.solicitante_Id = null;
+      this.justificante.solicitante_Id = null;
       this.justificante.folio = null;
-      //this.justificante.area = null;
-      //this.justificante.area_Id = null;
-      // this.justificante.capturista = null;
-      // this.justificante.capturista_Id = null;
-      // this.justificante.estatus = null;
-      // this.justificante.folio = null;
-      // this.justificante.fecha_Aprobacion_Rechazo = null;
-      // this.justificante.fecha_Creacion = null;
-      // this.justificante.puesto_Solicitante_Id = null;
-      // this.justificante.puesto_Solicitante = null;
-      // this.isPersonal = false;
+      this.justificante.responsable_Area = null;
+      this.justificante.area = null;
+      this.justificante.area_Id = null;
+      this.justificante.capturista = null;
+      this.justificante.capturista_Id = null;
+      this.justificante.estatus = null;
+      this.justificante.folio = null;
+      this.justificante.fecha_Aprobacion_Rechazo = null;
+      this.justificante.fecha_Creacion = null;
+      this.justificante.puesto_Solicitante_Id = null;
+      this.justificante.puesto_Solicitante = null;
       this.listaIncidencias = [];
     },
 
     //-----------------------------------------------------------
     async isAdministracion() {
       let area = parseInt(encryptStorage.decrypt("area"));
-      if (area == 6) {
+      let perfil = parseInt(encryptStorage.decrypt("perfil"));
+      if (area == 6 || perfil == 1) {
         this.administracion = true;
       } else {
         this.administracion = false;
@@ -138,9 +134,9 @@ export const useJustificanteStore = defineStore("justificante", {
         let resp = null;
         let listJustificantes = null;
         if (perfil == 1) {
-          console.log("Esto es perfil 1");
           resp = await api.get("/Justificantes/ObtenTodos");
           let { data } = resp.data;
+
           listJustificantes = data.map((justificante) => {
             return {
               justificante_Id: justificante.id,
@@ -165,6 +161,7 @@ export const useJustificanteStore = defineStore("justificante", {
                   : justificante.area,
               area_Completa: justificante.area,
               area_Id: justificante.area_Id,
+              detalles: justificante.detalles,
             };
           });
           this.isSuperAdmi = true;
@@ -195,6 +192,7 @@ export const useJustificanteStore = defineStore("justificante", {
                   : justificante.area,
               area_Completa: justificante.area,
               area_Id: justificante.area_Id,
+              detalles: justificante.detalles,
             };
           });
           this.isAdmi = true;
@@ -226,11 +224,11 @@ export const useJustificanteStore = defineStore("justificante", {
                   : justificante.area,
               area_Completa: justificante.area,
               area_Id: justificante.area_Id,
+              detalles: justificante.detalles,
             };
           });
           this.isPersonal = true;
         }
-
         this.justificantes = listJustificantes.sort(
           (a, b) => b.justificante_Id - a.justificante_Id
         );
@@ -498,29 +496,51 @@ export const useJustificanteStore = defineStore("justificante", {
       periodo_Vacacional,
       year
     ) {
-      var ultimoId =
-        this.listaIncidencias.length > 0
-          ? this.listaIncidencias[this.listaIncidencias.length - 1].id
-          : 0;
-      var nuevoId = ultimoId + 1;
-      try {
-        this.listaIncidencias.push({
-          id: nuevoId,
-          tipo_Justificantes: tipo_Justificantes,
-          dias_Incidencias: dias_Incidencias,
-          motivo: motivo,
-          periodo_Vacacional: periodo_Vacacional,
-          primer_Periodo: 0,
-          segundo_Periodo: 0,
-          dias_Economicos: 0,
-          year: year,
-        });
-      } catch (error) {
-        return {
-          success: false,
-          data: "Ocurrió un error, inténtelo de nuevo. Si el error persiste, contacte a soporte",
-        };
+      let incidenciaExistente = this.listaIncidencias.find(
+        (incidencia) =>
+          incidencia.tipo_Justificantes === "Vacaciones" &&
+          incidencia.year == year &&
+          incidencia.periodo_Vacacional == periodo_Vacacional
+      );
+
+      if (incidenciaExistente) {
+        if (this.isEditar == true) {
+          incidenciaExistente.dias_Incidencias += `, ${dias_Incidencias}`;
+        } else {
+          incidenciaExistente.dias_Incidencias = `${dias_Incidencias}`;
+        }
+        incidenciaExistente.motivo = motivo;
+      } else {
+        var ultimoId =
+          this.listaIncidencias.length > 0
+            ? this.listaIncidencias[this.listaIncidencias.length - 1].id
+            : 0;
+        var nuevoId = ultimoId + 1;
+
+        try {
+          this.listaIncidencias.push({
+            id: nuevoId,
+            tipo_Justificantes: tipo_Justificantes,
+            dias_Incidencias: dias_Incidencias,
+            motivo: motivo,
+            periodo_Vacacional: periodo_Vacacional,
+            primer_Periodo: 0,
+            segundo_Periodo: 0,
+            dias_Economicos: 0,
+            year: year,
+          });
+        } catch (error) {
+          return {
+            success: false,
+            data: "Ocurrió un error, inténtelo de nuevo. Si el error persiste, contacte a soporte",
+          };
+        }
       }
+
+      return {
+        success: true,
+        data: "Incidencia añadida o actualizada correctamente",
+      };
     },
 
     //-----------------------------------------------------------
@@ -535,13 +555,13 @@ export const useJustificanteStore = defineStore("justificante", {
             id: incidencia.id,
             tipo_Justificantes: incidencia.tipo_Justificantes,
             dias_Incidencias: incidencia.dias_Incidencias,
-            dias_Incidencias_Completo: incidencia.dias_Incidencias,
             periodo_Vacacional: incidencia.periodo_Vacacional,
             primer_Periodo: incidencia.primer_Periodo,
             segundo_Periodo: incidencia.segundo_Periodo,
             dias_Economicos: incidencia.dias_Economicos,
             motivo: incidencia.motivo,
             motivo_Completo: incidencia.motivo,
+            year: incidencia.year,
           };
         });
       } catch (error) {
@@ -641,7 +661,6 @@ export const useJustificanteStore = defineStore("justificante", {
           `/Detalle_Justificantes/${detalle.id}`,
           detalle
         );
-
         if (resp.status == 200) {
           const { success, data } = resp.data;
           if (success === true) {
@@ -836,6 +855,29 @@ export const useJustificanteStore = defineStore("justificante", {
             permuta_Laboral: reporte.permuta_Laboral,
             otros: reporte.otros,
             area_Id: reporte.area_Id,
+            area: reporte.area,
+            vacaciones_P1: reporte.vacaciones_P1,
+            vacaciones_P2: reporte.vacaciones_P2,
+            permiso_Economico: reporte.permiso_Economico,
+            omision_Entrada: reporte.omision_Entrada,
+            omision_Salida: reporte.omision_Salida,
+            comision_Oficial: reporte.comision_Oficial,
+            permuta_Laboral: reporte.permuta_Laboral,
+            otros: reporte.otros,
+            pases_Oficiales: reporte.pases_Oficiales,
+            pases_Oficial_Entrada: reporte.pases_Oficial_Entrada,
+            pases_Oficial_Intermedio: reporte.pases_Oficial_Intermedio,
+            pases_Oficial_Salida: reporte.pases_Oficial_Salida,
+            pases_Personal: reporte.pases_Personal,
+            pases_Personales_Entrada: reporte.pases_Personales_Entrada,
+            pases_Personal_Intermedio: reporte.pases_Personal_Intermedio,
+            pases_Personal_Salida: reporte.pases_Personal_Salida,
+            pases_Medico: reporte.pases_Medico,
+            pases_Medico_Entrada: reporte.pases_Medico_Entrada,
+            pases_Medico_Intermedio: reporte.pases_Medico_Intermedio,
+            pases_Medico_Salida: reporte.pases_Medico_Salida,
+            pases: reporte.pases,
+            justificantes: reporte.justificantes,
           };
         });
         this.listReporte = listReporte;

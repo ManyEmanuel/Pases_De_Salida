@@ -128,18 +128,8 @@
               <q-item-section>
                 <q-item-label>Solicitudes del área</q-item-label>
               </q-item-section>
-            </q-item>
-            <q-item
-              v-if="menuPasesList.some((element) => element == 'PS-REG-GEN')"
-              :to="{ name: 'registro_General' }"
-              class="text-grey-8 text-bold"
-              active-class="text-purple-ieen"
-            >
-              <q-item-section avatar>
-                <q-icon name="list_alt" />
-              </q-item-section>
-              <q-item-section>
-                <q-item-label>Registro general</q-item-label>
+              <q-item-section side>
+                <q-badge color="purple-ieen"> {{ solicitudes.length }}</q-badge>
               </q-item-section>
             </q-item>
           </q-expansion-item>
@@ -175,21 +165,39 @@
               <q-item-section>
                 <q-item-label>Solicitudes del área</q-item-label>
               </q-item-section>
-            </q-item>
-            <q-item
-              v-if="menuPasesList.some((element) => element == 'PS-GEN-JUS')"
-              :to="{ name: 'registro_general_justificantes' }"
-              class="text-grey-8 text-bold"
-              active-class="text-purple-ieen"
-            >
-              <q-item-section avatar>
-                <q-icon name="list_alt" />
-              </q-item-section>
-              <q-item-section>
-                <q-item-label>Registro general</q-item-label>
+              <q-item-section side>
+                <q-badge color="purple-ieen">
+                  {{ solicitudesArea.length }}</q-badge
+                >
               </q-item-section>
             </q-item>
           </q-expansion-item>
+          <q-item
+            v-if="menuPasesList.some((element) => element == 'PS-GEN-ADM')"
+            :to="{ name: 'registro_General' }"
+            class="text-grey-8 text-bold"
+            active-class="text-purple-ieen"
+          >
+            <q-item-section avatar>
+              <q-icon name="list_alt" />
+            </q-item-section>
+            <q-item-section>
+              <q-item-label>Historial general</q-item-label>
+            </q-item-section>
+          </q-item>
+          <q-item
+            v-if="menuPasesList.some((element) => element == 'PS-REPORTES')"
+            :to="{ name: 'reportes' }"
+            class="text-grey-8 text-bold"
+            active-class="text-purple-ieen"
+          >
+            <q-item-section avatar>
+              <q-icon name="analytics" />
+            </q-item-section>
+            <q-item-section>
+              <q-item-label>Reportes</q-item-label>
+            </q-item-section>
+          </q-item>
           <q-item
             v-if="menuPasesList.some((element) => element == 'PS-MISCHECADAS')"
             :to="{ name: 'misChecadas' }"
@@ -226,7 +234,8 @@
         <div class="bg-transparent">
           <div class="text-weight-bold text-black">
             <br />
-            Bienvenido(a) {{ usuario }}
+            Bienvenido(a) <br />
+            {{ usuario }}
           </div>
         </div>
       </q-img>
@@ -256,6 +265,8 @@ import { storeToRefs } from "pinia";
 import { useQuasar, QSpinnerFacebook } from "quasar";
 import { useNotifications } from "../helpers/signalRService";
 import { EncryptStorage } from "storage-encryption";
+import { useSolicitudJustificanteStore } from "src/stores/solicitudes_Justificantes_store";
+import { useSolicitudPaseStore } from "src/stores/solicitudes_Pase_store";
 
 //----------------------------------------------------------
 
@@ -266,6 +277,10 @@ const router = useRouter();
 const notificacionStore = useNotificacionStore();
 const authStore = useAuthStore();
 const encryptStorage = new EncryptStorage("SECRET_KEY", "sessionStorage");
+const solicitudJustificanteStore = useSolicitudJustificanteStore();
+const solicitudStore = useSolicitudPaseStore();
+const { solicitudesArea } = storeToRefs(solicitudJustificanteStore);
+const { solicitudes } = storeToRefs(solicitudStore);
 const { startConnection, onReceiveNotification, onLine } = useNotifications();
 const { notificaciones, no_notificaciones, notificaciones_all } =
   storeToRefs(notificacionStore);
@@ -309,9 +324,7 @@ onBeforeMount(async () => {
       usuario.value = encryptStorage.decrypt("usuario");
     }
   }
-  await loadMenu();
-  await notificacionStore.loadNotificaciones();
-  await notificacionStore.loadNotificacionesAll();
+  cargarData();
   conectar_signalr();
 });
 
@@ -321,6 +334,14 @@ const conectar_signalr = async () => {
 };
 
 //----------------------------------------------------------
+
+const cargarData = async () => {
+  loadMenu();
+  await notificacionStore.loadNotificaciones();
+  await notificacionStore.loadNotificacionesAll();
+  await solicitudJustificanteStore.loadSolicitudesJustificantes();
+  await solicitudStore.loadSolicitudes();
+};
 
 const toNotificaciones = () => {
   router.push({
@@ -442,9 +463,6 @@ const loadMenu = async () => {
       case "PS-SOL-PAS":
         menuPasesList.value.push("PS-SOL-PAS");
         break;
-      case "PS-REG-GEN":
-        menuPasesList.value.push("PS-REG-GEN");
-        break;
       case "PS-REG-JUS":
         menuPasesList.value.push("PS-REG-JUS");
         break;
@@ -457,9 +475,11 @@ const loadMenu = async () => {
       case "PS-CHECADAS":
         menuPasesList.value.push("PS-CHECADAS");
         break;
-      case "PS-GEN-JUS":
-        menuPasesList.value.push("PS-GEN-JUS");
+      case "PS-REPORTES":
+        menuPasesList.value.push("PS-REPORTES");
         break;
+      case "PS-GEN-ADM":
+        menuPasesList.value.push("PS-GEN-ADM");
     }
   });
   $q.loading.hide();

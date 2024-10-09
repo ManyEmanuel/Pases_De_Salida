@@ -5,15 +5,21 @@
     transition-show="scale"
     transition-hide="scale"
   >
-    <q-card style="width: 800px; max-width: 80vw">
+    <q-card style="width: 900px; max-width: 90vw">
       <q-card-section class="row">
-        <q-img src="../../../assets/IEEN300.png" width="90px" />
-        <div class="text-h5 text-gray-ieen-1 text-bold absolute-center">
-          DETALLE DEL PASE <br />
-          <p class="text-purple-ieen text-h6 text-center text-bold">
+        <q-img
+          src="../../../assets/IEEN300.png"
+          :width="$q.screen.xs ? '60px' : '90px'"
+        />
+        <div
+          class="text-h6 text-gray-ieen-1 text-bold absolute-center text-center"
+        >
+          VER PASE
+          <p class="text-purple-ieen text-subtitle1 text-center text-bold">
             {{ paseConsulta.folio }}
           </p>
         </div>
+
         <q-space />
         <q-btn
           icon="close"

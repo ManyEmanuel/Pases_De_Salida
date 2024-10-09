@@ -1,6 +1,6 @@
 <template>
   <q-page>
-    <div class="row bg-grey-2">
+    <div class="row bg-grey-1">
       <div class="col-9">
         <div class="q-pa-md q-gutter-sm">
           <div class="text-gray-ieen-1 text-h6">Registro de pases</div>

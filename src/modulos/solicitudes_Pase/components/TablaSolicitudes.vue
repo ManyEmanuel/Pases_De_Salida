@@ -2,11 +2,13 @@
   <div class="row">
     <div class="col">
       <q-table
+        :grid="$q.screen.xs"
         :visible-columns="visisble_columns"
-        :rows="solicitudes"
+        :rows="solicitudes_Filtrado"
         :columns="columns"
         :filter="filter"
         :pagination="pagination"
+        :rows-per-page-options="[5, 10, 15, 20, 25, 50]"
         row-key="id"
         rows-per-page-label="Filas por pagina"
         no-data-label="No hay registros"
@@ -25,7 +27,73 @@
             </template>
           </q-input>
         </template>
-        <template v-slot:body="props">
+        <!--TEMPLATE SCREEN XS-->
+        <template v-if="$q.screen.xs" v-slot:item="props">
+          <div
+            class="q-pa-xs col-xs-12 col-sm-6 col-md-4 col-lg-3 grid-style-transition"
+          >
+            <q-card bordered class="no-shadow">
+              <q-list dense>
+                <q-item v-for="col in props.cols" :key="col.name">
+                  <q-item-section>
+                    <q-item-label class="text-bold"
+                      >{{ col.label }}:</q-item-label
+                    >
+                  </q-item-section>
+                  <q-item-section class="flex-center">
+                    <div v-if="col.name === 'id'">
+                      <q-btn
+                        v-if="modulo.actualizar"
+                        flat
+                        round
+                        color="purple-ieen"
+                        icon="check_circle"
+                        @click="aceptar(col.value)"
+                      >
+                        <q-tooltip>Aceptar pase</q-tooltip>
+                      </q-btn>
+                      <q-btn
+                        v-if="modulo.eliminar"
+                        flat
+                        round
+                        color="purple-ieen"
+                        icon="cancel"
+                        @click="rechazar(col.value)"
+                      >
+                        <q-tooltip>Rechazar pase</q-tooltip>
+                      </q-btn>
+                      <q-btn
+                        v-if="modulo.eliminar"
+                        flat
+                        round
+                        color="purple-ieen"
+                        icon="search"
+                        @click="visualizar(col.value)"
+                      >
+                        <q-tooltip>Ver pase</q-tooltip>
+                      </q-btn>
+                    </div>
+                    <div v-else-if="col.name == 'estatus'">
+                      <q-badge
+                        color="orange"
+                        text-color="white"
+                        :label="col.value"
+                      >
+                        <q-icon name="warning" color="white" />
+                      </q-badge>
+                    </div>
+                    <label v-else-if="col.name == 'folio'" class="text-bold">{{
+                      col.value
+                    }}</label>
+                    <label v-else>{{ col.value }}</label>
+                  </q-item-section>
+                </q-item>
+              </q-list>
+            </q-card>
+          </div>
+        </template>
+        <!--TEMPLATE SCREEN DESKTOP-->
+        <template v-else v-slot:body="props">
           <q-tr :props="props">
             <q-td v-for="col in props.cols" :key="col.name" :props="props">
               <div v-if="col.name === 'id'">
@@ -79,7 +147,7 @@
 <script setup>
 import { storeToRefs } from "pinia";
 import { useQuasar, QSpinnerFacebook } from "quasar";
-import { onBeforeMount, ref } from "vue";
+import { ref } from "vue";
 import { useAuthStore } from "../../../stores/auth_store";
 import { useSolicitudPaseStore } from "../../../stores/solicitudes_Pase_store";
 import { useRegistroPaseStore } from "src/stores/registro_Pase_store";
@@ -89,11 +157,7 @@ const solicitudStore = useSolicitudPaseStore();
 const pasesStore = useRegistroPaseStore();
 const authStore = useAuthStore();
 const { modulo } = storeToRefs(authStore);
-const { solicitudes } = storeToRefs(solicitudStore);
-
-onBeforeMount(() => {
-  solicitudStore.loadSolicitudes();
-});
+const { solicitudes_Filtrado } = storeToRefs(solicitudStore);
 
 const columns = [
   {
@@ -162,7 +226,7 @@ const columns = [
   {
     name: "id",
     align: "center",
-    label: "Opciones",
+    label: "Acciones",
     field: "id",
     sortable: false,
   },
@@ -182,7 +246,7 @@ const visisble_columns = [
 
 const pagination = ref({
   page: 1,
-  rowsPerPage: 25,
+  rowsPerPage: 5,
   sortBy: "name",
   descending: false,
 });
@@ -203,12 +267,12 @@ const aceptar = async (id) => {
     transitionShow: "scale",
     transitionHide: "scale",
     ok: {
-      color: "positive",
+      color: "secondary",
       label: "¡Sí!, aceptar",
     },
     cancel: {
-      color: "negative",
-      label: "Cancelar",
+      color: "red",
+      label: "Regresar",
     },
   }).onOk(async () => {
     $q.loading.show({
@@ -235,7 +299,7 @@ const aceptar = async (id) => {
           },
         ],
       });
-      solicitudStore.loadSolicitudes();
+      solicitudStore.actualizarCargar(true);
     } else {
       $q.loading.hide();
       $q.notify({
@@ -264,12 +328,12 @@ const rechazar = async (id) => {
     transitionShow: "scale",
     transitionHide: "scale",
     ok: {
-      color: "positive",
+      color: "secondary",
       label: "¡Sí!, rechazar",
     },
     cancel: {
-      color: "negative",
-      label: "Cancelar",
+      color: "red",
+      label: "Regresar",
     },
   }).onOk(async () => {
     $q.loading.show({
@@ -296,7 +360,7 @@ const rechazar = async (id) => {
           },
         ],
       });
-      solicitudStore.loadSolicitudes();
+      solicitudStore.actualizarCargar(true);
     } else {
       $q.loading.hide();
       $q.notify({
