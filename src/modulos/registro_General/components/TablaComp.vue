@@ -56,12 +56,24 @@
                     </div>
                     <div v-else-if="col.name == 'estatus'">
                       <q-badge
-                        :color="col.value == 'Aprobado' ? 'green' : 'red'"
+                        :color="
+                          col.value == 'Aprobado'
+                            ? 'green'
+                            : col.value == 'Pendiente'
+                            ? 'orange'
+                            : 'red'
+                        "
                         text-color="white"
                         :label="col.value"
                       >
                         <q-icon
-                          :name="col.value == 'Aprobado' ? 'done' : 'close'"
+                          :name="
+                            col.value == 'Aprobado'
+                              ? 'done'
+                              : col.value == 'Pendiente'
+                              ? 'warning'
+                              : 'close'
+                          "
                           color="white"
                         />
                       </q-badge>
@@ -115,19 +127,31 @@
               </div>
               <div v-else-if="col.name == 'estatus'">
                 <q-badge
-                  :color="col.value == 'Aprobado' ? 'green' : 'red'"
+                  :color="
+                    col.value == 'Aprobado'
+                      ? 'green'
+                      : col.value == 'Pendiente'
+                      ? 'orange'
+                      : 'red'
+                  "
                   text-color="white"
                   :label="col.value"
                 >
                   <q-icon
-                    :name="col.value == 'Aprobado' ? 'done' : 'close'"
+                    :name="
+                      col.value == 'Aprobado'
+                        ? 'done'
+                        : col.value == 'Pendiente'
+                        ? 'warning'
+                        : 'close'
+                    "
                     color="white"
                   />
                 </q-badge>
               </div>
               <div v-else-if="col.name == 'asunto'">
                 <label>{{ col.value }}</label>
- <q-tooltip
+                <q-tooltip
                   :offset="[10, 10]"
                   v-if="
                     col.value != null &&

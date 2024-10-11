@@ -570,14 +570,17 @@ export const useRegistroPaseStore = defineStore("registroPase", {
 
     async compareHoras() {
       try {
-        let llegada = new Date("2022-05-05 " + this.pase.llegada);
+        let llegada = new Date(this.pase.llegada);
         let salida = new Date(this.pase.salida);
+        console.log(llegada, salida);
         if (llegada.getHours() > salida.getHours()) {
+          console.log("1");
           return {
             success: true,
             data: "Hora bien",
           };
         } else if (llegada.getHours() == salida.getHours()) {
+          console.log("2");
           if (llegada.getMinutes() > salida.getMinutes()) {
             return {
               success: true,
@@ -590,6 +593,7 @@ export const useRegistroPaseStore = defineStore("registroPase", {
             };
           }
         } else {
+          console.log("3");
           return {
             success: false,
             data: "La hora estimada de llegada, debe ser mayor a la hora de salida",

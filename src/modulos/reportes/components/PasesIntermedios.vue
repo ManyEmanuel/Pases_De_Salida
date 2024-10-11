@@ -1,7 +1,6 @@
 <template>
   <div class="row q-pt-lg">
-    <div class="col-lg-3 col-md-3 col-sm-12 col-xs-12 text-center">
-      <b>Buscar por: </b>
+    <div class="col-lg-3 col-md-2 col-sm-12 col-xs-12 text-center">
       <q-btn-toggle
         v-model="buscar_Por"
         style="border: 1px solid #673e84"
@@ -18,7 +17,7 @@
     </div>
     <div
       v-if="buscar_Por == 'año'"
-      class="col-lg-2 col-md-2 col-sm-4 col-xs-12"
+      class="col-lg-2 col-md-2 col-sm-4 col-xs-12 q-pr-xs"
     >
       <q-select
         filled
@@ -29,7 +28,7 @@
         label="Año"
       />
     </div>
-    <div v-else class="col-lg-3 col-md-3 col-sm-4 col-xs-12">
+    <div v-else class="col-lg-3 col-md-3 col-sm-4 col-xs-12 q-pr-xs">
       <q-input
         dense
         color="purple-ieen"
@@ -66,24 +65,45 @@
         </template>
       </q-input>
     </div>
-    <div class="col-lg-3 col-md-3 col-sm-4 col-xs-6 text-left">
+    <div class="col-lg-2 col-md-2 col-sm-6 col-xs-6">
+      <q-select
+        filled
+        dense
+        class="q-pr-xs"
+        v-model="area_Id"
+        :options="areas"
+        color="purple-ieen"
+        label="Buscar por área"
+        hint="Seleccione un área "
+      >
+      </q-select>
+    </div>
+    <div class="col-lg-2 col-md-2 col-sm-6 col-xs-6">
+      <q-select
+        filled
+        dense
+        v-model="empleado_Id"
+        :options="listEmpleados"
+        color="purple-ieen"
+        label="Buscar por personal"
+        hint="Seleccione personal"
+      >
+      </q-select>
+    </div>
+    <div class="col-lg-2 col-md-2 col-sm-6 col-xs-12 text-right">
       <q-btn
         type="button"
         color="purple-ieen"
         icon-right="search"
         label="Buscar"
+        class="q-mr-xs"
         @click="cargarTabla"
       />
-    </div>
-    <div
-      v-if="listPasesIntermediosFiltrado.length > 0"
-      class="col-lg-3 col-md-3 col-sm-4 col-xs-6 text-right q-pl-xs"
-    >
       <q-btn
+        v-if="listPasesIntermediosFiltrado.length > 0"
         type="button"
         color="purple-ieen"
         icon-right="download"
-        label="Excel"
         @click="descargarExcel"
       />
     </div>
@@ -99,29 +119,6 @@
         :rows-per-page-options="[5, 10, 15, 20, 25, 50]"
         no-data-label="No hay registros"
       >
-        <template v-slot:top-left>
-          <div class="row">
-            <q-select
-              class="q-pr-xs"
-              v-model="area_Id"
-              :options="areas"
-              color="purple-ieen"
-              label="Buscar por área"
-              hint="Seleccione un área "
-              style="width: 300px"
-            >
-            </q-select>
-            <q-select
-              v-model="empleado_Id"
-              :options="listEmpleados"
-              color="purple-ieen"
-              label="Buscar por personal"
-              hint="Seleccione personal"
-              style="width: 300px"
-            >
-            </q-select>
-          </div>
-        </template>
         <template v-slot:top-right>
           <q-input
             borderless
@@ -141,6 +138,28 @@
               <label v-if="col.name == 'folio'" class="text-bold">
                 {{ col.value }}
               </label>
+              <div v-else-if="col.name === 'estatus'">
+                <q-badge
+                  :color="
+                    col.value == 'Pendiente'
+                      ? 'orange'
+                      : col.value == 'Aprobado'
+                      ? 'green'
+                      : 'red'
+                  "
+                >
+                  {{ col.value }}
+                  <q-icon
+                    :name="
+                      col.value == 'Aprobado'
+                        ? 'done'
+                        : col.value == 'Pendiente'
+                        ? 'warning'
+                        : 'close'
+                    "
+                  />
+                </q-badge>
+              </div>
               <label v-else>
                 {{ col.value }}
               </label>
@@ -263,6 +282,10 @@ const cargarTabla = async () => {
         return fecha_Salida >= fecha_From && fecha_Salida <= fecha_To;
       }
     );
+    const filtro = {};
+    if (area_Id.value != null) filtro.area = area_Id.value.value;
+    if (empleado_Id.value != null) filtro.empleado = empleado_Id.value.value;
+    filtrar(listPasesIntermediosFiltrado.value, filtro);
   }
 
   $q.loading.hide();
@@ -336,19 +359,26 @@ const descargarExcel = () => {
   }
 };
 
-watchEffect(() => {
-  const filtro = {};
-  if (area_Id.value != null) filtro.area = area_Id.value.value;
-  if (empleado_Id.value != null) filtro.empleado = empleado_Id.value.value;
-  filtrar(listPasesIntermedios.value, filtro);
-});
-
 const columns = [
   {
     name: "folio",
     align: "center",
     label: "Folio",
     field: "folio",
+    sortable: true,
+  },
+  {
+    name: "estatus",
+    align: "center",
+    label: "Estatus",
+    field: "estatus",
+    sortable: true,
+  },
+  {
+    name: "tipo_Asunto",
+    align: "center",
+    label: "Tipo",
+    field: "tipo_Asunto",
     sortable: true,
   },
   {

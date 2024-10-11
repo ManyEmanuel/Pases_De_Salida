@@ -186,7 +186,12 @@
             </q-item-section>
           </q-item>
           <q-item
-            v-if="menuPasesList.some((element) => element == 'PS-REPORTES')"
+            v-if="
+              menuPasesList.some(
+                (element) =>
+                  element == 'PS-REPORTES' || element == 'PS-INTERMEDIO'
+              )
+            "
             :to="{ name: 'reportes' }"
             class="text-grey-8 text-bold"
             active-class="text-purple-ieen"
@@ -480,6 +485,10 @@ const loadMenu = async () => {
         break;
       case "PS-GEN-ADM":
         menuPasesList.value.push("PS-GEN-ADM");
+        break;
+      case "PS-INTERMEDIO":
+        menuPasesList.value.push("PS-INTERMEDIO");
+        break;
     }
   });
   $q.loading.hide();

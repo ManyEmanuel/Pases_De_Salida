@@ -12,6 +12,7 @@ export const useRegistroGeneralStore = defineStore("registroGeneral", {
     listAreas: [],
     listPasesIntermedios: [],
     documentoExcel: null,
+    tipo: "Todos",
   }),
   actions: {
     async loadPasesGeneral() {
@@ -82,9 +83,7 @@ export const useRegistroGeneralStore = defineStore("registroGeneral", {
             vehiculo: vehiculoSolicitud,
           };
         });
-        this.pasesGeneral = listPases
-          .filter((x) => x.estatus != "Pendiente")
-          .reverse();
+        this.pasesGeneral = listPases.reverse();
       } catch (error) {
         console.error(error);
         return {

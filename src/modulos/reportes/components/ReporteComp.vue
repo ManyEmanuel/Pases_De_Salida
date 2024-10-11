@@ -1,7 +1,6 @@
 <template>
   <div class="row q-pt-lg">
-    <div class="col-lg-4 col-md-3 col-sm-12 col-xs-12 text-center">
-      <b>Buscar por: </b>
+    <div class="col-lg-2 col-md-2 col-sm-12 col-xs-12 q-pt-xs text-center">
       <q-btn-toggle
         v-model="buscar_Por"
         style="border: 1px solid #673e84"
@@ -16,7 +15,9 @@
         ]"
       />
     </div>
-    <div class="col-lg-2 col-md-2 col-sm-12 col-xs-12 q-pr-xs text-right">
+    <div
+      class="col-lg-2 col-md-2 col-sm-12 col-xs-12 q-pt-xs q-pr-xs text-right"
+    >
       <q-select
         :options="tipos"
         color="purple-ieen"
@@ -26,18 +27,20 @@
         v-model="tipo"
       />
     </div>
-    <div v-if="buscar_Por == 'año'" class="col-lg-2 col-md-2 col-sm-3 col-xs-6">
+    <div
+      class="col-lg-2 col-md-2 col-sm-12 col-xs-12 q-pt-xs q-pr-xs text-right"
+    >
       <q-select
+        v-if="buscar_Por == 'año'"
+        label="Buscar por año"
         filled
         dense
         color="purple-ieen"
         v-model="year"
         :options="años"
-        label="Año"
       />
-    </div>
-    <div v-else class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
       <q-input
+        v-else
         dense
         color="purple-ieen"
         filled
@@ -73,25 +76,48 @@
         </template>
       </q-input>
     </div>
-    <div class="col-lg-2 col-md-2 col-sm-6 col-xs-6">
+    <div class="col-lg-2 col-md-2 col-sm-6 col-xs-6 q-pt-xs">
+      <q-select
+        filled
+        dense
+        v-show="administracion == true"
+        class="q-pr-xs"
+        v-model="area_Id"
+        :options="areas"
+        color="purple-ieen"
+        label="Buscar por área"
+        hint="Seleccione un área"
+      >
+      </q-select>
+    </div>
+    <div class="col-lg-2 col-md-2 col-sm-6 col-xs-6 q-pt-xs q-pr-xs">
+      <q-select
+        filled
+        dense
+        v-show="administracion == true"
+        v-model="empleado_Id"
+        :options="listEmpleados"
+        color="purple-ieen"
+        label="Buscar por personal"
+        hint="Seleccione personal"
+      >
+      </q-select>
+    </div>
+    <div class="col-lg-2 col-md-2 col-sm-6 col-xs-12 text-center">
       <q-btn
+        label="Buscar"
         type="button"
         color="purple-ieen"
         icon-right="search"
-        label="Buscar"
         @click="cargarTabla"
-        class="q-pr-xs"
+        class="q-ma-xs"
       />
-    </div>
-    <div
-      v-if="listFiltroReporte.length > 0"
-      class="col-lg-2 col-md-2 col-sm-6 col-xs-6 text-right"
-    >
       <q-btn
+        v-if="listFiltroReporte.length > 0"
+        class="q-ma-xs"
         type="button"
         color="purple-ieen"
         icon-right="download"
-        label="Excel"
         @click="descargarExcel"
       />
     </div>
@@ -109,31 +135,6 @@
         no-data-label="No hay registros"
         :visible-columns="visible_Columns"
       >
-        <template v-slot:top-left>
-          <div class="row">
-            <q-select
-              v-show="administracion == true"
-              class="q-pr-xs"
-              v-model="area_Id"
-              :options="areas"
-              color="purple-ieen"
-              label="Buscar por área"
-              hint="Seleccione un área "
-              style="width: 300px"
-            >
-            </q-select>
-            <q-select
-              v-show="administracion == true"
-              v-model="empleado_Id"
-              :options="listEmpleados"
-              color="purple-ieen"
-              label="Buscar por personal"
-              hint="Seleccione personal"
-              style="width: 300px"
-            >
-            </q-select>
-          </div>
-        </template>
         <template v-slot:top-right>
           <q-input
             borderless
@@ -301,6 +302,8 @@ const myLocale = {
   format24h: true,
   pluralDay: "dias",
 };
+const años = ref([]);
+const startYear = 2022;
 const visible_Columns = ref([
   "empleado",
   "pases",
@@ -331,8 +334,6 @@ const month = String(newDate.getMonth() + 1).padStart(2, "0");
 const day = String(newDate.getDate()).padStart(2, "0");
 const dateActual = ref(`${year.value}/${month}/${day}`);
 const date = ref({ from: `${year.value}/01/01`, to: `${year.value}/12/31` });
-const años = ref([]);
-const startYear = 2022;
 
 //-----------------------------------------------------------
 
@@ -361,68 +362,6 @@ watch(buscar_Por, (val) => {
   if (val != null) {
     rango_Fecha.value = null;
     textoFecha.value = null;
-  }
-});
-
-watch(tipo, (val) => {
-  if (val != null) {
-    switch (val) {
-      case "Todos":
-        visible_Columns.value = [
-          "empleado",
-          "pases",
-          "pases_Oficial_Entrada",
-          "pases_Medico_Entrada",
-          "pases_Personales_Entrada",
-          "pases_Oficial_Salida",
-          "pases_Medico_Salida",
-          "pases_Personal_Salida",
-          "pases_Oficial_Intermedio",
-          "pases_Medico_Intermedio",
-          "pases_Personal_Intermedio",
-          "justificantes",
-          "omision_Entrada",
-          "omision_Salida",
-          "comision_Oficial",
-          "permuta_Laboral",
-          "otros",
-          "permiso_Economico",
-          "vacaciones_P1",
-          "vacaciones_P2",
-        ];
-        break;
-      case "Pases de salida":
-        visible_Columns.value = [
-          "empleado",
-          "pases",
-          "pases_Oficial_Entrada",
-          "pases_Medico_Entrada",
-          "pases_Personales_Entrada",
-          "pases_Oficial_Salida",
-          "pases_Medico_Salida",
-          "pases_Personal_Salida",
-          "pases_Oficial_Intermedio",
-          "pases_Medico_Intermedio",
-          "pases_Personal_Intermedio",
-        ];
-        break;
-      case "Justificantes":
-        visible_Columns.value = [
-          "empleado",
-          "justificantes",
-          "omision_Entrada",
-          "omision_Salida",
-          "comision_Oficial",
-          "permuta_Laboral",
-          "otros",
-          "permiso_Economico",
-          "vacaciones_P1",
-          "vacaciones_P2",
-        ];
-        break;
-      default:
-        break;
-    }
   }
 });
 
@@ -468,8 +407,72 @@ const cargarTabla = async () => {
       buscar_Por.value == "año" ? date.value : rango_Fecha.value
     );
   }
-
+  const filtro = {};
+  if (area_Id.value != null) filtro.area = area_Id.value.value;
+  if (empleado_Id.value != null) filtro.empleado = empleado_Id.value.value;
+  filtrar(listReporte.value, filtro);
+  cargarColumnas();
   $q.loading.hide();
+};
+
+const cargarColumnas = () => {
+  switch (tipo.value) {
+    case "Todos":
+      visible_Columns.value = [
+        "empleado",
+        "pases",
+        "pases_Oficial_Entrada",
+        "pases_Medico_Entrada",
+        "pases_Personales_Entrada",
+        "pases_Oficial_Salida",
+        "pases_Medico_Salida",
+        "pases_Personal_Salida",
+        "pases_Oficial_Intermedio",
+        "pases_Medico_Intermedio",
+        "pases_Personal_Intermedio",
+        "justificantes",
+        "omision_Entrada",
+        "omision_Salida",
+        "comision_Oficial",
+        "permuta_Laboral",
+        "otros",
+        "permiso_Economico",
+        "vacaciones_P1",
+        "vacaciones_P2",
+      ];
+      break;
+    case "Pases de salida":
+      visible_Columns.value = [
+        "empleado",
+        "pases",
+        "pases_Oficial_Entrada",
+        "pases_Medico_Entrada",
+        "pases_Personales_Entrada",
+        "pases_Oficial_Salida",
+        "pases_Medico_Salida",
+        "pases_Personal_Salida",
+        "pases_Oficial_Intermedio",
+        "pases_Medico_Intermedio",
+        "pases_Personal_Intermedio",
+      ];
+      break;
+    case "Justificantes":
+      visible_Columns.value = [
+        "empleado",
+        "justificantes",
+        "omision_Entrada",
+        "omision_Salida",
+        "comision_Oficial",
+        "permuta_Laboral",
+        "otros",
+        "permiso_Economico",
+        "vacaciones_P1",
+        "vacaciones_P2",
+      ];
+      break;
+    default:
+      break;
+  }
 };
 
 // const crearReporte = async () => {
@@ -518,13 +521,6 @@ const filtrar = (listReporte, filtro) => {
     return cumple;
   });
 };
-
-watchEffect(() => {
-  const filtro = {};
-  if (area_Id.value != null) filtro.area = area_Id.value.value;
-  if (empleado_Id.value != null) filtro.empleado = empleado_Id.value.value;
-  filtrar(listReporte.value, filtro);
-});
 
 const descargarExcel = async () => {
   $q.loading.show({

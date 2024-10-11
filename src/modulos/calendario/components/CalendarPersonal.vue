@@ -80,7 +80,7 @@ const $q = useQuasar();
 const checada_store = useChecadaStore();
 const { mis_checadas, list_Checadas_Personal, personal_Id } =
   storeToRefs(checada_store);
-const currentDate = ref(new Date()); 
+const currentDate = ref(new Date());
 currentDate.value.setDate(currentDate.value.getDate() + 1);
 const props = defineProps({
   tipo: {
@@ -243,7 +243,7 @@ const getColor = (title) => {
     title.includes("Comisión") ||
     title.includes("Incapacidad")
   ) {
-    return "red";
+    return "primary";
   } else {
     return "orange";
   }
