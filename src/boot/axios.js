@@ -11,12 +11,12 @@ const encryptStorage = new EncryptStorage("SECRET_KEY", "sessionStorage");
 // "export default () => {}" function below (which runs individually
 // for each client)
 
+// const api = axios.create({
+//   baseURL: "https://l3h1d8pk-7289.usw3.devtunnels.ms/api",
+// });
 const api = axios.create({
   baseURL: "http://sistema.ieenayarit.org:9270/api",
 });
-// const api = axios.create({
-//   baseURL: "http://sistema.ieenayarit.org:9270/api",
-// });
 api.interceptors.request.use((config) => {
   config.headers = {
     Authorization: `Bearer ${encryptStorage.decrypt("key")}`,

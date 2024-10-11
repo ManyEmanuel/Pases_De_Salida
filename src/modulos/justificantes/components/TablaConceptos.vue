@@ -2,6 +2,7 @@
   <div class="row">
     <div class="col">
       <q-table
+        :grid="$q.screen.xs"
         :rows="listaIncidencias"
         :columns="columns"
         :filter="filter"
@@ -11,20 +12,45 @@
         rows-per-page-label="Filas por pagina"
         no-data-label="No hay registros"
       >
-        <template v-slot:top-right>
-          <q-input
-            borderless
-            dense
-            debounce="300"
-            v-model="filter"
-            placeholder="Buscar.."
+        <!--TEMPLATE SCREEN XS-->
+        <template v-if="$q.screen.xs" v-slot:item="props">
+          <div
+            class="q-pa-xs col-xs-12 col-sm-6 col-md-4 col-lg-3 grid-style-transition"
           >
-            <template v-slot:append>
-              <q-icon name="search" />
-            </template>
-          </q-input>
+            <q-card bordered class="no-shadow">
+              <q-list dense>
+                <q-item v-for="col in props.cols" :key="col.name">
+                  <q-item-section>
+                    <q-item-label class="text-bold"
+                      >{{ col.label }}:</q-item-label
+                    >
+                  </q-item-section>
+                  <q-item-section>
+                    <q-badge
+                      v-if="col.name == 'tipo_Justificantes'"
+                      color="purple-ieen"
+                    >
+                      {{ col.value }}
+                    </q-badge>
+                    <q-btn
+                      v-else-if="col.name == 'id'"
+                      flat
+                      round
+                      color="purple-ieen"
+                      icon="delete"
+                      @click="eliminar(col.value)"
+                    >
+                      <q-tooltip>Eliminar incidencia</q-tooltip>
+                    </q-btn>
+                    <q-item-label v-else>{{ col.value }}</q-item-label>
+                  </q-item-section>
+                </q-item>
+              </q-list>
+            </q-card>
+          </div>
         </template>
-        <template v-slot:body="props">
+        <!--TEMPLATE SCREEN DESKTOP-->
+        <template v-else v-slot:body="props">
           <q-tr :props="props">
             <q-td v-for="col in props.cols" :key="col.name" :props="props">
               <div v-if="col.name === 'id'">
@@ -32,11 +58,21 @@
                   flat
                   round
                   color="purple-ieen"
-                  icon="cancel"
+                  icon="delete"
                   @click="eliminar(col.value)"
                 >
                   <q-tooltip>Eliminar incidencia</q-tooltip>
                 </q-btn>
+              </div>
+              <div v-else-if="col.name == 'tipo_Justificantes'">
+                <q-badge color="purple-ieen">
+                  {{ col.value }}
+                  {{
+                    col.value == "Vacaciones"
+                      ? `Periodo ${props.row.periodo_Vacacional}`
+                      : ""
+                  }}
+                </q-badge>
               </div>
               <label v-else>{{ col.value }}</label>
             </q-td>
@@ -82,13 +118,6 @@ const columns = [
     align: "center",
     label: "Fecha",
     field: "dias_Incidencias",
-    sortable: true,
-  },
-  {
-    name: "dias_Incidencias_Completo",
-    align: "center",
-    label: "Fecha",
-    field: "dias_Incidencias_Completo",
     sortable: true,
   },
   {
@@ -140,8 +169,8 @@ const cargarColumnas = async () => {
 
 const eliminar = async (id) => {
   $q.dialog({
-    title: "Eliminar asignación",
-    message: "Al aceptar, se eliminara el detalle de la incidencia",
+    title: "Eliminar registro",
+    message: "Al aceptar, se eliminará el detalle de la incidencia",
     icon: "Warning",
     persistent: true,
     transitionShow: "scale",

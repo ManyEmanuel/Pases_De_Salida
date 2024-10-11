@@ -1,47 +1,261 @@
 <template>
-  <div class="scheduler-resource-calendar">
-    <div class="calendar-header">
-      <q-btn color="secondary" label="Anterior" @click="prevMonth" />
-      <h2>{{ formatMonthHeader }}</h2>
-      <q-btn color="secondary" label="Siguiente" @click="nextMonth" />
-    </div>
-    <div class="text-right q-px-lg">
-      <q-btn
-        icon="download"
-        color="secondary"
-        label="Excel"
-        @click="obtenerExcel"
-      />
+  <div class="scheduler-resource-calendar q-pr-lg q-pl-lg q-pt-lg">
+    <div v-if="props.tipo == 'mes'" class="text-center">
+      <div class="text-h3 text-bold text-grey">
+        {{ formatMonthHeader }}
+      </div>
     </div>
     <br />
     <div class="table-container">
       <div class="table-fixed">
         <table>
-          <thead>
+          <thead class="flotante">
+            <tr v-if="props.tipo == 'rango'">
+              <th :colspan="1">MES</th>
+              <th
+                v-for="(mes, index) in meses"
+                :key="mes"
+                :colspan="mes.filas - 1"
+                :class="
+                  index % 2 == 0
+                    ? 'bg-purple-ieen text-white'
+                    : 'bg-deep-purple-3 text-white'
+                "
+              >
+                {{ mes.month.toUpperCase() }}
+              </th>
+            </tr>
             <tr>
-              <th>Empleados</th>
-              <th v-for="day in currentMonthDays" :key="day">
-                {{ formatDayHeader(day) }}
+              <th class="text-grey-8"><q-icon name="person" />PERSONAL</th>
+              <th
+                class="text-grey-8"
+                v-for="day in currentMonthDays"
+                :key="day"
+              >
+                {{ formatDayLetra(day) }} <br />
+                {{ formatDay(day) }}
               </th>
             </tr>
           </thead>
           <tbody>
             <tr v-for="resource in resources" :key="resource.id">
-              <td class="resource-cell">{{ resource.title }}</td>
+              <td
+                style="background-color: #ececec"
+                class="text-bold text-grey-8"
+              >
+                {{ resource.title }}
+              </td>
               <td v-for="day in currentMonthDays" :key="day">
                 <div v-if="hasEventOnDay(resource.id, day)">
                   <div
                     v-for="event in getEventsOnDay(resource.id, day)"
                     :key="event.event_Id"
                   >
-                    <q-badge rounded :color="obtenColor(event.title)" />
-                    <div class="h6">{{ event.title }}</div>
+                    <q-badge
+                      :class="
+                        obtenColor(event.title) == 'yellow'
+                          ? 'text-black'
+                          : 'text-white'
+                      "
+                      rounded
+                      :color="obtenColor(event.title)"
+                    >
+                      <div>
+                        {{ event.title }}
+                      </div>
+                    </q-badge>
                   </div>
                 </div>
               </td>
             </tr>
           </tbody>
         </table>
+        <!-- <table id="calendar">
+          <tr class="weekdays">
+            <th scope="col">Sunday</th>
+            <th scope="col">Monday</th>
+            <th scope="col">Tuesday</th>
+            <th scope="col">Wednesday</th>
+            <th scope="col">Thursday</th>
+            <th scope="col">Friday</th>
+            <th scope="col">Saturday</th>
+          </tr>
+
+          <tr class="days">
+            <td class="day other-month">
+              <div class="date">27</div>
+            </td>
+            <td class="day other-month">
+              <div class="date">28</div>
+              <div class="event">
+                <div class="event-desc">
+                  HTML 5 lecture with Brad Traversy from Eduonix
+                </div>
+                <div class="event-time">1:00pm to 3:00pm</div>
+              </div>
+            </td>
+            <td class="day other-month">
+              <div class="date">29</div>
+            </td>
+            <td class="day other-month">
+              <div class="date">30</div>
+            </td>
+            <td class="day other-month">
+              <div class="date">31</div>
+            </td>
+
+            <td class="day">
+              <div class="date">1</div>
+            </td>
+            <td class="day">
+              <div class="date">2</div>
+              <div class="event">
+                <div class="event-desc">
+                  Career development @ Community College room #402
+                </div>
+
+                <div class="event-time">2:00pm to 5:00pm</div>
+              </div>
+              <div class="event">
+                <div class="event-desc">Test event 2</div>
+
+                <div class="event-time">5:00pm to 6:00pm</div>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td class="day">
+              <div class="date">3</div>
+            </td>
+            <td class="day">
+              <div class="date">4</div>
+            </td>
+            <td class="day">
+              <div class="date">5</div>
+            </td>
+            <td class="day">
+              <div class="date">6</div>
+            </td>
+            <td class="day">
+              <div class="date">7</div>
+              <div class="event">
+                <div class="event-desc">Group Project meetup</div>
+                <div class="event-time">6:00pm to 8:30pm</div>
+              </div>
+            </td>
+            <td class="day">
+              <div class="date">8</div>
+            </td>
+            <td class="day">
+              <div class="date">9</div>
+            </td>
+          </tr>
+          <tr>
+            <td class="day">
+              <div class="date">10</div>
+            </td>
+            <td class="day">
+              <div class="date">11</div>
+            </td>
+            <td class="day">
+              <div class="date">12</div>
+            </td>
+            <td class="day">
+              <div class="date">13</div>
+            </td>
+            <td class="day">
+              <div class="date">14</div>
+              <div class="event">
+                <div class="event-desc">Board Meeting</div>
+                <div class="event-time">1:00pm to 3:00pm</div>
+              </div>
+            </td>
+            <td class="day">
+              <div class="date">15</div>
+            </td>
+            <td class="day">
+              <div class="date">16</div>
+            </td>
+          </tr>
+          <tr>
+            <td class="day">
+              <div class="date">17</div>
+            </td>
+            <td class="day">
+              <div class="date">18</div>
+            </td>
+            <td class="day">
+              <div class="date">19</div>
+            </td>
+            <td class="day">
+              <div class="date">20</div>
+            </td>
+            <td class="day">
+              <div class="date">21</div>
+            </td>
+            <td class="day">
+              <div class="date">22</div>
+              <div class="event">
+                <div class="event-desc">Conference call</div>
+                <div class="event-time">9:00am to 12:00pm</div>
+              </div>
+            </td>
+            <td class="day">
+              <div class="date">23</div>
+            </td>
+          </tr>
+          <tr>
+            <td class="day">
+              <div class="date">24</div>
+            </td>
+            <td class="day">
+              <div class="date">25</div>
+              <div class="event">
+                <div class="event-desc">Conference Call</div>
+                <div class="event-time">1:00pm to 3:00pm</div>
+              </div>
+            </td>
+            <td class="day">
+              <div class="date">26</div>
+            </td>
+            <td class="day">
+              <div class="date">27</div>
+            </td>
+            <td class="day">
+              <div class="date">28</div>
+            </td>
+            <td class="day">
+              <div class="date">29</div>
+            </td>
+            <td class="day">
+              <div class="date">30</div>
+            </td>
+          </tr>
+          <tr>
+            <td class="day">
+              <div class="date">31</div>
+            </td>
+            <td class="day other-month">
+              <div class="date">1</div>
+
+            </td>
+            <td class="day other-month">
+              <div class="date">2</div>
+            </td>
+            <td class="day other-month">
+              <div class="date">3</div>
+            </td>
+            <td class="day other-month">
+              <div class="date">4</div>
+            </td>
+            <td class="day other-month">
+              <div class="date">5</div>
+            </td>
+            <td class="day other-month">
+              <div class="date">6</div>
+            </td>
+          </tr>
+        </table> -->
       </div>
     </div>
   </div>
@@ -49,67 +263,73 @@
 
 <script setup>
 import { useQuasar } from "quasar";
-import { storeToRefs } from "pinia";
 import { ref, defineProps, computed } from "vue";
-import { format, isWithinInterval, addMonths, subMonths } from "date-fns";
-import * as XLSX from "xlsx";
+import { format, addMonths, subMonths } from "date-fns";
+
+//-----------------------------------------------------------
 
 const $q = useQuasar();
 const props = defineProps([
   "resources",
   "events",
   "currentDate",
-  "rangeDate",
-  "stopDate",
+  "año",
+  "mes",
+  "tipo",
+  "fechaFrom",
+  "fechaTo",
 ]);
 const resources = ref(props.resources);
 const events = ref(props.events);
 const currentDate = ref(props.currentDate);
-const rangoFecha = ref(props.rangeDate);
-const stopDate = ref(props.stopDate);
+const daysOfWeekInSpanish = [
+  "domingo",
+  "lunes",
+  "martes",
+  "miércoles",
+  "jueves",
+  "viernes",
+  "sábado",
+];
+const meses = ref([]);
+
+//-----------------------------------------------------------
 
 const currentMonthDays = computed(() => {
-  const year = currentDate.value.getFullYear();
-  const month = currentDate.value.getMonth();
-  const firstDay = new Date(year, month, 1);
-  const lastDay = new Date(year, month + 1, 0);
-  const days = [];
-  for (
-    let date = new Date(firstDay);
-    date <= lastDay;
-    date.setDate(date.getDate() + 1)
-  ) {
-    days.push(format(date, "yyyy-MM-dd"));
-  }
-  return days;
-});
+  if (props.tipo == "mes") {
+    const firstDay = new Date(props.año, parseInt(props.mes.value - 1), 1);
+    const lastDay = new Date(props.año, parseInt(props.mes.value), 0);
+    const days = [];
+    for (
+      let date = new Date(firstDay);
+      date <= lastDay;
+      date.setDate(date.getDate() + 1)
+    ) {
+      const formattedDate = format(date, "yyyy-MM-dd");
+      const dayOfWeek = daysOfWeekInSpanish[date.getDay()].toUpperCase();
+      days.push({ date: formattedDate, dayOfWeek });
+    }
+    return days;
+  } else {
+    const startYear = parseInt(props.fechaFrom.split("/")[0]);
+    const endYear = parseInt(props.fechaTo.split("/")[0]);
 
-const obtenerExcel = async () => {
-  let encabezado = ["Empleado"];
-  let datos = [];
-  for (let fecha of stopDate.value) {
-    encabezado.push(fecha);
-  }
-  for (let empleado of resources.value) {
-    let objeto = {};
-    stopDate.value.forEach((fecha) => {
-      let filtro = events.value.filter(
-        (x) => x.resourceId == empleado.id && x.dateCompare == fecha
-      );
-      let texto = "";
-      for (let registro of filtro) {
-        texto = texto + " " + registro.title;
+    const days = [];
+    for (let year = startYear; year <= endYear; year++) {
+      for (
+        let date = new Date(props.fechaFrom);
+        date <= new Date(props.fechaTo);
+        date.setDate(date.getDate() + 1)
+      ) {
+        const formattedDate = format(date, "yyyy-MM-dd");
+        const dayOfWeek = daysOfWeekInSpanish[date.getDay()].toUpperCase();
+        days.push({ date: formattedDate, dayOfWeek });
       }
-      objeto[fecha] = texto;
-    });
-    datos.push({ Empleado: empleado.title, ...objeto });
+    }
+    formatMonth();
+    return days;
   }
-
-  const worksheet = XLSX.utils.json_to_sheet(datos, { header: encabezado });
-  const workbook = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(workbook, worksheet, "Checador");
-  XLSX.writeFile(workbook, "Reporte_Checador_Fechas.xlsx");
-};
+});
 
 const obtenColor = (title) => {
   if (title.includes("Entrada") || title.includes("Salida")) {
@@ -119,7 +339,7 @@ const obtenColor = (title) => {
     return "yellow";
   }
   if (title.includes("Falta")) {
-    return "red";
+    return "red-5";
   }
   if (
     title.includes("Omisión") ||
@@ -135,9 +355,10 @@ const obtenColor = (title) => {
 function hasEventOnDay(resourceId, day) {
   return events.value.some((event) => {
     // Parseamos las fechas y las convertimos a objetos Date sin la hora
+
     const eventStartDate = new Date(event.start.split(" ")[0]);
     const eventEndDate = new Date(event.end.split(" ")[0]);
-    const selectedDate = new Date(day.split(" ")[0]);
+    const selectedDate = new Date(day.date.split(" ")[0]);
 
     // Eliminamos la hora, minutos, segundos y milisegundos de las fechas
     eventStartDate.setHours(0, 0, 0, 0);
@@ -156,13 +377,21 @@ function getEventsOnDay(resourceId, day) {
   return events.value.filter((event) => {
     const eventStartDate = new Date(event.start.split(" ")[0]);
     const eventEndDate = new Date(event.end.split(" ")[0]);
-    const selectedDate = new Date(day.split(" ")[0]);
+    const selectedDate = new Date(day.date.split(" ")[0]);
 
     // Eliminamos la hora, minutos, segundos y milisegundos de las fechas
     eventStartDate.setHours(0, 0, 0, 0);
     eventEndDate.setHours(0, 0, 0, 0);
     selectedDate.setHours(0, 0, 0, 0);
+    // if (event.title == 'Falta' && event.dateCompare > ) {
 
+    // }
+    let fechaCompare = new Date(
+      event.dateCompare.split("-")[0],
+      event.dateCompare.split("-")[1],
+      event.dateCompare.split("-")[2]
+    );
+    let fechaActual = new Date();
     return (
       event.resourceId === resourceId &&
       selectedDate >= eventStartDate &&
@@ -171,12 +400,69 @@ function getEventsOnDay(resourceId, day) {
   });
 }
 
-function formatDayHeader(day) {
-  return day.split("-")[2]; // Mostrar solo el día del mes en el encabezado
+function formatDay(day) {
+  return day.date.split("-")[2];
+}
+
+function formatDayLetra(day) {
+  return day.dayOfWeek;
+}
+
+function formatMonth() {
+  const startDate = new Date(props.fechaFrom);
+  const endDate = new Date(props.fechaTo);
+
+  const months = [];
+  let current = new Date(startDate.getFullYear(), startDate.getMonth(), 1);
+  const end = new Date(endDate.getFullYear(), endDate.getMonth() + 1, 0);
+
+  while (current <= end) {
+    let monthNames = [
+      "Enero",
+      "Febrero",
+      "Marzo",
+      "Abril",
+      "Mayo",
+      "Junio",
+      "Julio",
+      "Agosto",
+      "Septiembre",
+      "Octubre",
+      "Noviembre",
+      "Diciembre",
+    ];
+    const firstDayOfMonth = new Date(
+      current.getFullYear(),
+      current.getMonth(),
+      1
+    );
+    const lastDayOfMonth = new Date(
+      current.getFullYear(),
+      current.getMonth() + 1,
+      0
+    );
+
+    const startOfMonth =
+      startDate > firstDayOfMonth ? startDate : firstDayOfMonth;
+
+    const endOfMonth = endDate < lastDayOfMonth ? endDate : lastDayOfMonth;
+
+    const numDaysInMonth = Math.max(
+      0,
+      (endOfMonth - startOfMonth) / (1000 * 60 * 60 * 24) + 1
+    );
+
+    months.push({
+      year: current.getFullYear(),
+      month: monthNames[current.getMonth()],
+      filas: numDaysInMonth + 1,
+    });
+    current.setMonth(current.getMonth() + 1);
+  }
+  meses.value = months;
 }
 
 const formatMonthHeader = computed(() => {
-  const date = currentDate.value;
   const monthNames = [
     "Enero",
     "Febrero",
@@ -191,7 +477,7 @@ const formatMonthHeader = computed(() => {
     "Noviembre",
     "Diciembre",
   ];
-  return `${monthNames[date.getMonth()]} ${date.getFullYear()}`;
+  return `${monthNames[parseInt(props.mes.value - 1)]} ${props.año}`;
 });
 
 function nextMonth() {
@@ -207,7 +493,7 @@ function getEventBadgeText(resourceId, day) {
     // Parseamos las fechas en el mismo formato de cadena "YYYY-MM-DD HH:mm"
     const eventStartDate = new Date(event.start.split(" ")[0]);
     const eventEndDate = new Date(event.end.split(" ")[0]);
-    const selectedDate = new Date(day.split(" ")[0]);
+    const selectedDate = new Date(day.date.split(" ")[0]);
 
     // Eliminamos la hora, minutos, segundos y milisegundos de las fechas
     eventStartDate.setHours(0, 0, 0, 0);
@@ -227,7 +513,7 @@ function getEventType(resourceId, day) {
     // Parseamos las fechas en el mismo formato de cadena "YYYY-MM-DD HH:mm"
     const eventStartDate = new Date(event.start.split(" ")[0]);
     const eventEndDate = new Date(event.end.split(" ")[0]);
-    const selectedDate = new Date(day.split(" ")[0]);
+    const selectedDate = new Date(day.date.split(" ")[0]);
 
     // Eliminamos la hora, minutos, segundos y milisegundos de las fechas
     eventStartDate.setHours(0, 0, 0, 0);
@@ -261,7 +547,7 @@ const evaluateEvent = async (resourceId, day) => {
     // Parseamos las fechas en el mismo formato de cadena "YYYY-MM-DD HH:mm"
     const eventStartDate = new Date(event.start.split(" ")[0]);
     const eventEndDate = new Date(event.end.split(" ")[0]);
-    const selectedDate = new Date(day.split(" ")[0]);
+    const selectedDate = new Date(day.date.split(" ")[0]);
 
     // Eliminamos la hora, minutos, segundos y milisegundos de las fechas
     eventStartDate.setHours(0, 0, 0, 0);
@@ -289,7 +575,13 @@ const evaluateEvent = async (resourceId, day) => {
 </script>
 
 <style scoped>
-/* Estilos personalizados */
+.flotante {
+  position: sticky;
+  top: 1px;
+  z-index: 999;
+  background-color: white;
+}
+
 .scheduler-resource-calendar {
   font-family: Arial, sans-serif;
   max-width: 1500px;
@@ -310,15 +602,16 @@ th,
 td {
   padding: 8px;
   text-align: center;
-  border: 1px solid #ccc;
+  border: 1px solid #eeeeee;
 }
 
 th {
   position: sticky;
   top: 0;
-  background-color: #ffffff;
-  z-index: 2; /* Asegura que la cabecera esté por encima del contenido de la tabla */
+  background-color: #ececec;
+  z-index: 2;
 }
+
 .resource-cell {
   font-weight: bold;
   position: sticky;
@@ -328,32 +621,13 @@ th {
   z-index: 2;
 }
 
-.event-cell {
-  position: relative;
-}
-
-.event-badge {
-  position: absolute;
-  top: 2px;
-  right: 2px;
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background-color: #3490dc;
-  font-size: 10px;
-  color: #fff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
 .highlight-column {
-  background-color: #f0f0f0; /* Color de sombreado para la columna resaltada */
+  background-color: #f0f0f0;
 }
 
 .table-container {
-  max-height: 500px; /* Ajusta la altura máxima según tus necesidades */
-  overflow-y: auto; /* Agrega desplazamiento vertical si el contenido excede la altura */
-  position: relative; /* Asegura que el contenedor sea la referencia para la posición sticky */
+  max-height: 650px;
+  overflow-y: auto;
+  position: relative;
 }
 </style>

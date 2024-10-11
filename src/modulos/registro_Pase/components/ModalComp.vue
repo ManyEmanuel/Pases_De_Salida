@@ -7,8 +7,13 @@
   >
     <q-card style="width: 800px; max-width: 80vw">
       <q-card-section class="row">
-        <q-img src="../../../assets/IEEN300.png" width="90px" />
-        <div class="text-h5 text-gray-ieen-1 text-bold absolute-center">
+        <q-img
+          src="../../../assets/IEEN300.png"
+          :width="$q.screen.xs ? '60px' : '90px'"
+        />
+        <div
+          class="text-h6 text-gray-ieen-1 text-bold absolute-center text-center"
+        >
           REGISTRO DE PASE
         </div>
         <q-space />
@@ -236,7 +241,7 @@
               color="purple-ieen"
               label="Hora estimada de llegada"
               hint="Ingrese hora estimada de llegada (Formato 24 horas)"
-              v-model="pase.llegada"
+              v-model="fecha_Llegada"
               lazy-rules
               :rules="[(val) => !!val || 'La hora estimada es requerida']"
             >
@@ -248,7 +253,7 @@
                     transition-hide="scale"
                   >
                     <q-time
-                      v-model="pase.llegada"
+                      v-model="fecha_Llegada"
                       mask="HH:mm"
                       :hour-options="horasLlegada"
                       color="purple"
@@ -376,17 +381,20 @@ const horasLlegada = [
 const empleado_Id = ref(null);
 const vehiculo_Id = ref(null);
 const loadingVehiculo = ref(false);
-
+const fecha_Llegada = ref(null);
 const { pase, modal, areas, empleados, myLocale, vehiculos, isEditar } =
   storeToRefs(pasesStore);
 
 const actualizarModal = (valor) => {
   pasesStore.actualizarModal(valor);
   pasesStore.initPase();
+  pasesStore.updateEditar(false);
   empleado_Id.value = null;
   area_Id.value = null;
   vehiculo_Id.value = null;
   verVehiculo.value = false;
+  personalRead.value = false;
+  areaRead.value = false;
 };
 
 onBeforeMount(() => {
@@ -409,15 +417,25 @@ watch(empleado_Id, (val) => {
   }
 });
 
-watchEffect(async () => {
-  if (pase.value.llegada != null) {
+watch(fecha_Llegada, (val) => {
+  if (val != null) {
     loadingVehiculo.value = true;
     let fecha = pase.value.salida.split(" ");
-    let fechaRegreso = fecha[0] + " " + pase.value.llegada;
-    await pasesStore.loadVehiculos(pase.value.salida, fechaRegreso);
+    let fechaRegreso = fecha[0] + " " + val;
+    vehiculosDisponibles(fechaRegreso);
     loadingVehiculo.value = false;
   }
 });
+
+watch(rol, (val) => {
+  if (val != null) {
+    vehiculo_Id.value = null;
+  }
+});
+
+const vehiculosDisponibles = async (fechaRegreso) => {
+  await pasesStore.loadVehiculos(pase.value.salida, fechaRegreso);
+};
 
 const FiltroFecha = (fechha) => {
   const today = new Date();
@@ -580,6 +598,8 @@ const onSubmit = async () => {
       //loading.value = false;
     }
   } else {
+    let fecha = pase.value.salida.split(" ")[0];
+    pase.value.llegada = `${fecha} ${fecha_Llegada.value}`;
     let comparacion;
     comparacion = await pasesStore.compareHoras();
     if (comparacion.success == true) {

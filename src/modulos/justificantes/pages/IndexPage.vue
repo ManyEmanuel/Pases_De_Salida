@@ -1,6 +1,6 @@
 <template>
   <q-page>
-    <div class="row bg-grey-2">
+    <div class="row bg-grey-1">
       <div class="col-9">
         <div class="q-pa-md q-gutter-sm">
           <div class="text-gray-ieen-1 text-h6">Registro de justificantes</div>
@@ -72,7 +72,17 @@ const leerPermisos = async () => {
   $q.loading.hide();
 };
 
-const actualizarModal = (valor) => {
+const actualizarModal = async (valor) => {
+  $q.loading.show({
+    spinner: QSpinnerFacebook,
+    spinnerColor: "purple-ieen",
+    spinnerSize: 140,
+    backgroundColor: "purple-3",
+    message: "Espere un momento, por favor...",
+    messageColor: "black",
+  });
+  await justificanteStore.loadInformacionJustificante();
   justificanteStore.actualizarModal(valor);
+  $q.loading.hide();
 };
 </script>

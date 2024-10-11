@@ -1,12 +1,17 @@
 <template>
-  <div class="row q-pr-lg q-pl-lg">
+  <div class="row">
     <div class="col">
       <q-table
-        :visible-columns="visisble_columns"
-        :rows="pasesGeneral"
-        :columns="columns"
+        :grid="$q.screen.xs"
+        :rows="
+          props.tipo == 'pases'
+            ? pasesGeneralFiltrado
+            : list_Justificantes_Todos_Filtrado
+        "
+        :columns="props.tipo == 'pases' ? columnsPases : columnsJustificantes"
         :filter="filter"
         :pagination="pagination"
+        :rows-per-page-options="[5, 10, 15, 20, 25, 50]"
         rows-per-page-label="Filas por pagina"
         no-data-label="No hay registros"
         class="my-sticky-last-column-table"
@@ -24,7 +29,89 @@
             </template>
           </q-input>
         </template>
-        <template v-slot:body="props">
+        <!--TEMPLATE SCREEN XS-->
+        <template v-if="$q.screen.xs" v-slot:item="props">
+          <div
+            class="q-pa-xs col-xs-12 col-sm-6 col-md-4 col-lg-3 grid-style-transition"
+          >
+            <q-card bordered class="no-shadow">
+              <q-list dense>
+                <q-item v-for="col in props.cols" :key="col.name">
+                  <q-item-section>
+                    <q-item-label class="text-bold"
+                      >{{ col.label }}:</q-item-label
+                    >
+                  </q-item-section>
+                  <q-item-section class="flex-center">
+                    <div v-if="col.name === 'id'">
+                      <q-btn
+                        flat
+                        round
+                        color="purple-ieen"
+                        icon="search"
+                        @click="visualizar(col.value)"
+                      >
+                        <q-tooltip>Ver pase</q-tooltip>
+                      </q-btn>
+                    </div>
+                    <div v-else-if="col.name == 'estatus'">
+                      <q-badge
+                        :color="
+                          col.value == 'Aprobado'
+                            ? 'green'
+                            : col.value == 'Pendiente'
+                            ? 'orange'
+                            : 'red'
+                        "
+                        text-color="white"
+                        :label="col.value"
+                      >
+                        <q-icon
+                          :name="
+                            col.value == 'Aprobado'
+                              ? 'done'
+                              : col.value == 'Pendiente'
+                              ? 'warning'
+                              : 'close'
+                          "
+                          color="white"
+                        />
+                      </q-badge>
+                    </div>
+                    <div v-else-if="col.name == 'asunto'">
+                      <label>{{ col.value }}</label>
+                      <q-tooltip
+                        :offset="[10, 10]"
+                        v-if="
+                          col.value.length != props.row.asunto_Completo.length
+                        "
+                      >
+                        {{ props.row.asunto_Completo }}
+                      </q-tooltip>
+                    </div>
+                    <div v-else-if="col.name == 'area'">
+                      <label>{{ col.value }}</label>
+                      <q-tooltip
+                        :offset="[10, 10]"
+                        v-if="
+                          col.value.length != props.row.area_Completa.length
+                        "
+                      >
+                        {{ props.row.area_Completa }}
+                      </q-tooltip>
+                    </div>
+                    <label v-else-if="col.name == 'folio'" class="text-bold">{{
+                      col.value
+                    }}</label>
+                    <label v-else>{{ col.value }}</label>
+                  </q-item-section>
+                </q-item>
+              </q-list>
+            </q-card>
+          </div>
+        </template>
+        <!--TEMPLATE SCREEN DESKTOP-->
+        <template v-else v-slot:body="props">
           <q-tr :props="props">
             <q-td v-for="col in props.cols" :key="col.name" :props="props">
               <div v-if="col.name === 'id'">
@@ -40,12 +127,24 @@
               </div>
               <div v-else-if="col.name == 'estatus'">
                 <q-badge
-                  :color="col.value == 'Aprobado' ? 'green' : 'red'"
+                  :color="
+                    col.value == 'Aprobado'
+                      ? 'green'
+                      : col.value == 'Pendiente'
+                      ? 'orange'
+                      : 'red'
+                  "
                   text-color="white"
                   :label="col.value"
                 >
                   <q-icon
-                    :name="col.value == 'Aprobado' ? 'done' : 'close'"
+                    :name="
+                      col.value == 'Aprobado'
+                        ? 'done'
+                        : col.value == 'Pendiente'
+                        ? 'warning'
+                        : 'close'
+                    "
                     color="white"
                   />
                 </q-badge>
@@ -54,9 +153,24 @@
                 <label>{{ col.value }}</label>
                 <q-tooltip
                   :offset="[10, 10]"
-                  v-if="col.value.length != props.row.asunto_Completo.length"
+                  v-if="
+                    col.value != null &&
+                    col.value.length != props.row.asunto_Completo.length
+                  "
                 >
                   {{ props.row.asunto_Completo }}
+                </q-tooltip>
+              </div>
+              <div v-else-if="col.name == 'area'">
+                <label>{{ col.value }}</label>
+                <q-tooltip
+                  :offset="[10, 10]"
+                  v-if="
+                    col.value != null &&
+                    col.value.length != props.row.area_Completa.length
+                  "
+                >
+                  {{ props.row.area_Completa }}
                 </q-tooltip>
               </div>
               <label v-else-if="col.name == 'folio'" class="text-bold">{{
@@ -73,23 +187,44 @@
 <script setup>
 import { storeToRefs } from "pinia";
 import { useQuasar } from "quasar";
-import { onBeforeMount, ref } from "vue";
-import { useAuthStore } from "../../../stores/auth_store";
+import { ref, watch } from "vue";
 import { useRegistroGeneralStore } from "src/stores/registro_General_store";
 import { useRegistroPaseStore } from "../../../stores/registro_Pase_store";
+import { useSolicitudJustificanteStore } from "src/stores/solicitudes_Justificantes_store";
+import { useJustificanteStore } from "src/stores/justificantes_store";
+
+//-----------------------------------------------------------
 
 const $q = useQuasar();
 const generalStore = useRegistroGeneralStore();
 const pasesStore = useRegistroPaseStore();
-const authStore = useAuthStore();
-const { modulo } = storeToRefs(authStore);
-const { pasesGeneral } = storeToRefs(generalStore);
-
-onBeforeMount(() => {
-  cargarData();
+const solicitudesJustificantesStore = useSolicitudJustificanteStore();
+const justificantesStore = useJustificanteStore();
+const { pasesGeneralFiltrado } = storeToRefs(generalStore);
+const { list_Justificantes_Todos_Filtrado } = storeToRefs(
+  solicitudesJustificantesStore
+);
+const props = defineProps({
+  tipo: {
+    type: String,
+  },
 });
 
-const columns = [
+//-----------------------------------------------------------
+
+const visualizar = async (id) => {
+  if (props.tipo == "pases") {
+    await pasesStore.loadPaseConsulta(id);
+    pasesStore.actualizarConsulta(true);
+  } else {
+    await justificantesStore.loadJustificante(id);
+    await justificantesStore.loadDetalleJustificantes(id);
+    justificantesStore.updateVisualizar(true);
+    justificantesStore.actualizarModal(true);
+  }
+};
+
+const columnsPases = [
   {
     name: "folio",
     align: "center",
@@ -130,14 +265,6 @@ const columns = [
     align: "center",
     label: "Motivo de pase",
     field: "asunto",
-    sortable: true,
-  },
-  {
-    name: "asunto_Completo",
-    align: "center",
-    label: "Motivo de pase",
-    field: "asunto_Completo",
-    sortable: true,
   },
   {
     name: "solicitante",
@@ -147,51 +274,93 @@ const columns = [
     sortable: true,
   },
   {
-    name: "capturista",
+    name: "area",
     align: "center",
-    label: "Quien tramita",
-    field: "capturista",
-    sortable: true,
+    label: "Área",
+    field: "area",
+    sortable: false,
   },
-
+  {
+    name: "responsable_Area",
+    align: "center",
+    label: "Responsable área",
+    field: "responsable_Area",
+    sortable: false,
+  },
   {
     name: "id",
     align: "center",
-    label: "Opciones",
+    label: "Acciones",
     field: "id",
     sortable: false,
   },
 ];
 
-const visisble_columns = [
-  "folio",
-  "fechaSolicitud",
-  "estatus",
-  "tipo_Pase",
-  "tipo_Asunto",
-  "asunto",
-  "solicitante",
-  "capturista",
-  "id",
+const columnsJustificantes = [
+  {
+    name: "folio",
+    align: "center",
+    label: "Folio",
+    field: "folio",
+    sortable: false,
+  },
+  {
+    name: "estatus",
+    align: "center",
+    label: "Estatus",
+    field: "estatus",
+    sortable: false,
+  },
+  {
+    name: "solicitante",
+    align: "center",
+    label: "Solicitante",
+    field: "solicitante",
+    sortable: false,
+  },
+  {
+    name: "area",
+    align: "center",
+    label: "Área",
+    field: "area",
+    sortable: false,
+  },
+  {
+    name: "responsable_Area",
+    align: "center",
+    label: "Responsable área",
+    field: "responsable_Area",
+    sortable: false,
+  },
+  {
+    name: "fecha_Creacion",
+    align: "center",
+    label: "Fecha de creación",
+    field: "fecha_Creacion",
+    sortable: false,
+  },
+  {
+    name: "fecha_Aprobacion_Rechazo",
+    align: "center",
+    label: "Fecha de aprobación o rechazo",
+    field: "fecha_Aprobacion_Rechazo",
+    sortable: false,
+  },
+  {
+    name: "id",
+    align: "center",
+    label: "Acciones",
+    field: "id",
+    sortable: false,
+  },
 ];
-
 const pagination = ref({
   page: 1,
-  rowsPerPage: 10,
+  rowsPerPage: 5,
   sortBy: "name",
   descending: false,
 });
 const filter = ref("");
-
-const cargarData = async () => {
-  await generalStore.loadPasesGeneral();
-  await generalStore.loadAreasList();
-};
-
-const visualizar = async (id) => {
-  pasesStore.loadPaseConsulta(id);
-  pasesStore.actualizarConsulta(true);
-};
 </script>
 <style lang="sass">
 .my-sticky-last-column-table

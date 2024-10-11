@@ -8,8 +8,7 @@ const ReporteGeneralJustificantes = async (date) => {
   try {
     //--------------------------------------------------------------------------//
     const justificanteStore = useJustificanteStore();
-    const { configuracion, listReporte, listFiltroReporte } =
-      storeToRefs(justificanteStore);
+    const { configuracion, listFiltroReporte } = storeToRefs(justificanteStore);
     const resp = await api.get("/Areas/AreaByUsuario");
     const { data } = resp.data;
     let img = new Image();
@@ -75,9 +74,15 @@ const ReporteGeneralJustificantes = async (date) => {
         `${configuracion.value[0].dias_Economicos - item.permiso_Economico}/${
           configuracion.value[0].dias_Economicos
         }`,
-        item.vacaciones_P1,
+        `${configuracion.value[0].dias_Primer_Periodo - item.vacaciones_P1}/${
+          configuracion.value[0].dias_Primer_Periodo == null
+            ? 10
+            : configuracion.value[0].dias_Primer_Periodo
+        }`,
         `${configuracion.value[0].dias_Segundo_Periodo - item.vacaciones_P2}/${
-          configuracion.value[0].dias_Segundo_Periodo
+          configuracion.value[0].dias_Segundo_Periodo == null
+            ? 10
+            : configuracion.value[0].dias_Segundo_Periodo
         }`,
       ]),
       bodyStyles: { fontSize: 10, textColor: [0, 0, 0] },

@@ -7,9 +7,14 @@
   >
     <q-card style="width: 900px; max-width: 90vw">
       <q-card-section class="row">
-        <q-img src="../../../assets/IEEN300.png" width="90px" />
-        <div class="text-h5 text-gray-ieen-1 text-bold absolute-center">
-          VER JUSTIFICANTE
+        <q-img
+          src="../../../assets/IEEN300.png"
+          :width="$q.screen.xs ? '60px' : '90px'"
+        />
+        <div
+          class="text-h6 text-gray-ieen-1 text-bold absolute-center text-center"
+        >
+          JUSTIFICANTE
           <div class="text-subtitle1 text-purple-ieen text-center text-bold">
             {{ justificante.folio }}
           </div>
@@ -76,6 +81,7 @@
         <div class="row">
           <div class="col">
             <q-table
+              :grid="$q.screen.xs"
               :rows="listaIncidencias"
               :columns="columns"
               :filter="filter"
@@ -84,27 +90,57 @@
               rows-per-page-label="Filas por pagina"
               no-data-label="No hay registros"
             >
-              <template v-slot:top-right>
-                <q-input
-                  borderless
-                  dense
-                  debounce="300"
-                  v-model="filter"
-                  placeholder="Buscar.."
+              <!--TEMPLATE SCREEN XS-->
+              <template v-if="$q.screen.xs" v-slot:item="props">
+                <div
+                  class="q-pa-xs col-xs-12 col-sm-6 col-md-4 col-lg-3 grid-style-transition"
                 >
-                  <template v-slot:append>
-                    <q-icon name="search" />
-                  </template>
-                </q-input>
+                  <q-card bordered class="no-shadow">
+                    <q-list dense>
+                      <q-item v-for="col in props.cols" :key="col.name">
+                        <q-item-section>
+                          <q-item-label class="text-bold"
+                            >{{ col.label }}:</q-item-label
+                          >
+                        </q-item-section>
+                        <q-item-section>
+                          <q-badge
+                            v-if="col.name == 'tipo_Justificantes'"
+                            color="purple-ieen"
+                          >
+                            {{ col.value }}
+                          </q-badge>
+                          <q-btn
+                            v-else-if="col.name == 'id'"
+                            flat
+                            round
+                            color="purple-ieen"
+                            icon="delete"
+                            @click="eliminar(col.value)"
+                          >
+                            <q-tooltip>Eliminar incidencia</q-tooltip>
+                          </q-btn>
+                          <q-item-label v-else>{{ col.value }}</q-item-label>
+                        </q-item-section>
+                      </q-item>
+                    </q-list>
+                  </q-card>
+                </div>
               </template>
-              <template v-slot:body="props">
+              <!--TEMPLATE SCREEN DESKTOP-->
+              <template v-else v-slot:body="props">
                 <q-tr :props="props">
                   <q-td
                     v-for="col in props.cols"
                     :key="col.name"
                     :props="props"
                   >
-                    <label>{{ col.value }}</label>
+                    <div v-if="col.name == 'tipo_Justificantes'">
+                      <q-badge color="purple-ieen">
+                        {{ col.value }}
+                      </q-badge>
+                    </div>
+                    <label v-else>{{ col.value }}</label>
                   </q-td>
                 </q-tr>
               </template>
@@ -145,6 +181,7 @@ const { modal } = storeToRefs(solicitudesStore);
 //-----------------------------------------------------------
 
 const actualizarModal = (valor) => {
+  justificanteStore.initJustificante();
   solicitudesStore.actualizarModal(valor);
 };
 
