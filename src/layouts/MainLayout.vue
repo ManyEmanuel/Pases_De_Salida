@@ -272,6 +272,7 @@ import { useNotifications } from "../helpers/signalRService";
 import { EncryptStorage } from "storage-encryption";
 import { useSolicitudJustificanteStore } from "src/stores/solicitudes_Justificantes_store";
 import { useSolicitudPaseStore } from "src/stores/solicitudes_Pase_store";
+import { urlSistemas } from "src/boot/axios";
 
 //----------------------------------------------------------
 
@@ -312,8 +313,10 @@ onBeforeMount(async () => {
     );
     $q.loading.hide();
     if (resp.success == false) {
+      localStorage.clear();
+      sessionStorage.clear();
       encryptStorage.remove("key");
-      window.location = "http://sistema.ieenayarit.org:9271?return=false";
+      window.location = `${urlSistemas}:9271?return=false`;
     }
   }
 
@@ -364,17 +367,15 @@ const show = () => {
       localStorage.clear();
       sessionStorage.clear();
       encryptStorage.remove("key");
-      //window.location = "http://sistema.ieenayarit.org:9271?return=false";
-      window.location = "http://sistema.ieenayarit.org:9271?return=false";
+      window.location = `${urlSistemas}:9271?return=false`;
     } else if (action.label == "Ir a universo") {
-      //window.location = "http://sistema.ieenayarit.org:9271?return=true";
-      window.location = "http://sistema.ieenayarit.org:9271?return=true";
+      window.location = `${urlSistemas}:9271?return=true`;
     } else {
-      window.location =
-        action.url +
-        `/#/?key=${encryptStorage.decrypt("key")}&sistema=${
-          action.id
-        }&usr=${encryptStorage.decrypt("usuario")}`;
+      window.location = `${urlSistemas}:${
+        action.url.split(":")[2]
+      }/#/?key=${encryptStorage.decrypt("key")}&sistema=${
+        action.id
+      }&usr=${encryptStorage.decrypt("usuario")}`;
     }
   });
 };

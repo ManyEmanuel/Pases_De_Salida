@@ -2,11 +2,12 @@ import { ref } from "vue";
 import { useQuasar } from "quasar";
 import { EncryptStorage } from "storage-encryption";
 import * as signalR from "@microsoft/signalr";
+import { urlSistemas } from "src/boot/axios";
 
 const encryptStorage = new EncryptStorage("SECRET_KEY", "sessionStorage");
 const onLine = ref(false);
 const connection = new signalR.HubConnectionBuilder()
-  .withUrl("http://sistema.ieenayarit.org:9270/hubUniverso", {
+  .withUrl(`${urlSistemas}:9270/hubUniverso`, {
     accessTokenFactory: () => encryptStorage.decrypt("key"),
   })
   .withAutomaticReconnect()

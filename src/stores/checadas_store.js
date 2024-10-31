@@ -28,6 +28,7 @@ export const useChecadaStore = defineStore("checadas", {
   actions: {
     async load_mis_checadas(fecha_inicio, fecha_fin) {
       try {
+        this.mis_checadas = [];
         const resp = await api.get(
           `/Checador/MisChecadas?Fecha_Inicio=${fecha_inicio}&Fecha_Fin=${fecha_fin}`
         );
@@ -38,7 +39,14 @@ export const useChecadaStore = defineStore("checadas", {
               return {
                 id: element.id,
                 title: element.title,
-                start: element.fecha,
+                start:
+                  element.fecha != null
+                    ? element.title.includes("Omisión de salida")
+                      ? `${element.fecha.split("T")[0]}T16:00:00`
+                      : element.title.includes("Omisión de entrada")
+                      ? `${element.fecha.split("T")[0]}T08:00:00`
+                      : element.fecha
+                    : element.fecha,
               };
             });
             return { success };
@@ -166,16 +174,19 @@ export const useChecadaStore = defineStore("checadas", {
     //-----------------------------------------------------------------------
     async load_Checadas_ByPersonal(id, fecha_Inicio, fecha_Fin) {
       try {
-        this.list_Checadas_Personal = [];
-        let respArea = await api.get(
+        let resp = await api.get(
           `/Checador/ByEmpleado/${id}/?Fecha_Inicio=${fecha_Inicio}&Fecha_Fin=${fecha_Fin}`
         );
-        let { data } = respArea.data;
+        let { data } = resp.data;
         this.list_Checadas_Personal = data.map((checada) => {
           return {
             id: checada.id,
             title: checada.title,
-            start: checada.fecha,
+            start: checada.title.includes("Omisión de salida")
+              ? `${checada.fecha.split("T")[0]}T16:00:00`
+              : checada.title.includes("Omisión de entrada")
+              ? `${checada.fecha.split("T")[0]}T08:00:00`
+              : checada.fecha,
           };
         });
       } catch (error) {

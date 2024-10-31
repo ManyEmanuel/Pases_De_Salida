@@ -1,34 +1,4 @@
 <template>
-  <div class="row flex-center q-pt-lg">
-    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 q-pr-sm">
-      <q-select
-        filled
-        dense
-        color="purple-ieen"
-        v-model="año_Id"
-        :options="años"
-        label="Año"
-      />
-    </div>
-    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
-      <q-select
-        filled
-        dense
-        color="purple-ieen"
-        v-model="mes_Id"
-        :options="meses"
-        label="Mes"
-      />
-    </div>
-    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 q-pl-sm">
-      <q-btn
-        @click="buscar"
-        color="purple-ieen"
-        label="Buscar"
-        icon-right="search"
-      />
-    </div>
-  </div>
   <template
     v-if="
       props.tipo == 'personal'
@@ -38,7 +8,11 @@
   >
     <div class="demo-app">
       <div class="demo-app-main">
-        <FullCalendar class="demo-app-calendar" :options="calendarOptions">
+        <FullCalendar
+          ref="calendar"
+          class="demo-app-calendar"
+          :options="calendarOptions"
+        >
           <template v-slot:eventContent="arg">
             <q-badge
               v-if="arg.event.title != ''"
@@ -46,7 +20,13 @@
               rounded
               class="text-black"
             >
-              <b>{{ arg.timeText }}</b>
+              <b
+                v-if="
+                  !arg.event.title.includes('Omisión de salida') &&
+                  !arg.event.title.includes('Omisión de entrada')
+                "
+                >{{ arg.timeText }}</b
+              >
               <i>{{ arg.event.title }}</i>
               <q-tooltip :delay="500">{{ arg.event.title }}</q-tooltip>
             </q-badge>
@@ -67,19 +47,19 @@
 <script setup>
 import { useQuasar, QSpinnerFacebook } from "quasar";
 import { storeToRefs } from "pinia";
-import { onBeforeMount, ref } from "vue";
+import { ref, watch } from "vue";
 import { useChecadaStore } from "../../../stores/checadas_store";
 import FullCalendar from "@fullcalendar/vue3";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
+import { ar } from "date-fns/locale";
 
 //-----------------------------------------------------------
 
 const $q = useQuasar();
 const checada_store = useChecadaStore();
-const { mis_checadas, list_Checadas_Personal, personal_Id } =
-  storeToRefs(checada_store);
+const { mis_checadas, list_Checadas_Personal } = storeToRefs(checada_store);
 const currentDate = ref(new Date());
 currentDate.value.setDate(currentDate.value.getDate() + 1);
 const props = defineProps({
@@ -87,38 +67,18 @@ const props = defineProps({
     type: String,
   },
 });
-const startYear = 2022;
-const currentYear = currentDate.value.getFullYear();
-const currentMonth = (currentDate.value.getMonth() + 1)
-  .toString()
-  .padStart(2, "0");
-const año_Id = ref(currentYear);
-const años = ref([]);
-const mes_Id = ref(null);
-const meses = ref([
-  { value: "01", label: "Enero" },
-  { value: "02", label: "Febrero" },
-  { value: "03", label: "Marzo" },
-  { value: "04", label: "Abril" },
-  { value: "05", label: "Mayo" },
-  { value: "06", label: "Junio" },
-  { value: "07", label: "Julio" },
-  { value: "08", label: "Agosto" },
-  { value: "09", label: "Septiembre" },
-  { value: "10", label: "Octubre" },
-  { value: "11", label: "Noviembre" },
-  { value: "12", label: "Diciembre" },
-]);
 
 //-----------------------------------------------------------
 
-onBeforeMount(() => {
-  for (let year = startYear; year <= currentYear; year++) {
-    años.value.push(year);
+watch(mis_checadas, (val) => {
+  if (val.length != 0) {
+    buscar();
   }
-  if (mes_Id.value == null) {
-    let mesFiltrado = meses.value.find((x) => x.value == currentMonth);
-    mes_Id.value = mesFiltrado;
+});
+
+watch(list_Checadas_Personal, (val) => {
+  if (val.length != 0) {
+    buscar();
   }
 });
 
@@ -137,13 +97,6 @@ const calendarOptions = ref({
     list: "list",
   },
   initialView: "dayGridMonth",
-  initialDate:
-    props.tipo == "personal" && mis_checadas.value.length > 0
-      ? mis_checadas.value[0].start
-      : props.tipo != "personal" && list_Checadas_Personal.value.length > 0
-      ? list_Checadas_Personal.value[0].start
-      : `${año_Id.value}-${currentMonth}-01`,
-  events: props.tipo == "personal" ? mis_checadas : list_Checadas_Personal,
   editable: false,
   selectable: false,
   selectMirror: true,
@@ -151,14 +104,6 @@ const calendarOptions = ref({
   weekends: true,
   locale: "es",
   dayHeaderFormat: { weekday: "long" },
-  validRange: {
-    start:
-      props.tipo == "personal" && mis_checadas.value.length > 0
-        ? mis_checadas.value[0].start
-        : props.tipo != "personal" && list_Checadas_Personal.value.length > 0
-        ? list_Checadas_Personal.value[0].start
-        : `${año_Id.value}-${currentMonth}-01`,
-  },
 });
 
 const buscar = async () => {
@@ -170,27 +115,19 @@ const buscar = async () => {
     message: "Espere un momento, por favor...",
     messageColor: "black",
   });
-  if (mes_Id.value == null) {
-    let mesFiltrado = meses.value.find((x) => x.value == currentMonth);
-    mes_Id.value = mesFiltrado;
-  }
-  let dias_Mes = new Date(año_Id.value, mes_Id.value.value, 0).getDate();
-  if (props.tipo == "personal") {
-    await checada_store.load_mis_checadas(
-      `${año_Id.value}-${mes_Id.value.value}-01`,
-      `${año_Id.value}-${mes_Id.value.value}-${dias_Mes}`
-    );
-  } else {
-    await checada_store.load_Checadas_ByPersonal(
-      personal_Id.value.value,
-      `${año_Id.value}-${mes_Id.value.value}-01`,
-      `${año_Id.value}-${mes_Id.value.value}-${dias_Mes}`
-    );
-  }
   if (
     (props.tipo == "personal" && mis_checadas.value.length > 0) ||
     (props.tipo != "personal" && list_Checadas_Personal.value.length > 0)
   ) {
+    let dias_Mes = new Date(
+      props.tipo == "personal"
+        ? mis_checadas.value[0].start.split("-")[0]
+        : list_Checadas_Personal.value[0].start.split("-")[0],
+      props.tipo == "personal"
+        ? mis_checadas.value[0].start.split("-")[1]
+        : list_Checadas_Personal.value[0].start.split("-")[1],
+      0
+    ).getDate();
     calendarOptions.value = {
       plugins: [dayGridPlugin, timeGridPlugin, interactionPlugin],
       headerToolbar: {
@@ -206,10 +143,6 @@ const buscar = async () => {
         list: "list",
       },
       initialView: "dayGridMonth",
-      initialDate:
-        props.tipo == "personal"
-          ? mis_checadas.value[0].start
-          : list_Checadas_Personal.value[0].start,
       events: props.tipo == "personal" ? mis_checadas : list_Checadas_Personal,
       editable: false,
       selectable: false,
@@ -223,29 +156,40 @@ const buscar = async () => {
           props.tipo == "personal"
             ? mis_checadas.value[0].start
             : list_Checadas_Personal.value[0].start,
-        end: `${año_Id.value}-${mes_Id.value.value}-${dias_Mes + 1}`,
+        end: `${
+          props.tipo == "personal"
+            ? mis_checadas.value[0].start.split("-")[0]
+            : list_Checadas_Personal.value[0].start.split("-")[0]
+        }-${
+          props.tipo == "personal"
+            ? mis_checadas.value[0].start.split("-")[1]
+            : list_Checadas_Personal.value[0].start.split("-")[1]
+        }-${dias_Mes + 1}`,
       },
     };
   }
+
   $q.loading.hide();
 };
 
 const getColor = (title) => {
-  if (title.includes("Retardo") || title.includes("Salida anticipada")) {
-    return "yellow";
-  } else if (title.includes("Entrada") || title.includes("Salida")) {
-    return "green-4";
-  } else if (title.includes("Falta")) {
-    return "red-5";
-  } else if (
-    title.includes("permiso") ||
-    title.includes("Pase") ||
-    title.includes("Comisión") ||
-    title.includes("Incapacidad")
-  ) {
-    return "primary";
-  } else {
-    return "orange";
+  if (title != "") {
+    if (title.includes("Retardo") || title.includes("Salida anticipada")) {
+      return "yellow";
+    } else if (title.includes("Entrada") || title.includes("Salida")) {
+      return "green-4";
+    } else if (title.includes("Falta")) {
+      return "red-5";
+    } else if (
+      title.includes("permiso") ||
+      title.includes("Pase") ||
+      title.includes("Comisión") ||
+      title.includes("Incapacidad")
+    ) {
+      return "primary";
+    } else {
+      return "orange";
+    }
   }
 };
 </script>

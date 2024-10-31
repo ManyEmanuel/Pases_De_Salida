@@ -898,19 +898,9 @@ const onSubmit = async () => {
       }
     }
     if (resp.success === true) {
-      $q.notify({
-        position: "top-right",
-        type: "positive",
-        message: "Se creo con exito",
-        actions: [
-          {
-            icon: "close",
-            color: "white",
-            round: true,
-            handler: () => {},
-          },
-        ],
-      });
+
+
+      
       await justificanteStore.loadJustificantes();
       actualizarModal(false);
     } else {

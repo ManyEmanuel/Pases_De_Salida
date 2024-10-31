@@ -1,8 +1,8 @@
 import { api } from "src/boot/axios";
 import { jsPDF } from "jspdf";
-import autoTable from "jspdf-autotable";
 import { storeToRefs } from "pinia";
 import { useJustificanteStore } from "src/stores/justificantes_store";
+import autoTable from "jspdf-autotable";
 
 const ValeJustificante = async () => {
   try {

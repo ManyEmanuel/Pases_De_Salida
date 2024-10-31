@@ -13,6 +13,36 @@
       </div>
     </div>
   </div>
+  <div class="row flex-center q-pt-lg">
+    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 q-pr-sm">
+      <q-select
+        filled
+        dense
+        color="purple-ieen"
+        v-model="año_Id"
+        :options="años"
+        label="Año"
+      />
+    </div>
+    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
+      <q-select
+        filled
+        dense
+        color="purple-ieen"
+        v-model="mes_Id"
+        :options="meses"
+        label="Mes"
+      />
+    </div>
+    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 q-pl-sm">
+      <q-btn
+        @click="cargarData"
+        color="purple-ieen"
+        label="Buscar"
+        icon-right="search"
+      />
+    </div>
+  </div>
   <CalendarPersonal :tipo="'personal'" />
 </template>
 
@@ -33,10 +63,35 @@ const currentYear = currentDate.value.getFullYear();
 const currentMonth = (currentDate.value.getMonth() + 1)
   .toString()
   .padStart(2, "0");
+const startYear = 2022;
+const año_Id = ref(currentYear);
+const años = ref([]);
+const mes_Id = ref(null);
+const meses = ref([
+  { value: "01", label: "Enero" },
+  { value: "02", label: "Febrero" },
+  { value: "03", label: "Marzo" },
+  { value: "04", label: "Abril" },
+  { value: "05", label: "Mayo" },
+  { value: "06", label: "Junio" },
+  { value: "07", label: "Julio" },
+  { value: "08", label: "Agosto" },
+  { value: "09", label: "Septiembre" },
+  { value: "10", label: "Octubre" },
+  { value: "11", label: "Noviembre" },
+  { value: "12", label: "Diciembre" },
+]);
 
 //-----------------------------------------------------------
 
 onBeforeMount(() => {
+  for (let year = startYear; year <= currentYear; year++) {
+    años.value.push(year);
+  }
+  if (mes_Id.value == null) {
+    let mesFiltrado = meses.value.find((x) => x.value == currentMonth);
+    mes_Id.value = mesFiltrado;
+  }
   cargarData();
 });
 
@@ -52,10 +107,14 @@ const cargarData = async () => {
     messageColor: "black",
   });
   mis_checadas.value = [];
-  let dias_Mes = new Date(currentYear, currentMonth, 0).getDate();
+  if (mes_Id.value == null) {
+    let mesFiltrado = meses.value.find((x) => x.value == currentMonth);
+    mes_Id.value = mesFiltrado;
+  }
+  let dias_Mes = new Date(año_Id.value, mes_Id.value.value, 0).getDate();
   await checada_store.load_mis_checadas(
-    `${currentYear}-${currentMonth}-01`,
-    `${currentYear}-${currentMonth}-${dias_Mes}`
+    `${año_Id.value}-${mes_Id.value.value}-01`,
+    `${año_Id.value}-${mes_Id.value.value}-${dias_Mes}`
   );
   $q.loading.hide();
 };
