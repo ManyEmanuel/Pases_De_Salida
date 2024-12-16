@@ -9,6 +9,9 @@ const ValeJustificante = async () => {
     const justificanteStore = useJustificanteStore();
     const { justificante, listaIncidencias } = storeToRefs(justificanteStore);
     const resp = await api.get(`/Empleados/GetResponsableByArea/${6}`);
+    await justificanteStore.loadResponsabeAreaByEmpleado(
+      justificante.value.solicitante_Id
+    );
     let { success, data } = resp.data;
     if (success) {
       justificante.value.responsable_Administracion = `${data.nombres}  ${data.apellido_Paterno} ${data.apellido_Materno}`;
@@ -45,7 +48,7 @@ const ValeJustificante = async () => {
     doc.setFont("helvetica", "bold");
     doc.text(`Folio:`, 170, 35, null, null, "right");
     doc.setFont("helvetica", "normal");
-    doc.text(`${justificante.value.folio}.`, 205, 35, null, null, "right");
+    doc.text(justificante.value.folio, 205, 35, null, null, "right");
     //--------------------------------------------------------------------------//
     doc.text(
       `Tepic, Nayarit a ${day} de ${monthNameLong} de ${year}.`,
@@ -76,12 +79,12 @@ const ValeJustificante = async () => {
     doc.setFont("helvetica", "normal");
     doc.setFontSize(10);
     doc.text("Nombre del solicitante:", 47, 80, null, null, "right");
-    doc.text(`${justificante.value.solicitante}`, 55, 80, null, null);
+    doc.text(justificante.value.solicitante, 55, 80, null, null);
     doc.setDrawColor(0, 0, 0);
     doc.line(50, 81, 205, 81);
     //--------------------------------------------------------------------------//
     doc.text("Área de adscripción:", 47, 90, null, null, "right");
-    doc.text(`${justificante.value.area}`, 55, 90, null, null);
+    doc.text(justificante.value.area, 55, 90, null, null);
     doc.line(50, 91, 205, 91);
     //--------------------------------------------------------------------------//
     doc.setFillColor(134, 51, 153);
@@ -151,17 +154,10 @@ const ValeJustificante = async () => {
     //--------------------------------------------------------------------------//
     doc.setFont("helvetica", "normal");
     doc.setDrawColor(0, 0, 0);
-    doc.text(
-      `${justificante.value.solicitante}`,
-      50,
-      229,
-      null,
-      null,
-      "center"
-    );
+    doc.text(justificante.value.solicitante, 50, 229, null, null, "center");
     doc.line(10, 230, 90, 230);
     doc.text(
-      `${justificante.value.puesto_Solicitante}`,
+      justificante.value.puesto_Solicitante,
       50,
       235,
       null,
@@ -172,7 +168,7 @@ const ValeJustificante = async () => {
     //--------------------------------------------------------------------------//
     doc.line(125, 230, 205, 230);
     doc.text(
-      `${justificante.value.responsable_Area}`,
+      justificante.value.responsable_Area,
       165,
       229,
       null,
@@ -180,7 +176,7 @@ const ValeJustificante = async () => {
       "center"
     );
     doc.text(
-      `${justificante.value.puesto_Responsable_Area}`,
+      justificante.value.puesto_Responsable_Area,
       165,
       235,
       null,
@@ -191,7 +187,7 @@ const ValeJustificante = async () => {
     //--------------------------------------------------------------------------//
     doc.line(70, 260, 145, 260);
     doc.text(
-      `${justificante.value.recursos_Humanos}`,
+      justificante.value.recursos_Humanos,
       108,
       259,
       null,
@@ -199,7 +195,7 @@ const ValeJustificante = async () => {
       "center"
     );
     doc.text(
-      `${justificante.value.puesto_Recursos_Humanos}`,
+      justificante.value.puesto_Recursos_Humanos,
       108,
       265,
       null,
@@ -256,6 +252,7 @@ const ValeJustificante = async () => {
 
     footer();
     doc.save(`Justificante-${justificante.value.solicitante}` + ".pdf");
+
     return {
       success: true,
       msj: "Recibo generado con éxito",

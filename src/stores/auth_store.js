@@ -60,7 +60,7 @@ export const useAuthStore = defineStore("auth", {
       try {
         const resp = await api.get(`/Empleados/ByUsuario`);
         if (resp.status == 200) {
-          const { success, data } = resp.data;
+          const { success, data } = resp.data; 
           if (success === true) {
             if (data) {
               encryptStorage.encrypt("empleado", data.id);

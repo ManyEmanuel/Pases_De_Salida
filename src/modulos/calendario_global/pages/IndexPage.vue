@@ -14,106 +14,6 @@
         </div>
       </div>
     </div>
-    <div
-      class="row q-pr-lg q-pl-lg q-pt-lg"
-      style="max-width: 1500px; margin: 0 auto"
-      v-if="tab == 'general'"
-    >
-      <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 text-center">
-        <b>Buscar por: </b>
-        <q-btn-toggle
-          v-model="buscar_Por"
-          style="border: 1px solid #673e84"
-          no-caps
-          unelevated
-          toggle-color="purple-ieen"
-          color="white"
-          text-color="purple-ieen"
-          :options="[
-            { label: 'Mes', value: 'mes' },
-            { label: 'Rango de fecha', value: 'rango' },
-          ]"
-        />
-      </div>
-      <div
-        v-if="buscar_Por == 'rango'"
-        class="col-lg-4 col-md-4 col-sm-6 col-xs-12"
-      >
-        <q-input
-          v-model="fechas_texto"
-          label="Rango de fechas"
-          lazy-rules
-          color="purple-ieen"
-        >
-          <template v-slot:prepend>
-            <q-icon name="event" color="purple-ieen" class="cursor-pointer">
-              <q-popup-proxy
-                cover
-                transition-show="scale"
-                transition-hide="scale"
-              >
-                <q-date
-                  color="purple-ieen"
-                  v-model="fechas"
-                  range
-                  :options="FiltroFecha"
-                  :locale="myLocale"
-                />
-              </q-popup-proxy>
-            </q-icon>
-          </template>
-          <!-- <template v-slot:after>
-            <q-btn
-              label="Buscar"
-              color="purple-ieen"
-              icon-right="search"
-              @click="cargar_checadas"
-            />
-          </template> -->
-        </q-input>
-      </div>
-      <div
-        v-if="buscar_Por == 'mes'"
-        class="col-lg-2 col-md-2 col-sm-2 col-xs-12 q-pr-sm"
-      >
-        <q-select
-          color="purple-ieen"
-          v-model="año_Id"
-          :options="años"
-          label="Año"
-        />
-      </div>
-      <div
-        v-if="buscar_Por == 'mes'"
-        class="col-lg-2 col-md-2 col-sm-2 col-xs-12"
-      >
-        <q-select
-          color="purple-ieen"
-          v-model="mes_Id"
-          :options="meses"
-          label="Mes"
-        />
-      </div>
-      <!-- <div
-        v-if="buscar_Por == 'mes'"
-        class="col-lg-2 col-md-2 col-sm-2 col-xs-12"
-      >
-        <q-btn
-          icon-right="search"
-          color="purple-ieen"
-          label="Buscar"
-          @click="buscar"
-        />
-      </div> -->
-      <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 text-right q-pt-sm">
-        <q-btn
-          icon="download"
-          color="purple-ieen"
-          label="Excel"
-          @click="obtenerExcel"
-        />
-      </div>
-    </div>
     <br />
     <q-card class="q-ml-lg q-mr-lg">
       <q-tabs
@@ -129,6 +29,104 @@
       <q-separator />
       <q-tab-panels v-model="tab" animated>
         <q-tab-panel name="general">
+          <div
+            class="row q-pr-lg q-pl-lg q-pt-lg"
+            style="max-width: 1500px; margin: 0 auto"
+            v-if="tab == 'general'"
+          >
+            <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+              <b class="text-grey-8">Buscar por: </b>
+              <q-btn-toggle
+                v-model="buscar_Por"
+                style="border: 1px solid #673e84"
+                no-caps
+                unelevated
+                toggle-color="purple-ieen"
+                color="white"
+                text-color="purple-ieen"
+                :options="[
+                  { label: 'Mes', value: 'mes' },
+                  { label: 'Rango de fecha', value: 'rango' },
+                ]"
+              />
+            </div>
+            <div
+              v-if="buscar_Por == 'rango'"
+              class="col-lg-4 col-md-4 col-sm-6 col-xs-12"
+            >
+              <q-input
+                dense
+                v-model="fechas_texto"
+                label="Rango de fechas"
+                lazy-rules
+                color="purple-ieen"
+              >
+                <template v-slot:prepend>
+                  <q-icon
+                    name="event"
+                    color="purple-ieen"
+                    class="cursor-pointer"
+                  >
+                    <q-popup-proxy
+                      cover
+                      transition-show="scale"
+                      transition-hide="scale"
+                    >
+                      <q-date
+                        color="purple-ieen"
+                        v-model="fechas"
+                        range
+                        :options="FiltroFecha"
+                        :locale="myLocale"
+                      />
+                    </q-popup-proxy>
+                  </q-icon>
+                </template>
+                <!-- <template v-slot:after>
+            <q-btn
+              label="Buscar"
+              color="purple-ieen"
+              icon-right="search"
+              @click="cargar_checadas"
+            />
+          </template> -->
+              </q-input>
+            </div>
+            <div
+              v-if="buscar_Por == 'mes'"
+              class="col-lg-2 col-md-2 col-sm-2 col-xs-12 q-pr-sm"
+            >
+              <q-select
+                dense
+                color="purple-ieen"
+                v-model="año_Id"
+                :options="años"
+                label="Año"
+              />
+            </div>
+            <div
+              v-if="buscar_Por == 'mes'"
+              class="col-lg-2 col-md-2 col-sm-2 col-xs-12"
+            >
+              <q-select
+                dense
+                color="purple-ieen"
+                v-model="mes_Id"
+                :options="meses"
+                label="Mes"
+              />
+            </div>
+            <div
+              class="col-lg-2 col-md-2 col-sm-2 col-xs-12 text-right q-pt-sm"
+            >
+              <q-btn
+                icon="download"
+                color="purple-ieen"
+                label="Excel"
+                @click="obtenerExcel"
+              />
+            </div>
+          </div>
           <SchedulerResourceCalendar
             v-if="empleados.length > 0 && checadas.length > 0"
             :resources="empleados"
@@ -157,7 +155,6 @@
               class="col-lg-3 col-md-4 col-sm-12 col-xs-12 q-pr-xs"
             >
               <q-select
-                filled
                 dense
                 color="purple-ieen"
                 v-model="area_Id"
@@ -170,7 +167,6 @@
             </div>
             <div class="col-lg-3 col-md-4 col-sm-12 col-xs-12 q-pr-xs">
               <q-select
-                filled
                 dense
                 color="purple-ieen"
                 v-model="personal_Id"
@@ -183,7 +179,6 @@
             </div>
             <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 q-pr-sm">
               <q-select
-                filled
                 dense
                 color="purple-ieen"
                 v-model="año_Personal"
@@ -193,7 +188,6 @@
             </div>
             <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 q-pr-sm">
               <q-select
-                filled
                 dense
                 color="purple-ieen"
                 v-model="mes_Personal"
@@ -220,11 +214,11 @@
 </template>
 
 <script setup>
+import { storeToRefs } from "pinia";
+import { EncryptStorage } from "storage-encryption";
+import { useChecadaStore } from "../../../stores/checadas_store";
 import { useQuasar, QSpinnerFacebook } from "quasar";
 import { onBeforeMount, ref, watch, watchEffect } from "vue";
-import { storeToRefs } from "pinia";
-import { useChecadaStore } from "../../../stores/checadas_store";
-import { EncryptStorage } from "storage-encryption";
 import SchedulerResourceCalendar from "../components/SchedulerResourceCalendar.vue";
 import * as XLSX from "xlsx";
 import CalendarioPersonal from "../../calendario/components/CalendarPersonal.vue";
@@ -366,14 +360,7 @@ watch(area_Id, (val) => {
 //-----------------------------------------------------------
 
 const cargarData = async () => {
-  $q.loading.show({
-    spinner: QSpinnerFacebook,
-    spinnerColor: "purple-ieen",
-    spinnerSize: 140,
-    backgroundColor: "purple-3",
-    message: "Espere un momento, por favor...",
-    messageColor: "black",
-  });
+  loading();
   await checador_store.load_Areas();
   if (!area_Administracion.value && !perfilSA.value) {
     cargarEmpleadosByArea(encryptStorage.decrypt("area_Id"));
@@ -381,7 +368,7 @@ const cargarData = async () => {
   $q.loading.hide();
 };
 
-const cargarChecadorPersonal = async () => {
+const loading = () => {
   $q.loading.show({
     spinner: QSpinnerFacebook,
     spinnerColor: "purple-ieen",
@@ -390,6 +377,10 @@ const cargarChecadorPersonal = async () => {
     message: "Espere un momento, por favor...",
     messageColor: "black",
   });
+};
+
+const cargarChecadorPersonal = async () => {
+  loading();
   list_Checadas_Personal.value = [];
   let dias_Mes = new Date(
     año_Personal.value,
@@ -405,14 +396,7 @@ const cargarChecadorPersonal = async () => {
 };
 
 const cargarEmpleadosByArea = async (id) => {
-  $q.loading.show({
-    spinner: QSpinnerFacebook,
-    spinnerColor: "purple-ieen",
-    spinnerSize: 140,
-    backgroundColor: "purple-3",
-    message: "Espere un momento, por favor...",
-    messageColor: "black",
-  });
+  loading();
   await checador_store.load_Personal_ByArea(id);
   $q.loading.hide();
 };
@@ -433,14 +417,7 @@ function getDaysInMonth(year, month) {
 }
 
 const buscar = async () => {
-  $q.loading.show({
-    spinner: QSpinnerFacebook,
-    spinnerColor: "purple-ieen",
-    spinnerSize: 140,
-    backgroundColor: "purple-3",
-    message: "Espere un momento, por favor...",
-    messageColor: "black",
-  });
+  loading();
   const year = parseInt(año_Id.value, 10);
   const month = parseInt(mes_Id.value.value, 10) - 1;
   const daysInMonth = getDaysInMonth(year, month);
@@ -464,14 +441,7 @@ const FiltroFecha = (fechha) => {
 };
 
 const load_empleados = async () => {
-  $q.loading.show({
-    spinner: QSpinnerFacebook,
-    spinnerColor: "purple-ieen",
-    spinnerSize: 140,
-    backgroundColor: "purple-3",
-    message: "Espere un momento, por favor...",
-    messageColor: "black",
-  });
+  loading();
   let currentDate = ref(new Date());
   let day = currentDate.value.getDate().toString().padStart(2, "0");
   await checador_store.load_empleados_calendario();
@@ -483,14 +453,7 @@ const load_empleados = async () => {
 };
 
 const cargar_checadas = async () => {
-  $q.loading.show({
-    spinner: QSpinnerFacebook,
-    spinnerColor: "purple-ieen",
-    spinnerSize: 140,
-    backgroundColor: "purple-3",
-    message: "Espere un momento, por favor...",
-    messageColor: "black",
-  });
+  loading();
   await checador_store.load_checadas(fechas.value.from, fechas.value.to);
   $q.loading.hide();
 };

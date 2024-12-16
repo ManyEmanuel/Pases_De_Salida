@@ -16,7 +16,6 @@
   <div class="row flex-center q-pt-lg">
     <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 q-pr-sm">
       <q-select
-        filled
         dense
         color="purple-ieen"
         v-model="año_Id"
@@ -26,7 +25,6 @@
     </div>
     <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
       <q-select
-        filled
         dense
         color="purple-ieen"
         v-model="mes_Id"

@@ -205,19 +205,13 @@ watch(cargar, (val) => {
 //-----------------------------------------------------------
 
 const leerPermisos = async () => {
-  $q.loading.show({
-    spinner: QSpinnerFacebook,
-    spinnerColor: "purple-ieen",
-    spinnerSize: 140,
-    backgroundColor: "purple-3",
-    message: "Espere un momento, por favor...",
-    messageColor: "black",
-  });
+  loading();
   await authStore.loadModulo(siglas);
   $q.loading.hide();
 };
 
 const cargarData = async () => {
+  loading();
   for (let yearLit = startYear; yearLit <= year.value; yearLit++) {
     años.value.push(yearLit);
   }
@@ -231,9 +225,10 @@ const cargarData = async () => {
     let yearSolicitud = element.fecha_Creacion.split(" ")[0].split("/")[2];
     return yearSolicitud == year.value;
   });
+  $q.loading.hide();
 };
 
-const buscar = async () => {
+const loading = () => {
   $q.loading.show({
     spinner: QSpinnerFacebook,
     spinnerColor: "purple-ieen",
@@ -242,6 +237,10 @@ const buscar = async () => {
     message: "Espere un momento, por favor...",
     messageColor: "black",
   });
+};
+
+const buscar = async () => {
+  loading();
   if (buscar_Por.value == "año") {
     historial_Filtrado.value = historial.value.filter((element) => {
       let yearSolicitud = element.fecha_Creacion.split(" ")[0].split("/")[2];
@@ -288,14 +287,7 @@ const buscar = async () => {
 };
 
 const descargarExcel = async () => {
-  $q.loading.show({
-    spinner: QSpinnerFacebook,
-    spinnerColor: "purple-ieen",
-    spinnerSize: 140,
-    backgroundColor: "purple-3",
-    message: "Espere un momento, por favor...",
-    messageColor: "black",
-  });
+  loading();
   await solicitudJustificanteStore.downloadExcel();
   const link = document.createElement("a");
   link.href = solicitudJustificanteStore.documentoExcel;

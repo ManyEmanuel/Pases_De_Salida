@@ -352,7 +352,11 @@ export const useJustificanteStore = defineStore("justificante", {
       try {
         let perfil = parseInt(encryptStorage.decrypt("perfil"));
         let area = parseInt(encryptStorage.decrypt("area"));
-        let resp = await api.get("/ResponsablesAreas/ResposableByUsuario");
+        let resp = await api.get(
+          `/Empleados/GetResponsableByEmpleado/${encryptStorage.decrypt(
+            "empleado"
+          )}`
+        );
         let dataResp = resp.data.data;
         if (perfil == 1) {
           let respArea = await api.get("/Areas/GetLista");
@@ -377,8 +381,8 @@ export const useJustificanteStore = defineStore("justificante", {
           this.areas = listAreas;
           this.justificante.area_Id = data.area_Id;
           this.justificante.area = data.area;
-          this.justificante.responsable_Area_Id = dataResp.empleado_Id;
-          this.justificante.responsable_Area = dataResp.empleado;
+          this.justificante.responsable_Area_Id = dataResp.id;
+          this.justificante.responsable_Area = `${dataResp.nombres} ${dataResp.apellido_Paterno} ${dataResp.apellido_Materno}`;
           this.justificante.puesto_Responsable_Area_Id = dataResp.puesto_Id;
         } else if (perfil == 3) {
           this.listEmpleados = [];

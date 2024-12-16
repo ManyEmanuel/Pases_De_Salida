@@ -423,7 +423,7 @@ watch(days, (val) => {
 //-----------------------------------------------------------
 
 const cargarData = async () => {
-  await justificanteStore.loadInformacionJustificante();
+  //await justificanteStore.loadInformacionJustificante();
   await justificanteStore.loadCapturista();
 };
 
@@ -898,9 +898,6 @@ const onSubmit = async () => {
       }
     }
     if (resp.success === true) {
-
-
-      
       await justificanteStore.loadJustificantes();
       actualizarModal(false);
     } else {
