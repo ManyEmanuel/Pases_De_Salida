@@ -134,6 +134,7 @@
         :rows-per-page-options="[5, 10, 15, 20, 25, 50]"
         no-data-label="No hay registros"
         :visible-columns="visible_Columns"
+        class="my-sticky-column-table"
       >
         <template v-slot:top-right>
           <q-input
@@ -699,3 +700,18 @@ const pagination = ref({
 });
 const filter = ref("");
 </script>
+<style lang="sass">
+.my-sticky-column-table
+
+  thead tr:first-child th:first-child
+    background-color: #ffff
+
+  td:first-child
+    background-color: #ffff
+
+  th:first-child,
+  td:first-child
+    position: sticky
+    left: 0
+    z-index: 1
+</style>

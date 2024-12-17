@@ -9,6 +9,8 @@ export const useNotificacionStore = defineStore("Notificaciones", {
   }),
 
   actions: {
+    //---------------------------------------------------------------
+    //LEER NOTIFICACIONES
     async loadNotificaciones() {
       try {
         const resp = await api.get("/NotificacionesUniverso");
@@ -55,6 +57,8 @@ export const useNotificacionStore = defineStore("Notificaciones", {
       }
     },
 
+    //---------------------------------------------------------------
+    //LEER TODAS
     async loadNotificacionesAll() {
       try {
         const resp = await api.get("/NotificacionesUniverso/GetAll");
@@ -93,6 +97,8 @@ export const useNotificacionStore = defineStore("Notificaciones", {
       }
     },
 
+    //---------------------------------------------------------------
+    //LEER NOTIFICACION
     async leerNotificacion(id) {
       try {
         const resp = await api.get(`/NotificacionesUniverso/Leer/${id}`);
@@ -113,9 +119,33 @@ export const useNotificacionStore = defineStore("Notificaciones", {
       }
     },
 
+    //---------------------------------------------------------------
+    //LEER TODAS
     async leerTodas() {
       try {
         const resp = await api.get("/NotificacionesUniverso/LeerTodas");
+        if (resp.status == 200) {
+          const { success, data } = resp.data;
+          return { success, data };
+        } else {
+          return {
+            success: false,
+            data: "Ocurrió un error, inténtelo de nuevo. Si el error persiste, contacte a soporte",
+          };
+        }
+      } catch (error) {
+        return {
+          success: false,
+          data: "Ocurrió un error, inténtelo de nuevo. Si el error persiste, contacte a soporte",
+        };
+      }
+    },
+
+    //---------------------------------------------------------------
+    //NO LEER NOTIFICACION
+    async noLeer(id) {
+      try {
+        const resp = await api.get(`/NotificacionesUniverso/NoLeida/${id}`);
         if (resp.status == 200) {
           const { success, data } = resp.data;
           return { success, data };

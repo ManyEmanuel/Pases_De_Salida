@@ -34,21 +34,21 @@
           ]"
         />
       </div>
-      <div  v-if="buscar_Por == 'año'" class="col-lg-2 col-md-2 col-sm-3 col-xs-6">
+      <div
+        v-if="buscar_Por == 'año'"
+        class="col-lg-2 col-md-2 col-sm-3 col-xs-6"
+      >
         <q-select
-
-        filled
-        dense
-        color="purple-ieen"
-        v-model="year"
-        :options="años"
-        label="Año"
-      />
+          filled
+          dense
+          color="purple-ieen"
+          v-model="year"
+          :options="años"
+          label="Año"
+        />
       </div>
-      <div  v-else class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
-
+      <div v-else class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
         <q-input
-
           dense
           color="purple-ieen"
           filled
@@ -383,19 +383,13 @@ watch(cargar, (val) => {
 //-----------------------------------------------------------
 
 const leerPermisos = async () => {
-  $q.loading.show({
-    spinner: QSpinnerFacebook,
-    spinnerColor: "purple-ieen",
-    spinnerSize: 140,
-    backgroundColor: "purple-3",
-    message: "Espere un momento, por favor...",
-    messageColor: "black",
-  });
+  loading();
   await authStore.loadModulo(siglas);
   $q.loading.hide();
 };
 
 const cargarData = async () => {
+  loading();
   for (let yearLit = startYear; yearLit <= year.value; yearLit++) {
     años.value.push(yearLit);
   }
@@ -409,9 +403,10 @@ const cargarData = async () => {
     let yearSolicitud = element.fechaSolicitud.split("-")[2];
     return yearSolicitud == year.value;
   });
+  $q.loading.hide();
 };
 
-const buscar = async () => {
+const loading = () => {
   $q.loading.show({
     spinner: QSpinnerFacebook,
     spinnerColor: "purple-ieen",
@@ -420,6 +415,10 @@ const buscar = async () => {
     message: "Espere un momento, por favor...",
     messageColor: "black",
   });
+};
+
+const buscar = async () => {
+  loading();
   if (buscar_Por.value == "año") {
     historial_Filtrado.value = historial.value.filter((element) => {
       let yearSolicitud = element.fechaSolicitud.split("-")[2];

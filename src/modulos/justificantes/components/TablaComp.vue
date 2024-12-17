@@ -90,7 +90,6 @@
                           <q-tooltip>Ver justificante</q-tooltip>
                         </q-btn>
                         <q-btn
-                          :disable="activar_pdf"
                           v-show="
                             modulo.leer && props.row.estatus == 'Aprobado'
                           "
@@ -174,7 +173,6 @@
                     <q-tooltip>Ver justificante</q-tooltip>
                   </q-btn>
                   <q-btn
-                    :disable="activar_pdf"
                     v-show="modulo.leer && props.row.estatus == 'Aprobado'"
                     flat
                     round
@@ -273,7 +271,6 @@ const authStore = useAuthStore();
 const justificanteStore = useJustificanteStore();
 const { justificantes } = storeToRefs(justificanteStore);
 const { modulo } = storeToRefs(authStore);
-const activar_pdf = ref(false);
 
 //-----------------------------------------------------------
 
@@ -284,6 +281,12 @@ onBeforeMount(() => {
 //-----------------------------------------------------------
 
 const cargarData = async () => {
+  loading();
+  await justificanteStore.loadJustificantes();
+  $q.loading.hide();
+};
+
+const loading = () => {
   $q.loading.show({
     spinner: QSpinnerFacebook,
     spinnerColor: "purple-ieen",
@@ -292,8 +295,6 @@ const cargarData = async () => {
     message: "Espere un momento, por favor...",
     messageColor: "black",
   });
-  await justificanteStore.loadJustificantes();
-  $q.loading.hide();
 };
 
 const cancelar = async (id) => {
@@ -309,14 +310,7 @@ const cancelar = async (id) => {
     cancelButtonColor: "#f44336",
   }).them(async (result) => {
     if (result.isConfirmed) {
-      $q.loading.show({
-        spinner: QSpinnerFacebook,
-        spinnerColor: "purple-ieen",
-        spinnerSize: 140,
-        backgroundColor: "purple-3",
-        message: "Espere un momento, por favor...",
-        messageColor: "black",
-      });
+      loading();
       const resp = await justificanteStore.cancelarJustificante(id);
       if (resp.success) {
         $q.loading.hide();
@@ -341,14 +335,7 @@ const cancelar = async (id) => {
 };
 
 const editar = async (id) => {
-  $q.loading.show({
-    spinner: QSpinnerFacebook,
-    spinnerColor: "purple-ieen",
-    spinnerSize: 140,
-    backgroundColor: "purple-3",
-    message: "Espere un momento, por favor...",
-    messageColor: "black",
-  });
+  loading();
   await justificanteStore.loadJustificante(id);
   await justificanteStore.loadDetalleJustificantes(id);
   justificanteStore.actualizarModal(true);
@@ -358,14 +345,7 @@ const editar = async (id) => {
 };
 
 const visualizar = async (id) => {
-  $q.loading.show({
-    spinner: QSpinnerFacebook,
-    spinnerColor: "purple-ieen",
-    spinnerSize: 140,
-    backgroundColor: "purple-3",
-    message: "Espere un momento, por favor...",
-    messageColor: "black",
-  });
+  loading();
   await justificanteStore.loadJustificante(id);
   await justificanteStore.loadDetalleJustificantes(id);
   justificanteStore.actualizarModal(true);
@@ -375,24 +355,12 @@ const visualizar = async (id) => {
 };
 
 const imprimir = async (id) => {
+  loading();
   let resp = null;
-  $q.loading.show({
-    spinner: QSpinnerFacebook,
-    spinnerColor: "purple-ieen",
-    spinnerSize: 140,
-    backgroundColor: "purple-3",
-    message: "Espere un momento, por favor...",
-    messageColor: "black",
-  });
   resp = await justificanteStore.loadJustificante(id);
   await justificanteStore.loadDetalleJustificantes(id);
   if (resp.success === true) {
     ValeJustificante();
-    activar_pdf.value = true;
-    setTimeout(() => {
-      activar_pdf.value = false;
-      justificanteStore.initJustificante();
-    }, 2000);
   }
   $q.loading.hide();
 };

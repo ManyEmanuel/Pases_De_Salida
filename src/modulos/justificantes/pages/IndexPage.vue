@@ -36,10 +36,10 @@
 
 <script setup>
 import { storeToRefs } from "pinia";
-import { useQuasar, QSpinnerFacebook } from "quasar";
-import { useJustificanteStore } from "src/stores/justificantes_store";
-import { onBeforeMount } from "vue";
 import { useAuthStore } from "../../../stores/auth_store";
+import { onBeforeMount } from "vue";
+import { useJustificanteStore } from "src/stores/justificantes_store";
+import { useQuasar, QSpinnerFacebook } from "quasar";
 import ModalCompVue from "../components/ModalComp.vue";
 import TablaComp from "../components/TablaComp.vue";
 
@@ -60,19 +60,12 @@ onBeforeMount(() => {
 //-----------------------------------------------------------
 
 const leerPermisos = async () => {
-  $q.loading.show({
-    spinner: QSpinnerFacebook,
-    spinnerColor: "purple-ieen",
-    spinnerSize: 140,
-    backgroundColor: "purple-3",
-    message: "Espere un momento, por favor...",
-    messageColor: "black",
-  });
+  loading();
   await authStore.loadModulo(siglas);
   $q.loading.hide();
 };
 
-const actualizarModal = async (valor) => {
+const loading = () => {
   $q.loading.show({
     spinner: QSpinnerFacebook,
     spinnerColor: "purple-ieen",
@@ -81,8 +74,13 @@ const actualizarModal = async (valor) => {
     message: "Espere un momento, por favor...",
     messageColor: "black",
   });
-  await justificanteStore.loadInformacionJustificante();
+};
+
+const actualizarModal = async (valor) => {
+  loading();
+  justificanteStore.initJustificante();
   justificanteStore.actualizarModal(valor);
+  await justificanteStore.loadInformacionJustificante();
   $q.loading.hide();
 };
 </script>
