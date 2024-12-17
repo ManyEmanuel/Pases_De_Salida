@@ -41,16 +41,18 @@
             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
               <q-input
                 v-if="isPersonal || isVisualizar"
-                disable
+                readonly
                 v-model="justificante.area"
                 label="Área"
                 color="purple-ieen"
               >
-                <template v-slot:prepend> <q-icon name="apartment" /> </template
-              ></q-input>
+                <template v-slot:prepend>
+                  <q-icon name="apartment" />
+                </template>
+              </q-input>
               <q-select
                 v-else
-                :disable="isAdmi || isEditar"
+                :readonly="isAdmi || isEditar"
                 v-model="area_Id"
                 :options="areas"
                 label="Área del empleado"
@@ -66,8 +68,8 @@
             </div>
             <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
               <q-select
-                v-if="!isVisualizar"
-                :disable="isEditar || isPersonal"
+                v-if="!isVisualizar && !isEditar"
+                :readonly="isEditar || isPersonal"
                 stack-label
                 color="purple-ieen"
                 v-model="empleado_Id"
@@ -83,7 +85,7 @@
               </q-select>
               <q-input
                 v-else
-                disable
+                readonly
                 v-model="justificante.solicitante"
                 label="Solicitante"
                 color="purple-ieen"
@@ -96,7 +98,7 @@
             <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
               <q-input
                 color="purple-ieen"
-                disable
+                readonly
                 v-model="justificante.responsable_Area"
                 label="Personal que autoriza"
               >
@@ -159,12 +161,7 @@
                   : 'col-lg-5 col-md-5 col-sm-5 col-xs-10 '
               "
             >
-              <q-input
-                color="purple-ieen"
-                label="Fecha"
-                v-model="days"
-                disable
-              />
+              <q-input disable color="purple-ieen" v-model="days" />
               <div
                 class="text-body2 q-pt-md text-bold"
                 v-show="tipo == 'Vacaciones' || tipo == 'Permiso día económico'"
@@ -176,19 +173,11 @@
                 }}
               </div>
             </div>
-            <div
-              v-if="!isVisualizar"
-              :class="
-                tipo == 'Vacaciones'
-                  ? 'col-1'
-                  : 'col-lg-1 col-md-1 col-sm-1 col-xs-2 q-pt-sm'
-              "
-            >
-              <q-btn
-                flat
-                icon="event"
+            <div class="col-1 text-center q-pt-md">
+              <q-icon
                 size="lg"
                 color="purple-ieen"
+                name="event"
                 class="cursor-pointer"
               >
                 <q-popup-proxy
@@ -201,27 +190,23 @@
                       tipo == 'Omisión de entrada' ||
                       tipo == 'Omisión de salida'
                     "
-                    color="purple"
+                    :locale="myLocale"
                     v-model="days"
                     multiple
-                    :locale="myLocale"
                     :options="filtroFecha"
+                    color="purple"
                   >
                     <div class="row items-center justify-end">
-                      <q-btn
-                        v-close-popup
-                        label="Cerrar"
-                        color="black"
-                        flat
-                      /></div
-                  ></q-date>
+                      <q-btn v-close-popup label="Close" color="primary" flat />
+                    </div>
+                  </q-date>
                   <q-date
                     v-else
                     color="purple"
                     v-model="days"
                     multiple
                     :locale="myLocale"
-                    @click="validateDates"
+                    @update:model-value="validateDates"
                   >
                     <div class="row items-center justify-end">
                       <q-btn
@@ -232,7 +217,7 @@
                       /></div
                   ></q-date>
                 </q-popup-proxy>
-              </q-btn>
+              </q-icon>
             </div>
           </div>
           <div v-if="tipo == 'Otros'" class="text-caption text-red">
@@ -323,6 +308,7 @@ const tipoJustificante = ref([
   "Comisión oficial",
   "Permuta por día laborado",
   "Otros",
+  "Vacaciones",
 ]);
 const years = ref([2023, 2024]);
 const year = ref(2024);
@@ -368,7 +354,7 @@ watch(area_Id, (val) => {
 watch(tipo, (val) => {
   if (val != null) {
     days.value = [];
-
+    vacacionesFijo.value = false;
     diasRestantes();
   }
 });
@@ -515,18 +501,11 @@ const getTiposJustificantesByEmpleado = async (val) => {
       tipoJustificante.value.push("Permiso día económico");
     }
   }
-  if (
-    dias_restantes.value.primer_Periodo != 0 ||
-    dias_restantes.value.segundo_Periodo != 0
-  ) {
-    if (!tipoJustificante.value.includes("Vacaciones")) {
-      tipoJustificante.value.push("Vacaciones");
-    }
-  }
+
   limpiarCampos();
 };
 
-const validateDates = () => {
+const validateDates = (newValue) => {
   if (days.value != null) {
     if (tipo.value == "Permiso día económico") {
       if (days.value.length > dias_restantes.value.dias_Economicos) {
@@ -538,11 +517,21 @@ const validateDates = () => {
           days.value = days.value.slice(0, dias_restantes.value.primer_Periodo);
         }
       } else if (periodoVacacional.value.value == 2) {
-        if (days.value.length > dias_restantes.value.segundo_Periodo) {
-          days.value = days.value.slice(
-            0,
-            dias_restantes.value.segundo_Periodo
-          );
+        if (configuracion.value[0].tipo_Segundo_Periodo == "Fijo") {
+          let maxDays =
+            configuracion.value[0].fechas_Segundo_Periodo.split(",").length;
+          if (newValue.length > maxDays) {
+            days.value = newValue.slice(0, maxDays);
+          } else {
+            days.value = newValue;
+          }
+        } else {
+          let maxDays = configuracion.value[0].dias_Segundo_Periodo;
+          if (newValue.length > maxDays) {
+            days.value = newValue.slice(0, maxDays);
+          } else {
+            days.value = newValue;
+          }
         }
       }
     }
