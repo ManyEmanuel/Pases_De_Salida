@@ -280,7 +280,7 @@
 import { storeToRefs } from "pinia";
 import { useQuasar, date, QSpinnerFacebook } from "quasar";
 import { useJustificanteStore } from "src/stores/justificantes_store";
-import { onBeforeMount, ref, watch } from "vue";
+import { onBeforeMount, onMounted, ref, watch } from "vue";
 import TablaConceptos from "./TablaConceptos.vue";
 
 //-----------------------------------------------------------
@@ -310,8 +310,8 @@ const tipoJustificante = ref([
   "Otros",
   "Vacaciones",
 ]);
-const years = ref([2023, 2024]);
-const year = ref(2024);
+const years = ref();
+const year = ref(new Date().getFullYear());
 const days = ref([]);
 const periodos_Vacacionales = ref([
   { value: 1, label: "Primer periodo" },
@@ -332,6 +332,10 @@ const vacacionesFijo = ref(false);
 
 onBeforeMount(() => {
   cargarData();
+});
+
+onMounted(() => {
+  cargarAños();
 });
 
 //-----------------------------------------------------------
@@ -415,6 +419,16 @@ const cargarData = async () => {
 
 const cargarPersonalArea = async (val) => {
   await justificanteStore.loadPersonalArea(val.value, false);
+};
+
+const cargarAños = async () => {
+  let anioActual = new Date().getFullYear();
+  let listaAnio = [];
+  for (let i = 2023; i <= anioActual; i++) {
+    listaAnio.push(i);
+  }
+  years.value = listaAnio;
+  console.log();
 };
 
 const cargarArea = async (val) => {
